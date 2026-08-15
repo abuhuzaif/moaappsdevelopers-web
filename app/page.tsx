@@ -62,11 +62,12 @@ export default function HomePage() {
       <section className="hero">
         <div className="container">
           <h1>
-            Apps built for <span className="gold">Saudi Arabia</span>
+            Apps & Tools Built to <span className="gold">Make Life Easier</span>
           </h1>
           <p>
-            We design and build mobile apps for Saudi Arabia&apos;s community —
-            from classifieds to Islamic tools. Explore what we&apos;ve shipped so far.
+            We design and build mobile apps and digital tools that help people around the
+            world — from community marketplaces to everyday essentials. Explore what
+            we&apos;ve shipped so far.
           </p>
           <LiveStats />
         </div>

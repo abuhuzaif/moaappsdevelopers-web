@@ -292,8 +292,12 @@ export default function KsaConnectPage() {
                         <div className="listing-image" />
                       )}
                       {l.createdAt && <span className="date-badge">{timeAgo(l.createdAt)}</span>}
+                      <button className="heart-btn" aria-label="Save listing" title="Save (visual only for now)">
+                        🤍
+                      </button>
                     </div>
                     <div className="listing-body">
+                      <p className="listing-category-tag">{l.category}</p>
                       <p className="listing-title">{l.title}</p>
                       <p className="listing-price">{formattedPrice(l)}</p>
                       <p className="listing-location">
