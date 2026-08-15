@@ -6,16 +6,18 @@ import { db } from "@/lib/firebase";
 import { Listing, formattedPrice } from "@/lib/types";
 import { timeAgo } from "@/lib/timeago";
 
-const CITIES = ["All", "Riyadh", "Jeddah", "Dammam", "Khobar", "Jubail", "Yanbu", "Madinah"];
-const CATEGORIES = ["All", "Housing", "Car", "Household", "Buy & Sell", "Services", "Classifieds"];
+const CITIES = ["Riyadh", "Jeddah", "Dammam", "Khobar", "Jubail", "Yanbu", "Madinah"];
+const CATEGORIES = ["Housing", "Car", "Household", "Buy & Sell", "Services", "Classifieds"];
 
 export default function KsaConnectPage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [featured, setFeatured] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [city, setCity] = useState("All");
-  const [category, setCategory] = useState("All");
+
+  // Checkbox filters — empty set means "no filter applied" (show all).
+  const [cities, setCities] = useState<Set<string>>(new Set());
+  const [categories, setCategories] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<"newest" | "price_low" | "price_high">("newest");
 
@@ -59,10 +61,25 @@ export default function KsaConnectPage() {
     return () => unsub();
   }, []);
 
+  function toggle(set: Set<string>, setFn: (s: Set<string>) => void, value: string) {
+    const next = new Set(set);
+    if (next.has(value)) next.delete(value);
+    else next.add(value);
+    setFn(next);
+  }
+
+  function clearAll() {
+    setCities(new Set());
+    setCategories(new Set());
+    setSearch("");
+  }
+
+  const hasActiveFilters = cities.size > 0 || categories.size > 0 || search.trim().length > 0;
+
   const filtered = listings
     .filter((l) => {
-      if (city !== "All" && l.city !== city) return false;
-      if (category !== "All" && l.category !== category) return false;
+      if (cities.size > 0 && !cities.has(l.city)) return false;
+      if (categories.size > 0 && !categories.has(l.category)) return false;
       if (search.trim() && !l.title.toLowerCase().includes(search.trim().toLowerCase())) return false;
       return true;
     })
@@ -162,113 +179,136 @@ export default function KsaConnectPage() {
           </div>
         )}
 
-        <div className="filters" style={{ marginTop: 24 }}>
-          {CITIES.map((c) => (
-            <button
-              key={c}
-              className={`filter-chip ${city === c ? "active" : ""}`}
-              onClick={() => setCity(c)}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-        <div className="filters">
-          {CATEGORIES.map((c) => (
-            <button
-              key={c}
-              className={`filter-chip ${category === c ? "active" : ""}`}
-              onClick={() => setCategory(c)}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
+        {/* ── Sidebar filters + main listing grid ── */}
+        <div className="listings-layout">
+          <aside className="filters-sidebar">
+            <p className="filters-sidebar-title">
+              Filters
+              {hasActiveFilters && (
+                <button className="clear-filters" onClick={clearAll}>
+                  Clear all
+                </button>
+              )}
+            </p>
 
-        <div className="search-row">
-          <input
-            className="search-input"
-            type="text"
-            placeholder="Search listings by title…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <select
-            className="sort-select"
-            value={sort}
-            onChange={(e) => setSort(e.target.value as typeof sort)}
-          >
-            <option value="newest">Newest first</option>
-            <option value="price_low">Price: Low to High</option>
-            <option value="price_high">Price: High to Low</option>
-          </select>
-        </div>
+            <div className="filter-group">
+              <p className="filter-group-title">City</p>
+              {CITIES.map((c) => (
+                <label className="checkbox-row" key={c}>
+                  <input
+                    type="checkbox"
+                    checked={cities.has(c)}
+                    onChange={() => toggle(cities, setCities, c)}
+                  />
+                  {c}
+                </label>
+              ))}
+            </div>
 
-        {!loading && !error && (
-          <p className="results-count">
-            {filtered.length} listing{filtered.length === 1 ? "" : "s"} found
-          </p>
-        )}
+            <div className="filter-group">
+              <p className="filter-group-title">Category</p>
+              {CATEGORIES.map((c) => (
+                <label className="checkbox-row" key={c}>
+                  <input
+                    type="checkbox"
+                    checked={categories.has(c)}
+                    onChange={() => toggle(categories, setCategories, c)}
+                  />
+                  {c}
+                </label>
+              ))}
+            </div>
+          </aside>
 
-        {loading && (
-          <div className="listing-grid">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div className="skeleton-card" key={i}>
-                <div className="skeleton skeleton-image" />
-                <div className="skeleton-body">
-                  <div className="skeleton skeleton-line" style={{ width: "80%" }} />
-                  <div className="skeleton skeleton-line" style={{ width: "50%" }} />
-                  <div className="skeleton skeleton-line" style={{ width: "65%", marginBottom: 0 }} />
-                </div>
+          <div className="listings-main">
+            <div className="listings-topbar">
+              <input
+                className="search-input"
+                type="text"
+                placeholder="Search listings by title…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ flex: 1, minWidth: 180 }}
+              />
+              <select
+                className="sort-select"
+                value={sort}
+                onChange={(e) => setSort(e.target.value as typeof sort)}
+              >
+                <option value="newest">Newest first</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+              </select>
+            </div>
+
+            {!loading && !error && (
+              <p className="results-count">
+                Showing {filtered.length} of {listings.length} listing{listings.length === 1 ? "" : "s"}
+              </p>
+            )}
+
+            {loading && (
+              <div className="listing-grid">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div className="skeleton-card" key={i}>
+                    <div className="skeleton skeleton-image" />
+                    <div className="skeleton-body">
+                      <div className="skeleton skeleton-line" style={{ width: "80%" }} />
+                      <div className="skeleton skeleton-line" style={{ width: "50%" }} />
+                      <div className="skeleton skeleton-line" style={{ width: "65%", marginBottom: 0 }} />
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
+            )}
 
-        {error && (
-          <div className="empty-state" style={{ color: "#b91c1c" }}>
-            Couldn&apos;t load listings: {error}
-            <br />
-            <span style={{ fontSize: 12 }}>
-              (Check Firestore security rules allow public reads, and that your .env.local
-              Firebase config is correct.)
-            </span>
-          </div>
-        )}
+            {error && (
+              <div className="empty-state" style={{ color: "#b91c1c" }}>
+                Couldn&apos;t load listings: {error}
+                <br />
+                <span style={{ fontSize: 12 }}>
+                  (Check Firestore security rules allow public reads, and that your .env.local
+                  Firebase config is correct.)
+                </span>
+              </div>
+            )}
 
-        {!loading && !error && filtered.length === 0 && (
-          <div className="empty-state">
-            <span className="empty-icon">🔍</span>
-            No listings found. Try a different city, category, or search term.
-          </div>
-        )}
+            {!loading && !error && filtered.length === 0 && (
+              <div className="empty-state">
+                <span className="empty-icon">🔍</span>
+                No listings found. Try a different city, category, or search term.
+              </div>
+            )}
 
-        {!loading && !error && filtered.length > 0 && (
-          <div className="listing-grid">
-            {filtered.map((l) => (
-              <a href={`/ksa-connect/${l.id}`} className="listing-card" key={l.id} style={{ display: "block" }}>
-                <div style={{ position: "relative" }}>
-                  {l.imageUrls?.[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={l.imageUrls[0]} alt={l.title} className="listing-image" />
-                  ) : (
-                    <div className="listing-image" />
-                  )}
-                  {l.createdAt && (
-                    <span className="date-badge">{timeAgo(l.createdAt)}</span>
-                  )}
-                </div>
-                <div className="listing-body">
-                  <p className="listing-title">{l.title}</p>
-                  <p className="listing-price">{formattedPrice(l)}</p>
-                  <p className="listing-location">
-                    {l.city} · {l.location}
-                  </p>
-                </div>
-              </a>
-            ))}
+            {!loading && !error && filtered.length > 0 && (
+              <div className="listing-grid">
+                {filtered.map((l) => (
+                  <div className="listing-card" key={l.id}>
+                    <div style={{ position: "relative" }}>
+                      {l.imageUrls?.[0] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={l.imageUrls[0]} alt={l.title} className="listing-image" />
+                      ) : (
+                        <div className="listing-image" />
+                      )}
+                      {l.createdAt && <span className="date-badge">{timeAgo(l.createdAt)}</span>}
+                    </div>
+                    <div className="listing-body">
+                      <p className="listing-title">{l.title}</p>
+                      <p className="listing-price">{formattedPrice(l)}</p>
+                      <p className="listing-location">
+                        {l.city} · {l.location}
+                      </p>
+                      <a href={`/ksa-connect/${l.id}`} className="view-details-btn">
+                        View Details
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </main>
 
       <footer className="footer">

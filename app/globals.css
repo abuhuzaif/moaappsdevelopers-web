@@ -328,6 +328,108 @@ a {
   border-radius: 20px;
 }
 
+/* ── Listings page layout (sidebar + main) ── */
+.listings-layout {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  margin-top: 24px;
+}
+
+.filters-sidebar {
+  flex: 0 0 240px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  position: sticky;
+  top: 20px;
+}
+
+.filters-sidebar-title {
+  font-weight: 800;
+  font-size: 15px;
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.clear-filters {
+  font-size: 12px;
+  color: var(--gold);
+  cursor: pointer;
+  font-weight: 600;
+  background: none;
+  border: none;
+}
+
+.filter-group {
+  margin-bottom: 20px;
+}
+
+.filter-group-title {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  margin: 0 0 10px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 13.5px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.checkbox-row input {
+  accent-color: var(--navy);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+.listings-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.listings-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.view-details-btn {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  padding: 8px 0;
+  border-radius: 8px;
+  background: var(--navy);
+  color: white;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+@media (max-width: 820px) {
+  .listings-layout {
+    flex-direction: column;
+  }
+  .filters-sidebar {
+    flex: none;
+    width: 100%;
+    position: static;
+  }
+}
+
 /* ── Search & Sort ── */
 .search-row {
   display: flex;

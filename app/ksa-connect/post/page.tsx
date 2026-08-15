@@ -7,6 +7,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
 import { CITIES, CATEGORIES, SUB_CATEGORIES } from "@/lib/categories";
+import { DRAFT_TEMPLATES } from "@/lib/draftTemplates";
 
 const MAX_PHOTOS = 3;
 
@@ -26,9 +27,45 @@ export default function PostListingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Tracks whether Title/Description currently came from our own draft
+  // template (so switching sub-category keeps updating it) vs. the user
+  // manually editing it (in which case we stop auto-filling).
+  const [isDraftAutoFilled, setIsDraftAutoFilled] = useState(false);
+  const [lastDraft, setLastDraft] = useState({ title: "", description: "" });
+
+  function applyDraftIfEmpty(cat: string, sub: string) {
+    const draft = DRAFT_TEMPLATES[cat]?.[sub];
+    if (!draft) return;
+
+    const bothEmpty = title.trim() === "" && description.trim() === "";
+    if (bothEmpty || isDraftAutoFilled) {
+      setTitle(draft.title);
+      setDescription(draft.description);
+      setLastDraft(draft);
+      setIsDraftAutoFilled(true);
+    }
+  }
+
+  function onTitleChange(value: string) {
+    setTitle(value);
+    if (isDraftAutoFilled && value !== lastDraft.title) setIsDraftAutoFilled(false);
+  }
+
+  function onDescriptionChange(value: string) {
+    setDescription(value);
+    if (isDraftAutoFilled && value !== lastDraft.description) setIsDraftAutoFilled(false);
+  }
+
   function onCategoryChange(key: string) {
     setCategory(key);
-    setSubCategory(SUB_CATEGORIES[key][0]);
+    const firstSub = SUB_CATEGORIES[key][0];
+    setSubCategory(firstSub);
+    applyDraftIfEmpty(key, firstSub);
+  }
+
+  function onSubCategoryChange(sub: string) {
+    setSubCategory(sub);
+    applyDraftIfEmpty(category, sub);
   }
 
   function onFilesChosen(e: React.ChangeEvent<HTMLInputElement>) {
@@ -198,7 +235,7 @@ export default function PostListingPage() {
                   type="button"
                   key={s}
                   className={`filter-chip ${subCategory === s ? "active" : ""}`}
-                  onClick={() => setSubCategory(s)}
+                  onClick={() => onSubCategoryChange(s)}
                 >
                   {s}
                 </button>
@@ -242,7 +279,7 @@ export default function PostListingPage() {
             <input
               style={inputStyle}
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => onTitleChange(e.target.value)}
               placeholder="e.g. 2BHK Apartment - Al Olaya"
             />
 
@@ -250,7 +287,7 @@ export default function PostListingPage() {
             <textarea
               style={{ ...inputStyle, minHeight: 100 }}
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => onDescriptionChange(e.target.value)}
               placeholder="Describe your listing..."
             />
 
