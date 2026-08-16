@@ -8,6 +8,14 @@ import { timeAgo } from "@/lib/timeago";
 
 const CITIES = ["Riyadh", "Jeddah", "Dammam", "Khobar", "Jubail", "Yanbu", "Madinah"];
 const CATEGORIES = ["Housing", "Car", "Household", "Buy & Sell", "Services", "Classifieds"];
+const CATEGORY_ICONS: Record<string, string> = {
+  Housing: "🏠",
+  Car: "🚗",
+  Household: "🛋️",
+  "Buy & Sell": "🛍️",
+  Services: "🛠️",
+  Classifieds: "🏷️",
+};
 const TRENDING_KEYWORDS = [
   "Villa",
   "Apartment",
@@ -30,6 +38,7 @@ export default function KsaConnectPage() {
   const [categories, setCategories] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<"newest" | "price_low" | "price_high">("newest");
+  const [citiesExpanded, setCitiesExpanded] = useState(false);
 
   useEffect(() => {
     const q = query(
@@ -287,15 +296,18 @@ export default function KsaConnectPage() {
               Filters
               {hasActiveFilters && (
                 <button className="clear-filters" onClick={clearAll}>
-                  Clear all
+                  Clear All
                 </button>
               )}
             </p>
 
             <div className="filter-group">
               <p className="filter-group-title">City</p>
-              {CITIES.map((c) => (
-                <label className="checkbox-row" key={c}>
+              {(citiesExpanded ? CITIES : CITIES.slice(0, 5)).map((c) => (
+                <label
+                  className={`checkbox-row${cities.has(c) ? " checkbox-row-active" : ""}`}
+                  key={c}
+                >
                   <input
                     type="checkbox"
                     checked={cities.has(c)}
@@ -304,17 +316,30 @@ export default function KsaConnectPage() {
                   {c}
                 </label>
               ))}
+              {CITIES.length > 5 && (
+                <button
+                  type="button"
+                  className="view-more-toggle"
+                  onClick={() => setCitiesExpanded((v) => !v)}
+                >
+                  {citiesExpanded ? "View less ˄" : "View more ˅"}
+                </button>
+              )}
             </div>
 
             <div className="filter-group">
               <p className="filter-group-title">Category</p>
               {CATEGORIES.map((c) => (
-                <label className="checkbox-row" key={c}>
+                <label
+                  className={`checkbox-row${categories.has(c) ? " checkbox-row-active" : ""}`}
+                  key={c}
+                >
                   <input
                     type="checkbox"
                     checked={categories.has(c)}
                     onChange={() => toggle(categories, setCategories, c)}
                   />
+                  <span className="checkbox-icon">{CATEGORY_ICONS[c]}</span>
                   {c}
                 </label>
               ))}

@@ -434,11 +434,13 @@ a {
 
 .filters-sidebar {
   flex: 0 0 240px;
-  border: 1px solid var(--border);
+  background: linear-gradient(160deg, rgba(58, 41, 112, 0.97), rgba(28, 20, 66, 0.97));
+  border: none;
   border-radius: 14px;
   padding: 18px;
   position: sticky;
   top: 20px;
+  color: white;
 }
 
 .filters-sidebar-title {
@@ -448,13 +450,14 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  color: white;
 }
 
 .clear-filters {
   font-size: 12px;
   color: var(--gold);
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
   background: none;
   border: none;
 }
@@ -468,7 +471,7 @@ a {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.6);
   margin: 0 0 10px;
 }
 
@@ -476,17 +479,45 @@ a {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 0;
+  padding: 7px 8px;
+  margin: 0 -8px 2px;
+  border-radius: 8px;
   font-size: 13.5px;
-  color: var(--ink);
+  color: white;
   cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.checkbox-row:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.checkbox-row-active {
+  background: rgba(230, 25, 92, 0.22);
+  border-color: var(--matrimonial);
+  font-weight: 700;
 }
 
 .checkbox-row input {
-  accent-color: var(--navy);
-  width: 15px;
-  height: 15px;
+  accent-color: var(--matrimonial);
+  width: 16px;
+  height: 16px;
   cursor: pointer;
+}
+
+.checkbox-icon {
+  font-size: 14px;
+}
+
+.view-more-toggle {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 0 0;
 }
 
 .listings-main {
