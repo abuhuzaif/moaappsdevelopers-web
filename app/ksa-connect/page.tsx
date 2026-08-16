@@ -123,7 +123,7 @@ export default function KsaConnectPage() {
               position: "relative",
             }}
           >
-            <div className="container" style={{ paddingBottom: 8 }}>
+            <div className="container" style={{ paddingBottom: 8, margin: "0 auto 0 0" }}>
               <h1 style={{ textAlign: "left", maxWidth: 320 }}>
                 KSA<span className="gold">-Connect</span>
               </h1>

@@ -68,7 +68,7 @@ export default function HomePage() {
                 "linear-gradient(90deg, rgba(6,11,22,0.95) 0%, rgba(6,11,22,0.85) 32%, rgba(6,11,22,0.45) 50%, rgba(6,11,22,0.15) 62%, rgba(6,11,22,0.05) 100%), url('/images/ksa-connect-hero.png')",
             }}
           >
-            <div className="container">
+            <div className="container" style={{ margin: "0 auto 0 0" }}>
               <h1 style={{ textAlign: "left", maxWidth: 340 }}>
                 Apps & Tools Built to <span className="gold">Make Life Easier</span>
               </h1>
