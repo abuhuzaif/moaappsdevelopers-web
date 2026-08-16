@@ -59,19 +59,31 @@ export default function HomePage() {
         </div>
       </nav>
 
-      <section className="hero">
-        <div className="container">
-          <h1>
-            Apps & Tools Built to <span className="gold">Make Life Easier</span>
-          </h1>
-          <p>
-            We design and build mobile apps and digital tools that help people around the
-            world — from community marketplaces to everyday essentials. Explore what
-            we&apos;ve shipped so far.
-          </p>
-          <LiveStats />
+      <div className="hero-outer">
+        <div className="hero-photo-box">
+          <div
+            className="hero-photo-inner"
+            style={{
+              backgroundImage:
+                "linear-gradient(90deg, rgba(6,11,22,0.95) 0%, rgba(6,11,22,0.85) 32%, rgba(6,11,22,0.45) 50%, rgba(6,11,22,0.15) 62%, rgba(6,11,22,0.05) 100%), url('/images/ksa-connect-hero.png')",
+            }}
+          >
+            <div className="container">
+              <h1 style={{ textAlign: "left", maxWidth: 340 }}>
+                Apps & Tools Built to <span className="gold">Make Life Easier</span>
+              </h1>
+              <p style={{ textAlign: "left", maxWidth: 300 }}>
+                We design and build mobile apps and digital tools that help people around the
+                world — from community marketplaces to everyday essentials. Explore what
+                we&apos;ve shipped so far.
+              </p>
+              <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                <LiveStats />
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
+      </div>
 
       <main className="container">
         <div className="grid">

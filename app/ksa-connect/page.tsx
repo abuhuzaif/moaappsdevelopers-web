@@ -8,6 +8,16 @@ import { timeAgo } from "@/lib/timeago";
 
 const CITIES = ["Riyadh", "Jeddah", "Dammam", "Khobar", "Jubail", "Yanbu", "Madinah"];
 const CATEGORIES = ["Housing", "Car", "Household", "Buy & Sell", "Services", "Classifieds"];
+const TRENDING_KEYWORDS = [
+  "Villa",
+  "Apartment",
+  "Toyota",
+  "Furniture",
+  "Cleaning",
+  "Studio Room",
+  "Sofa Set",
+  "Driver",
+];
 
 export default function KsaConnectPage() {
   const [listings, setListings] = useState<Listing[]>([]);
@@ -76,6 +86,11 @@ export default function KsaConnectPage() {
 
   const hasActiveFilters = cities.size > 0 || categories.size > 0 || search.trim().length > 0;
 
+  function handleTrendingClick(keyword: string) {
+    setSearch(keyword);
+    document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" });
+  }
+
   const filtered = listings
     .filter((l) => {
       if (cities.size > 0 && !cities.has(l.city)) return false;
@@ -98,29 +113,115 @@ export default function KsaConnectPage() {
         </a>
       </nav>
 
-      <section className="hero" style={{ padding: "40px 0 56px" }}>
-        <div className="container">
-          <h1 style={{ fontSize: 32 }}>
-            KSA<span className="gold">-Connect</span>
-          </h1>
-          <p>Browse live listings across Saudi Arabia. Post or chat from the app.</p>
-          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-            <a href="/ksa-connect/post" className="btn btn-gold" style={{ marginTop: 16 }}>
-              Post a Listing
-            </a>
-            <a
-              href="https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect"
-              target="_blank"
-              className="btn btn-outline"
-              style={{ marginTop: 16 }}
-            >
-              Get the app to chat with sellers
-            </a>
+      <div className="hero-outer">
+        <div className="hero-photo-box">
+          <div
+            className="hero-photo-inner"
+            style={{
+              backgroundImage:
+                "linear-gradient(90deg, rgba(6,11,22,0.95) 0%, rgba(6,11,22,0.88) 32%, rgba(6,11,22,0.5) 50%, rgba(6,11,22,0.15) 62%, rgba(6,11,22,0.05) 100%), url('/images/ksa-connect-hero.png')",
+              position: "relative",
+            }}
+          >
+            <div className="container" style={{ paddingBottom: 8 }}>
+              <h1 style={{ textAlign: "left", maxWidth: 320 }}>
+                KSA<span className="gold">-Connect</span>
+              </h1>
+              <p style={{ textAlign: "left", maxWidth: 300, margin: "0 0 20px" }}>
+                Browse live listings across Saudi Arabia. Post or chat from the app.
+              </p>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 24 }}>
+                <a href="#listings" className="btn btn-pink">
+                  Browse Ads
+                </a>
+                <a href="/ksa-connect/post" className="btn btn-pink-outline">
+                  Post an Ad
+                </a>
+              </div>
+              <div className="stats-row" style={{ justifyContent: "flex-start", gap: 32, marginTop: 0 }}>
+                <div className="stat">
+                  <p className="stat-value">{CITIES.length}</p>
+                  <p className="stat-label">Cities Covered</p>
+                </div>
+                <div className="stat">
+                  <p className="stat-value">{listings.length}+</p>
+                  <p className="stat-label">Active Listings</p>
+                </div>
+                <div className="stat">
+                  <p className="stat-value">{CATEGORIES.length}</p>
+                  <p className="stat-label">Categories</p>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Search bar + trending keywords, merged into the photo (functional) ── */}
+            <div className="hero-search-overlay">
+              <div className="hero-search-row">
+                <div className="hero-search-field">
+                  <span className="hero-search-icon">📍</span>
+                  <select
+                    value={cities.size === 1 ? Array.from(cities)[0] : ""}
+                    onChange={(e) =>
+                      setCities(e.target.value ? new Set([e.target.value]) : new Set())
+                    }
+                  >
+                    <option value="">Select a city</option>
+                    {CITIES.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="hero-search-field">
+                  <span className="hero-search-icon">🏷️</span>
+                  <select
+                    value={categories.size === 1 ? Array.from(categories)[0] : ""}
+                    onChange={(e) =>
+                      setCategories(e.target.value ? new Set([e.target.value]) : new Set())
+                    }
+                  >
+                    <option value="">Select category</option>
+                    {CATEGORIES.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="hero-search-field" style={{ flex: 1.4 }}>
+                  <span className="hero-search-icon">🔍</span>
+                  <input
+                    type="text"
+                    placeholder="Type your keyword"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+                <a href="#listings" className="hero-search-submit">
+                  Search
+                </a>
+              </div>
+
+              <div className="hero-trending-row">
+                <span className="hero-trending-label">Trending Keywords:</span>
+                {TRENDING_KEYWORDS.map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    className="hero-trending-chip"
+                    onClick={() => handleTrendingClick(k)}
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <main className="container">
+      <main className="container" style={{ marginTop: 32 }}>
         {/* Matrimonial promo — feature lives only in the app, this is just
             an advertisement/CTA, no profiles are shown here. */}
         <div
@@ -128,7 +229,7 @@ export default function KsaConnectPage() {
             marginTop: 24,
             padding: "20px 24px",
             borderRadius: 14,
-            background: "linear-gradient(120deg, var(--navy-deep), var(--navy))",
+            background: "linear-gradient(120deg, var(--matrimonial-deep), var(--matrimonial))",
             color: "white",
             display: "flex",
             alignItems: "center",
@@ -166,7 +267,7 @@ export default function KsaConnectPage() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={l.imageUrls[0]} alt={l.title} className="featured-image" />
                   ) : (
-                    <div className="featured-image" />
+                    <div className="featured-image featured-image-empty" />
                   )}
                   <span className="featured-tag">⭐ Featured</span>
                   <div className="listing-body">
@@ -180,7 +281,7 @@ export default function KsaConnectPage() {
         )}
 
         {/* ── Sidebar filters + main listing grid ── */}
-        <div className="listings-layout">
+        <div className="listings-layout" id="listings">
           <aside className="filters-sidebar">
             <p className="filters-sidebar-title">
               Filters
@@ -289,7 +390,7 @@ export default function KsaConnectPage() {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={l.imageUrls[0]} alt={l.title} className="listing-image" />
                       ) : (
-                        <div className="listing-image" />
+                        <div className="listing-image listing-image-empty" />
                       )}
                       {l.createdAt && <span className="date-badge">{timeAgo(l.createdAt)}</span>}
                       <button className="heart-btn" aria-label="Save listing" title="Save (visual only for now)">

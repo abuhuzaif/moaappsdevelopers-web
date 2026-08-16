@@ -7,6 +7,8 @@
   --text-muted: #5b6472;
   --surface: #f7f6f2;
   --border: #e4e1d8;
+  --matrimonial: #e6195c;
+  --matrimonial-deep: #9c1046;
 }
 
 * {
@@ -32,7 +34,7 @@ a {
 }
 
 .container {
-  max-width: 1100px;
+  max-width: 1360px;
   margin: 0 auto;
   padding: 0 24px;
 }
@@ -94,7 +96,46 @@ a {
   color: var(--gold);
 }
 
-/* ── Stats bar (homepage hero) ── */
+/* ── Hero photo (bounded, crop-proof) ── */
+.hero-outer {
+  background: linear-gradient(180deg, var(--navy-deep), var(--navy));
+  padding: 36px 0;
+}
+
+.hero-photo-box {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.hero-photo-inner {
+  aspect-ratio: 1718 / 916;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-photo-inner h1 {
+  color: white;
+  font-weight: 800;
+  margin: 0 0 12px;
+  font-size: clamp(26px, 4.5vw, 40px);
+}
+
+.hero-photo-inner p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 15px;
+  margin: 0;
+}
+
+@media (max-width: 700px) {
+  .hero-photo-inner {
+    border-radius: 12px;
+  }
+}
 .stats-row {
   display: flex;
   justify-content: center;
@@ -247,6 +288,31 @@ a {
   background: #e5e7eb;
   object-fit: cover;
   display: block;
+}
+
+.listing-image-empty,
+.featured-image-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #eef0f4, #e6e3da);
+  color: #9aa0ab;
+}
+
+.listing-image-empty::before,
+.featured-image-empty::before {
+  content: "🖼️";
+  font-size: 24px;
+}
+
+.listing-image-empty::after,
+.featured-image-empty::after {
+  content: "No Photo";
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
 }
 
 .date-badge {
@@ -457,6 +523,153 @@ a {
     flex: none;
     width: 100%;
     position: static;
+  }
+}
+
+/* ── Hero CTA buttons (pink accent, matches matrimonial branding) ── */
+.btn-pink {
+  background: var(--matrimonial);
+  color: white;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
+}
+
+.btn-pink:hover {
+  background: var(--matrimonial-deep);
+}
+
+.btn-pink-outline {
+  background: white;
+  color: var(--matrimonial);
+  border: 1.5px solid var(--matrimonial);
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-pink-outline:hover {
+  background: var(--matrimonial);
+  color: white;
+}
+
+/* ── Search bar + trending keywords, embedded directly in the hero photo ── */
+.hero-search-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 18px 24px 16px;
+  background: linear-gradient(135deg, rgba(58, 41, 112, 0.94), rgba(28, 20, 66, 0.94));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hero-search-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.hero-search-field {
+  flex: 1;
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border-radius: 10px;
+  padding: 11px 14px;
+}
+
+.hero-search-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.hero-search-field select,
+.hero-search-field input {
+  border: none;
+  outline: none;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: var(--ink);
+  width: 100%;
+  background: transparent;
+}
+
+.hero-search-field select {
+  cursor: pointer;
+}
+
+.hero-search-submit {
+  background: var(--matrimonial);
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 11px 26px;
+  border-radius: 10px;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.hero-search-submit:hover {
+  background: var(--matrimonial-deep);
+}
+
+.hero-trending-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hero-trending-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.hero-trending-chip {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.hero-trending-chip:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+@media (max-width: 700px) {
+  .hero-photo-inner {
+    aspect-ratio: unset;
+    min-height: 460px;
+    display: block;
+    padding-top: 28px;
+  }
+  .hero-search-overlay {
+    position: static;
+    width: 100%;
+    margin-top: 16px;
+    border-radius: 0 0 12px 12px;
   }
 }
 
