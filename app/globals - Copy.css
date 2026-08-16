@@ -22,7 +22,6 @@ body {
   background: #ffffff;
   color: var(--ink);
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  scroll-behavior: smooth;
 }
 
 h1, h2, h3, .brand, .btn, .listing-title, .stat-value {
@@ -38,7 +37,6 @@ a {
   max-width: 1360px;
   margin: 0 auto;
   padding: 0 24px;
-  scroll-margin-top: 20px;
 }
 
 /* ── Nav ── */
@@ -171,7 +169,7 @@ a {
 }
 
 .hero-photo-inner-global {
-  aspect-ratio: 1536 / 700;
+  aspect-ratio: 1536 / 1024;
   background-size: cover;
   background-position: center;
 }
@@ -180,7 +178,7 @@ a {
   .hero-photo-inner-global {
     aspect-ratio: unset;
     min-height: 520px;
-    background-position: 35% center;
+    background-position: 30% center;
   }
 }
 
@@ -240,105 +238,6 @@ a {
   font-weight: 800;
   font-size: 16px;
   color: white;
-}
-
-.hero-nav-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 20px;
-  padding-bottom: 14px;
-}
-
-.hero-nav-brand {
-  color: white;
-}
-
-.hero-nav-subtitle {
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.hero-nav-overlay .nav-link {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.hero-nav-overlay .nav-link:hover {
-  color: white;
-}
-
-.hero-nav-overlay .nav-link-active {
-  color: var(--gold);
-}
-
-@media (max-width: 800px) {
-  .hero-nav-overlay .nav-links {
-    display: none;
-  }
-}
-
-.mobile-nav {
-  display: none;
-  position: relative;
-}
-
-.mobile-nav-toggle {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: white;
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.mobile-nav-panel {
-  position: absolute;
-  top: 46px;
-  right: 0;
-  background: var(--navy-deep);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 180px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-  z-index: 10;
-}
-
-.mobile-nav-link {
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 14px;
-  font-weight: 600;
-  padding: 10px 12px;
-  border-radius: 8px;
-}
-
-.mobile-nav-link:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.mobile-nav-cta {
-  margin-top: 6px;
-  text-align: center;
-  font-size: 13px;
-  padding: 10px;
-}
-
-@media (max-width: 800px) {
-  .mobile-nav {
-    display: block;
-  }
-  .hero-nav-overlay .nav-cta {
-    display: none;
-  }
 }
 
 .hero-photo-inner h1 {
@@ -1103,7 +1002,6 @@ a {
 /* ── Content sections (Services / About) ── */
 .content-section {
   padding: 40px 0 8px;
-  scroll-margin-top: 20px;
 }
 
 .section-eyebrow {

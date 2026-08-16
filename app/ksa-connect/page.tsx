@@ -115,13 +115,6 @@ export default function KsaConnectPage() {
 
   return (
     <>
-      <nav className="nav container">
-        <a href="/" className="brand">
-          <div className="brand-badge">M</div>
-          MOA Apps Developer&apos;s
-        </a>
-      </nav>
-
       <div className="hero-outer">
         <div className="hero-photo-box">
           <div
@@ -132,7 +125,11 @@ export default function KsaConnectPage() {
               position: "relative",
             }}
           >
-            <div className="container" style={{ paddingBottom: 8, margin: "0 auto 0 0" }}>
+            <a href="/" className="hero-brand-overlay">
+              <div className="brand-badge">M</div>
+              MOA Apps Developer&apos;s
+            </a>
+            <div className="container" style={{ paddingBottom: 8, paddingTop: 56, margin: "0 auto 0 0" }}>
               <h1 style={{ textAlign: "left", maxWidth: 320 }}>
                 KSA<span className="gold">-Connect</span>
               </h1>
@@ -292,6 +289,9 @@ export default function KsaConnectPage() {
         {/* ── Sidebar filters + main listing grid ── */}
         <div className="listings-layout" id="listings">
           <aside className="filters-sidebar">
+            <a href="/ksa-connect/post" className="sidebar-post-ad-btn">
+              <span>➕</span> Post an Ad
+            </a>
             <p className="filters-sidebar-title">
               Filters
               {hasActiveFilters && (
