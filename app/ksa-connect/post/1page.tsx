@@ -21,7 +21,6 @@ export default function PostListingPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [negotiable, setNegotiable] = useState(false);
   const [location, setLocation] = useState("");
   const [phone, setPhone] = useState("");
   const [files, setFiles] = useState<File[]>([]);
@@ -87,20 +86,14 @@ export default function PostListingPage() {
       setError("Please sign in first.");
       return;
     }
-    if (!title.trim() || !location.trim() || !phone.trim()) {
+    if (!title.trim() || !price.trim() || !location.trim() || !phone.trim()) {
       setError("Please fill in all required fields.");
       return;
     }
-    let priceNum = 0;
-    if (!negotiable) {
-      const cleaned = price.replace(/,/g, "").trim();
-      if (cleaned) {
-        priceNum = parseFloat(cleaned);
-        if (isNaN(priceNum) || priceNum <= 0) {
-          setError("Please enter a valid price, or check 'Negotiable / Price on request'.");
-          return;
-        }
-      }
+    const priceNum = parseFloat(price);
+    if (isNaN(priceNum) || priceNum <= 0) {
+      setError("Please enter a valid price.");
+      return;
     }
 
     setSubmitting(true);
@@ -125,7 +118,6 @@ export default function PostListingPage() {
         title: title.trim(),
         description: description.trim(),
         price: priceNum,
-        negotiable,
         location: location.trim(),
         phone: phone.trim(),
         imageUrls,
@@ -300,47 +292,19 @@ export default function PostListingPage() {
             />
 
             <label style={fieldLabel}>
-              {category === "Classifieds" && subCategory === "Jobs" ? "Salary (SAR)" : "Price (SAR)"}
+              {category === "Classifieds" && subCategory === "Jobs" ? "Salary (SAR) *" : "Price (SAR) *"}
             </label>
             <input
-              style={{ ...inputStyle, opacity: negotiable ? 0.5 : 1 }}
-              type="text"
-              inputMode="numeric"
-              disabled={negotiable}
+              style={inputStyle}
+              type="number"
               value={price}
-              onChange={(e) => {
-                const digitsOnly = e.target.value.replace(/[^\d]/g, "");
-                setPrice(digitsOnly ? Number(digitsOnly).toLocaleString("en-US") : "");
-              }}
-              placeholder="e.g. 2,000"
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="e.g. 2000"
             />
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                fontSize: 13.5,
-                fontWeight: 600,
-                color: "var(--text-muted)",
-                margin: "8px 0 4px",
-                cursor: "pointer",
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={negotiable}
-                onChange={(e) => {
-                  setNegotiable(e.target.checked);
-                  if (e.target.checked) setPrice("");
-                }}
-              />
-              Negotiable / Price on request
-            </label>
 
             <label style={fieldLabel}>Location *</label>
             <input
               style={inputStyle}
-              type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="e.g. Al Malqa, Riyadh"

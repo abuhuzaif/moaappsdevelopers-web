@@ -8,6 +8,7 @@ export interface Listing {
   title: string;
   description: string;
   price: number;
+  negotiable?: boolean;
   location: string;
   phone: string;
   imageUrls: string[];
@@ -21,6 +22,7 @@ export interface Listing {
 }
 
 export function formattedPrice(l: Listing): string {
-  if (l.category === 'Housing') return `${Math.round(l.price)} SAR/month`;
-  return `${Math.round(l.price)} SAR`;
+  if (l.negotiable || !l.price) return "Price on request";
+  if (l.category === 'Housing') return `${Math.round(l.price).toLocaleString('en-US')} SAR/month`;
+  return `${Math.round(l.price).toLocaleString('en-US')} SAR`;
 }
