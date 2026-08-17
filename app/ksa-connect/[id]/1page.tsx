@@ -1,25 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { doc, getDoc, deleteDoc } from "firebase/firestore";
+import { useParams } from "next/navigation";
+import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Listing, formattedPrice } from "@/lib/types";
 import { timeAgo } from "@/lib/timeago";
-import { useAuth } from "@/lib/useAuth";
-import { ADMIN_EMAILS, isAdmin } from "@/lib/admin";
+
+// Same admin emails used in the Flutter app and Firestore rules — listings
+// posted from these accounts show "KSA-Connect Team" instead of the real
+// name/photo, everywhere the seller is displayed.
+const ADMIN_EMAILS = ["abuman.moa@gmail.com", "abuhuzaif@gmail.com"];
 
 export default function ListingDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const id = params?.id as string;
-  const { user } = useAuth();
 
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState(0);
-  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -39,21 +39,6 @@ export default function ListingDetailPage() {
     })();
   }, [id]);
 
-  const canManage = !!user && !!listing && (user.uid === listing.userId || isAdmin(user));
-
-  async function handleDelete() {
-    if (!listing) return;
-    if (!confirm("Delete this listing permanently? This can't be undone.")) return;
-    setDeleting(true);
-    try {
-      await deleteDoc(doc(db, "listings", listing.id));
-      router.push("/ksa-connect");
-    } catch (err: any) {
-      alert(err.message ?? "Couldn't delete this listing.");
-      setDeleting(false);
-    }
-  }
-
   return (
     <>
       <nav className="nav container">
@@ -67,43 +52,6 @@ export default function ListingDetailPage() {
         <a href="/ksa-connect" style={{ display: "inline-block", margin: "20px 0", color: "var(--navy)", fontWeight: 600, fontSize: 14 }}>
           ← Back to listings
         </a>
-
-        {canManage && (
-          <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-            <a
-              href={`/ksa-connect/post?edit=${listing!.id}`}
-              className="btn btn-outline"
-              style={{ fontSize: 13, padding: "8px 16px" }}
-            >
-              ✏️ Edit Listing
-            </a>
-            <button
-              onClick={handleDelete}
-              disabled={deleting}
-              className="btn"
-              style={{
-                fontSize: 13,
-                padding: "8px 16px",
-                background: "#fee2e2",
-                color: "#b91c1c",
-                border: "1px solid #fecaca",
-              }}
-            >
-              {deleting ? "Deleting…" : "🗑️ Delete"}
-            </button>
-            {isAdmin(user) && listing!.userId !== user?.uid && (
-              <span
-                style={{
-                  fontSize: 12,
-                  color: "var(--text-muted)",
-                  alignSelf: "center",
-                }}
-              >
-                (admin mode)
-              </span>
-            )}
-          </div>
-        )}
 
         {loading && <p>Loading…</p>}
         {error && <div className="empty-state">{error}</div>}

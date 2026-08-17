@@ -1,31 +1,19 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { addDoc, collection, doc, getDoc, serverTimestamp, Timestamp, updateDoc } from "firebase/firestore";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
-import { isAdmin } from "@/lib/admin";
 import { CITIES, CATEGORIES, SUB_CATEGORIES } from "@/lib/categories";
 import { DRAFT_TEMPLATES } from "@/lib/draftTemplates";
 
 const MAX_PHOTOS = 3;
-const LISTING_LIFESPAN_DAYS = 8;
-const DESCRIPTION_COLORS = [
-  { label: "Default", value: "" },
-  { label: "Red", value: "#dc2626" },
-  { label: "Green", value: "#16a34a" },
-  { label: "Blue", value: "#2563eb" },
-  { label: "Gold", value: "#b45309" },
-  { label: "Purple", value: "#7c3aed" },
-];
 
-function PostListingForm() {
+export default function PostListingPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const editId = searchParams.get("edit");
 
   const [city, setCity] = useState(CITIES[0]);
   const [category, setCategory] = useState(CATEGORIES[0].key);
@@ -37,59 +25,8 @@ function PostListingForm() {
   const [location, setLocation] = useState("");
   const [phone, setPhone] = useState("");
   const [files, setFiles] = useState<File[]>([]);
-  const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
-  const [descriptionColor, setDescriptionColor] = useState("");
-  const [descriptionBold, setDescriptionBold] = useState(false);
-  const [descriptionItalic, setDescriptionItalic] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [editLoading, setEditLoading] = useState(!!editId);
-  const [notAuthorized, setNotAuthorized] = useState(false);
-
-  // Edit mode: load the existing listing and prefill the form. Runs once
-  // the signed-in user is known, so we can check owner/admin authorization.
-  useEffect(() => {
-    if (!editId || loading) return;
-    if (!user) {
-      setEditLoading(false);
-      return;
-    }
-    (async () => {
-      try {
-        const snap = await getDoc(doc(db, "listings", editId));
-        if (!snap.exists()) {
-          setError("This listing no longer exists.");
-          setEditLoading(false);
-          return;
-        }
-        const data = snap.data();
-        if (data.userId !== user.uid && !isAdmin(user)) {
-          setNotAuthorized(true);
-          setEditLoading(false);
-          return;
-        }
-        setCity(data.city ?? CITIES[0]);
-        setCategory(data.category ?? CATEGORIES[0].key);
-        setSubCategory(data.subCategory ?? SUB_CATEGORIES[data.category ?? CATEGORIES[0].key][0]);
-        setTitle(data.title ?? "");
-        setDescription(data.description ?? "");
-        setPrice(data.price ? Number(data.price).toLocaleString("en-US") : "");
-        setNegotiable(!!data.negotiable);
-        setLocation(data.location ?? "");
-        setPhone(data.phone ?? "");
-        setExistingImageUrls(data.imageUrls ?? []);
-        setDescriptionColor(data.descriptionColor ?? "");
-        setDescriptionBold(!!data.descriptionBold);
-        setDescriptionItalic(!!data.descriptionItalic);
-        setIsDraftAutoFilled(false);
-      } catch (err: any) {
-        setError(err.message ?? "Couldn't load this listing for editing.");
-      } finally {
-        setEditLoading(false);
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editId, user, loading]);
 
   // Tracks whether Title/Description currently came from our own draft
   // template (so switching sub-category keeps updating it) vs. the user
@@ -134,17 +71,12 @@ function PostListingForm() {
 
   function onFilesChosen(e: React.ChangeEvent<HTMLInputElement>) {
     const chosen = Array.from(e.target.files ?? []);
-    const room = MAX_PHOTOS - existingImageUrls.length;
-    const combined = [...files, ...chosen].slice(0, Math.max(room, 0));
+    const combined = [...files, ...chosen].slice(0, MAX_PHOTOS);
     setFiles(combined);
   }
 
   function removeFile(i: number) {
     setFiles(files.filter((_, idx) => idx !== i));
-  }
-
-  function removeExistingImage(i: number) {
-    setExistingImageUrls(existingImageUrls.filter((_, idx) => idx !== i));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -173,20 +105,20 @@ function PostListingForm() {
 
     setSubmitting(true);
     try {
-      // Upload any newly chosen photos; keep existing ones already on the
-      // listing (relevant when editing) unless the user removed them.
-      const newUrls: string[] = [];
+      // Upload photos to Firebase Storage
+      const imageUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const path = `listings/${user.uid}/${Date.now()}_${i}.jpg`;
         const storageRef = ref(storage, path);
         await uploadBytes(storageRef, file);
         const url = await getDownloadURL(storageRef);
-        newUrls.push(url);
+        imageUrls.push(url);
       }
-      const imageUrls = [...existingImageUrls, ...newUrls].slice(0, MAX_PHOTOS);
 
-      const commonFields = {
+      // Create the Firestore document — same schema as the Flutter app's
+      // ListingModel.toMap(), so it shows up correctly in the app too.
+      await addDoc(collection(db, "listings"), {
         category,
         subCategory,
         city,
@@ -197,38 +129,21 @@ function PostListingForm() {
         location: location.trim(),
         phone: phone.trim(),
         imageUrls,
-        descriptionColor: descriptionColor || null,
-        descriptionBold,
-        descriptionItalic,
-      };
+        userId: user.uid,
+        userName: user.displayName ?? "User",
+        userPhoto: user.photoURL ?? null,
+        userEmail: user.email ?? null,
+        createdAt: serverTimestamp(),
+        isFeatured: false,
+        status: "active",
+        latitude: null,
+        longitude: null,
+        descriptionColor: null,
+        descriptionBold: false,
+        descriptionItalic: false,
+      });
 
-      if (editId) {
-        // Editing an existing listing — owner or admin only (checked on load).
-        await updateDoc(doc(db, "listings", editId), commonFields);
-      } else {
-        // Creating a new listing — same schema as the Flutter app's
-        // ListingModel.toMap(), so it shows up correctly in the app too.
-        // expiresAt drives a Firestore TTL policy that auto-deletes listings
-        // after LISTING_LIFESPAN_DAYS (set up separately in Firebase Console).
-        const expiresAt = Timestamp.fromDate(
-          new Date(Date.now() + LISTING_LIFESPAN_DAYS * 24 * 60 * 60 * 1000)
-        );
-        await addDoc(collection(db, "listings"), {
-          ...commonFields,
-          userId: user.uid,
-          userName: user.displayName ?? "User",
-          userPhoto: user.photoURL ?? null,
-          userEmail: user.email ?? null,
-          createdAt: serverTimestamp(),
-          expiresAt,
-          isFeatured: false,
-          status: "active",
-          latitude: null,
-          longitude: null,
-        });
-      }
-
-      router.push(editId ? `/ksa-connect/${editId}` : "/ksa-connect");
+      router.push("/ksa-connect");
     } catch (err: any) {
       setError(err.message ?? "Something went wrong while posting.");
     } finally {
@@ -248,27 +163,19 @@ function PostListingForm() {
       <section className="hero" style={{ padding: "36px 0 44px" }}>
         <div className="container">
           <h1 style={{ fontSize: 28 }}>
-            {editId ? (
-              <>
-                Edit <span className="gold">Listing</span>
-              </>
-            ) : (
-              <>
-                Post a <span className="gold">Listing</span>
-              </>
-            )}
+            Post a <span className="gold">Listing</span>
           </h1>
           <p>Share housing, cars, or items with the KSA-Connect community.</p>
         </div>
       </section>
 
       <main className="container" style={{ maxWidth: 640, paddingBottom: 60 }}>
-        {(loading || editLoading) && <p style={{ marginTop: 24 }}>Checking sign-in status…</p>}
+        {loading && <p style={{ marginTop: 24 }}>Checking sign-in status…</p>}
 
-        {!loading && !editLoading && !user && (
+        {!loading && !user && (
           <div style={{ marginTop: 32, textAlign: "center" }}>
             <p style={{ marginBottom: 16, color: "var(--text-muted)" }}>
-              Sign in with Google to {editId ? "edit this listing" : "post a listing"}.
+              Sign in with Google to post a listing.
             </p>
             <button className="btn btn-gold" onClick={() => signInWithGoogle()}>
               Sign in with Google
@@ -276,13 +183,7 @@ function PostListingForm() {
           </div>
         )}
 
-        {!loading && !editLoading && user && notAuthorized && (
-          <div className="empty-state">
-            You don&apos;t have permission to edit this listing.
-          </div>
-        )}
-
-        {!loading && !editLoading && user && !notAuthorized && (
+        {!loading && user && (
           <form onSubmit={handleSubmit} style={{ marginTop: 24 }}>
             <div
               style={{
@@ -349,23 +250,8 @@ function PostListingForm() {
               ))}
             </div>
 
-            <label style={fieldLabel}>
-              Photos ({existingImageUrls.length + files.length}/{MAX_PHOTOS})
-            </label>
+            <label style={fieldLabel}>Photos ({files.length}/{MAX_PHOTOS})</label>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
-              {existingImageUrls.map((url, i) => (
-                <div key={`existing-${i}`} style={{ position: "relative" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={url}
-                    alt=""
-                    style={{ width: 90, height: 90, objectFit: "cover", borderRadius: 10 }}
-                  />
-                  <button type="button" onClick={() => removeExistingImage(i)} style={removeBtn}>
-                    ×
-                  </button>
-                </div>
-              ))}
               {files.map((f, i) => (
                 <div key={i} style={{ position: "relative" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -383,7 +269,7 @@ function PostListingForm() {
                   </button>
                 </div>
               ))}
-              {existingImageUrls.length + files.length < MAX_PHOTOS && (
+              {files.length < MAX_PHOTOS && (
                 <label style={addPhotoBox}>
                   + Add
                   <input
@@ -406,66 +292,8 @@ function PostListingForm() {
             />
 
             <label style={fieldLabel}>Description</label>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-              <button
-                type="button"
-                onClick={() => setDescriptionBold((v) => !v)}
-                style={{
-                  ...formatToggleBtn,
-                  background: descriptionBold ? "var(--navy)" : "white",
-                  color: descriptionBold ? "white" : "var(--ink)",
-                }}
-                title="Bold"
-              >
-                B
-              </button>
-              <button
-                type="button"
-                onClick={() => setDescriptionItalic((v) => !v)}
-                style={{
-                  ...formatToggleBtn,
-                  fontStyle: "italic",
-                  background: descriptionItalic ? "var(--navy)" : "white",
-                  color: descriptionItalic ? "white" : "var(--ink)",
-                }}
-                title="Italic"
-              >
-                I
-              </button>
-              <span style={{ width: 1, height: 20, background: "var(--border)", margin: "0 2px" }} />
-              {DESCRIPTION_COLORS.map((c) => (
-                <button
-                  key={c.label}
-                  type="button"
-                  onClick={() => setDescriptionColor(c.value)}
-                  title={c.label}
-                  style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: "50%",
-                    border:
-                      descriptionColor === c.value ? "2px solid var(--navy)" : "1px solid var(--border)",
-                    background: c.value || "white",
-                    cursor: "pointer",
-                    position: "relative",
-                  }}
-                >
-                  {!c.value && (
-                    <span style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "var(--text-muted)" }}>
-                      ✕
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
             <textarea
-              style={{
-                ...inputStyle,
-                minHeight: 100,
-                color: descriptionColor || "var(--ink)",
-                fontWeight: descriptionBold ? 700 : 400,
-                fontStyle: descriptionItalic ? "italic" : "normal",
-              }}
+              style={{ ...inputStyle, minHeight: 100 }}
               value={description}
               onChange={(e) => onDescriptionChange(e.target.value)}
               placeholder="Describe your listing..."
@@ -536,7 +364,7 @@ function PostListingForm() {
               className="btn btn-gold"
               style={{ width: "100%", marginTop: 20, padding: "14px 0", fontSize: 15 }}
             >
-              {submitting ? (editId ? "Saving…" : "Posting…") : editId ? "Save Changes" : "Post Ad"}
+              {submitting ? "Posting…" : "Post Ad"}
             </button>
           </form>
         )}
@@ -548,14 +376,6 @@ function PostListingForm() {
         </p>
       </footer>
     </>
-  );
-}
-
-export default function PostListingPage() {
-  return (
-    <Suspense fallback={<p style={{ padding: 24 }}>Loading…</p>}>
-      <PostListingForm />
-    </Suspense>
   );
 }
 
@@ -575,16 +395,6 @@ const inputStyle: React.CSSProperties = {
   border: "1px solid var(--border)",
   fontSize: 14,
   fontFamily: "inherit",
-};
-
-const formatToggleBtn: React.CSSProperties = {
-  width: 30,
-  height: 30,
-  borderRadius: 6,
-  border: "1px solid var(--border)",
-  fontWeight: 700,
-  fontSize: 13,
-  cursor: "pointer",
 };
 
 const addPhotoBox: React.CSSProperties = {
