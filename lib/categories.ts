@@ -10,7 +10,18 @@ export const CATEGORIES = [
 ];
 
 export const SUB_CATEGORIES: Record<string, string[]> = {
-  Housing: ["Studio", "1BHK", "2BHK", "3BHK", "4BHK+", "Villa", "Room", "Office"],
+  Housing: [
+    "Studio",
+    "1BHK",
+    "2BHK",
+    "3BHK",
+    "4BHK+",
+    "Villa",
+    "Room",
+    "Furnished Apartment",
+    "Furnished Room",
+    "Office",
+  ],
   Car: ["Sedan", "SUV", "Pickup", "Van", "Lease Transfer"],
   Household: ["Furniture", "Electronics", "Kitchen", "Other"],
   "Buy & Sell": [

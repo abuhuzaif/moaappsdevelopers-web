@@ -9,6 +9,7 @@ export interface Listing {
   description: string;
   price: number;
   negotiable?: boolean;
+  views?: number;
   location: string;
   phone: string;
   imageUrls: string[];

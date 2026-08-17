@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { doc, getDoc, deleteDoc, updateDoc, increment } from "firebase/firestore";
+import { doc, getDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Listing, formattedPrice } from "@/lib/types";
 import { timeAgo } from "@/lib/timeago";
@@ -30,16 +30,6 @@ export default function ListingDetailPage() {
           setError("This listing doesn't exist or has been removed.");
         } else {
           setListing({ id: snap.id, ...snap.data() } as Listing);
-
-          // Count a view once per browser session per listing, so refreshing
-          // the page repeatedly doesn't inflate the number artificially.
-          const key = `viewed_${id}`;
-          if (!sessionStorage.getItem(key)) {
-            sessionStorage.setItem(key, "1");
-            updateDoc(doc(db, "listings", id), { views: increment(1) }).catch(() => {
-              // Non-critical — don't block the page if this write fails.
-            });
-          }
         }
       } catch (err: any) {
         setError(err.message ?? "Couldn't load this listing.");
@@ -161,11 +151,6 @@ export default function ListingDetailPage() {
               {listing.createdAt && (
                 <span style={{ marginLeft: 10, fontSize: 12, color: "var(--text-muted)" }}>
                   Posted {timeAgo(listing.createdAt)}
-                </span>
-              )}
-              {!!listing.views && (
-                <span style={{ marginLeft: 10, fontSize: 12, color: "var(--text-muted)" }}>
-                  👁️ {listing.views} {listing.views === 1 ? "view" : "views"}
                 </span>
               )}
               <h1 style={{ fontSize: 24, margin: "12px 0 4px" }}>{listing.title}</h1>
