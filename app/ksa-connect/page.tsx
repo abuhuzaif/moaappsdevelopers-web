@@ -191,7 +191,7 @@ export default function KsaConnectPage() {
           <div className="mk-section-head"><h2>Browse Ads by City</h2><button onClick={() => { setCities(new Set()); document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" }); }}>View all cities →</button></div>
           <div className="mk-city-grid">
             {CITY_OPTIONS.map((city, i) => (
-              <button key={city.value} className="mk-city-card" onClick={() => handleCityClick(city.value)} style={{ backgroundImage: `linear-gradient(180deg, rgba(2,24,34,.02) 35%, rgba(2,12,20,.9) 100%), url('/images/cities/${city.image}.jpg')` }}>
+              <button key={city.value} className={`mk-city-card${cities.has(city.value) ? " mk-city-card-active" : ""}`} onClick={() => handleCityClick(city.value)} style={{ backgroundImage: `linear-gradient(180deg, rgba(2,24,34,.02) 35%, rgba(2,12,20,.9) 100%), url('/images/cities/${city.image}.jpg')` }}>
                 <span className="mk-city-number">{i + 1}</span><span className="mk-city-name">● &nbsp;{city.label}</span>
               </button>
             ))}
@@ -231,7 +231,15 @@ export default function KsaConnectPage() {
             </aside>
             <div className="listings-main">
               <div className="listings-topbar"><input className="search-input" type="text" placeholder="Search listings by title…" value={search} onChange={(e) => setSearch(e.target.value)} style={{ flex: 1, minWidth: 180 }} /><select className="sort-select" value={sort} onChange={(e) => setSort(e.target.value as SortMode)}><option value="newest">Newest first</option><option value="price_low">Price: Low to High</option><option value="price_high">Price: High to Low</option></select><a href="/ksa-connect/post" className="mk-btn mk-btn-gold listings-post-btn">＋ Post an Ad</a></div>
-              {!loading && !error && <p className="results-count">Showing {filtered.length} of {listings.length} listing{listings.length === 1 ? "" : "s"}</p>}
+              {!loading && !error && (
+                <p className="results-count">
+                  Showing {filtered.length} of {listings.length} listing{listings.length === 1 ? "" : "s"}
+                  {cities.size === 1 && (
+                    <> in <strong>{CITY_OPTIONS.find((c) => c.value === Array.from(cities)[0])?.label}</strong></>
+                  )}
+                  {categories.size === 1 && <> · {Array.from(categories)[0]}</>}
+                </p>
+              )}
               {loading && <div className="listing-grid">{Array.from({ length: 6 }).map((_, i) => <div className="skeleton-card" key={i}><div className="skeleton skeleton-image" /><div className="skeleton-body"><div className="skeleton skeleton-line" style={{ width: "80%" }} /><div className="skeleton skeleton-line" style={{ width: "50%" }} /><div className="skeleton skeleton-line" style={{ width: "65%", marginBottom: 0 }} /></div></div>)}</div>}
               {error && <div className="empty-state" style={{ color: "#b91c1c" }}>Couldn&apos;t load listings: {error}<br /><span style={{ fontSize: 12 }}>(Check Firestore security rules and your .env.local Firebase config.)</span></div>}
               {!loading && !error && filtered.length === 0 && <div className="empty-state"><span className="empty-icon">🔍</span>No listings found. Try a different city, category, or search term.</div>}

@@ -1227,7 +1227,9 @@ a {
 .mk-section-head h2,.mk-listings-title h2{margin:0;font-size:20px;letter-spacing:-.3px;}
 .mk-section-head button,.mk-section-head a{border:0;background:none;color:#0c4237;font-weight:750;text-decoration:none;cursor:pointer;}
 .mk-city-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:9px;}
-.mk-city-card{min-width:0;height:155px;border:0;border-radius:11px;background-size:cover;background-position:center;position:relative;overflow:hidden;cursor:pointer;box-shadow:0 4px 13px rgba(4,27,31,.12);padding:0;}
+.mk-city-card{min-width:0;height:155px;border:0;border-radius:11px;background-size:cover;background-position:center;position:relative;overflow:hidden;cursor:pointer;box-shadow:0 4px 13px rgba(4,27,31,.12);padding:0;transition:box-shadow .18s,transform .18s;}
+.mk-city-card-active{box-shadow:0 0 0 3px var(--mk-gold),0 8px 18px rgba(4,27,31,.25);transform:translateY(-2px);}
+.mk-city-card-active .mk-city-number{background:var(--mk-gold);color:#1a1400;}
 .mk-city-number{position:absolute;left:9px;top:9px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#075445;color:#fff;font-weight:800;font-size:11px;}
 .mk-city-name{position:absolute;left:0;right:0;bottom:0;padding:18px 10px 9px;color:#fff;text-align:left;font-size:14px;font-weight:800;background:linear-gradient(transparent,rgba(0,0,0,.9));}
 .mk-category-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;}
