@@ -1,5 +1,6 @@
 import LiveStats from "@/components/LiveStats";
 import MobileNav from "@/components/MobileNav";
+import KsaConnectPage from "./ksa-connect/page";
 
 const apps = [
   {
@@ -51,6 +52,16 @@ const apps = [
 ];
 
 export default function HomePage() {
+  // This lets the SAME codebase power two independent Vercel projects/domains:
+  // - moaappsdevelopers-web (SITE_MODE unset)         -> normal MOA homepage
+  // - a second Vercel project for myksaconnect.com     -> set SITE_MODE=ksaconnect
+  //   in that project's Environment Variables, and its root "/" will render
+  //   the KSA-Connect page directly. No hostname-based rewriting involved —
+  //   each deployment simply renders what its own env var tells it to.
+  if (process.env.SITE_MODE === "ksaconnect") {
+    return <KsaConnectPage />;
+  }
+
   return (
     <>
       <div className="hero-outer">
