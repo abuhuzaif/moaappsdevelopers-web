@@ -17,16 +17,16 @@ const CITY_OPTIONS = [
   { value: "Yanbu", label: "Yanbu", image: "yanbu" },
 ];
 
-const CATEGORIES = ["Housing", "Car", "Household", "Buy & Sell", "Services", "Classifieds"];
+const CATEGORIES = ["Housing", "Car", "Household", "Buy & Sell", "Services", "Electronics", "Jobs", "Community", "Classifieds"];
 const TRENDING_KEYWORDS = ["Villa", "Apartment", "Toyota", "iPhone", "Sofa Set", "Driver", "Room Rent", "Labour", "Furniture"];
 
 const CATEGORY_CARDS = [
   ["⌂", "Housing", "Rent, Sale", "Housing"],
   ["🚗", "Cars", "Buy & Sell", "Car"],
-  ["▣", "Electronics", "Mobiles, Laptops", ""],
+  ["▣", "Electronics", "Mobiles, Laptops", "Electronics"],
   ["⚒", "Services", "Home, Repair", "Services"],
-  ["▤", "Jobs", "Drivers, Labour", ""],
-  ["♙", "Community", "Groups, Events", ""],
+  ["▤", "Jobs", "Drivers, Labour", "Jobs"],
+  ["♙", "Community", "Groups, Events", "Community"],
   ["•••", "Others", "More Ads", "Classifieds"],
 ] as const;
 
@@ -36,6 +36,9 @@ const CATEGORY_ICONS: Record<string, string> = {
   Household: "🛋️",
   "Buy & Sell": "🛍️",
   Services: "🛠️",
+  Electronics: "💻",
+  Jobs: "💼",
+  Community: "👥",
   Classifieds: "🏷️",
 };
 

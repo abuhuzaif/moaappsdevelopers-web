@@ -5,10 +5,7 @@ export const CATEGORIES = [
   { key: "Car", label: "Car", emoji: "🚗" },
   { key: "Household", label: "Household", emoji: "🛋️" },
   { key: "Buy & Sell", label: "Buy & Sell", emoji: "🛍️" },
-  { key: "Electronics", label: "Electronics", emoji: "💻" },
   { key: "Services", label: "Services", emoji: "🔧" },
-  { key: "Jobs", label: "Jobs", emoji: "💼" },
-  { key: "Community", label: "Community", emoji: "👥" },
   { key: "Classifieds", label: "Classifieds", emoji: "📋" },
 ];
 
@@ -37,15 +34,6 @@ export const SUB_CATEGORIES: Record<string, string[]> = {
     "Tools & Equipment",
     "Other",
   ],
-  Electronics: [
-    "Mobiles",
-    "Laptops",
-    "TVs",
-    "Cameras",
-    "Accessories",
-    "Home Appliances",
-    "Other",
-  ],
   Services: [
     "AC Repair",
     "Cleaning",
@@ -56,23 +44,6 @@ export const SUB_CATEGORIES: Record<string, string[]> = {
     "Delivery",
     "Relocation",
     "Cargo",
-  ],
-  Jobs: [
-    "Driver",
-    "Labour",
-    "Domestic Help",
-    "Office Staff",
-    "Delivery Rider",
-    "Technician",
-    "Other",
-  ],
-  Community: [
-    "Events",
-    "Groups",
-    "Lost & Found",
-    "Announcements",
-    "Volunteering",
-    "Other",
   ],
   Classifieds: [
     "Jobs",
