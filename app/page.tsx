@@ -64,6 +64,9 @@ export default function HomePage() {
 
   return (
     <>
+      <div style={{ background: "red", color: "white", padding: 12, fontSize: 14, fontWeight: 700 }}>
+        DEBUG — SITE_MODE value seen at build time: {JSON.stringify(process.env.SITE_MODE)}
+      </div>
       <div className="hero-outer">
         <div className="hero-photo-box">
           <div
