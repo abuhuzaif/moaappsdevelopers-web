@@ -1235,6 +1235,7 @@ a {
 .mk-category-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;}
 .mk-category-card{min-height:122px;background:#fff;border:1px solid #e6e4dc;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:#0d2722;transition:.18s;}
 .mk-category-card:hover{border-color:#cda12b;transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.06);}
+.mk-category-card-active{border-color:var(--mk-gold)!important;box-shadow:0 0 0 2px var(--mk-gold),0 8px 18px rgba(0,0,0,.1);transform:translateY(-2px);}
 .mk-category-icon{font-size:27px;color:#075445;line-height:1;}
 .mk-category-card strong{font-size:13px;}
 .mk-category-card small{color:#66706d;font-size:11px;}

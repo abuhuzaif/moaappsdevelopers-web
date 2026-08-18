@@ -205,7 +205,7 @@ export default function KsaConnectPage() {
           <div className="mk-section-head"><h2>Browse by Category</h2><button onClick={clearAll}>View all categories →</button></div>
           <div className="mk-category-grid">
             {CATEGORY_CARDS.map(([icon, title, sub, filter]) => (
-              <button key={title} className="mk-category-card" onClick={() => filter && setCategories(new Set([filter]))}>
+              <button key={title} className={`mk-category-card${filter && categories.has(filter) ? " mk-category-card-active" : ""}`} onClick={() => filter && setCategories(new Set([filter]))}>
                 <span className="mk-category-icon">{icon}</span><strong>{title}</strong><small>{sub}</small>
               </button>
             ))}
