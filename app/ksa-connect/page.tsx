@@ -262,7 +262,7 @@ export default function KsaConnectPage() {
             <div><span>♧</span><strong>24/7 Support</strong><small>We are here to help you anytime.</small></div>
           </section>
         </div>
-        <p><a href="/ksa-connect/privacy">Privacy Policy</a> · <a href="mailto:abuman.moa@gmail.com">Contact</a></p>
+        <p><a href="/ksa-connect/privacy">Privacy Policy</a> · <a href="/ksa-connect/safety">Safety &amp; Fraud Prevention</a> · <a href="mailto:abuman.moa@gmail.com">Contact</a></p>
       </footer>
     </div>
   );
