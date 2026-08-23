@@ -219,9 +219,26 @@ export default function KsaConnectPage() {
                 key={city.value}
                 href={`/ksa-connect/city/${city.value.toLowerCase()}`}
                 className="mk-city-card"
-                style={{ backgroundImage: `linear-gradient(180deg, rgba(2,24,34,.02) 35%, rgba(2,12,20,.9) 100%), url('/images/cities/${city.image}.jpg')` }}
+                style={{ position: "relative", overflow: "hidden" }}
               >
-                <span className="mk-city-number">{i + 1}</span><span className="mk-city-name">● &nbsp;{city.label}</span>
+                <Image
+                  src={`/images/cities/${city.image}.jpg`}
+                  alt={`${city.label} skyline`}
+                  fill
+                  sizes="(max-width: 640px) 45vw, 160px"
+                  style={{ objectFit: "cover", zIndex: 0 }}
+                />
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: "linear-gradient(180deg, rgba(2,24,34,.02) 35%, rgba(2,12,20,.9) 100%)",
+                    zIndex: 1,
+                  }}
+                />
+                <span className="mk-city-number" style={{ position: "relative", zIndex: 2 }}>{i + 1}</span>
+                <span className="mk-city-name" style={{ position: "relative", zIndex: 2 }}>● &nbsp;{city.label}</span>
               </a>
             ))}
           </div>
