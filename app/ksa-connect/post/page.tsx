@@ -12,6 +12,7 @@ import { DRAFT_TEMPLATES } from "@/lib/draftTemplates";
 
 const MAX_PHOTOS = 3;
 const LISTING_LIFESPAN_DAYS = 8;
+const IS_KSA_CONNECT_SITE = process.env.NEXT_PUBLIC_SITE_MODE === "ksaconnect";
 const DESCRIPTION_COLORS = [
   { label: "Default", value: "" },
   { label: "Red", value: "#dc2626" },
@@ -240,8 +241,8 @@ function PostListingForm() {
     <>
       <nav className="nav container">
         <a href="/" className="brand">
-          <div className="brand-badge">M</div>
-          MOA Apps Developer&apos;s
+          <div className="brand-badge">{IS_KSA_CONNECT_SITE ? "K" : "M"}</div>
+          {IS_KSA_CONNECT_SITE ? "KSA-Connect" : "MOA Apps Developer's"}
         </a>
       </nav>
 
