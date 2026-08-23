@@ -3,7 +3,7 @@ import { CITIES } from "@/lib/categories";
 import CityListingsClient from "./CityListingsClient";
 
 type Props = {
-  params: { city: string };
+  params: Promise<{ city: string }>;
 };
 
 function slugToCityValue(slug: string): string | null {
@@ -17,12 +17,13 @@ export function generateStaticParams() {
   return CITIES.map((c) => ({ city: c.toLowerCase() }));
 }
 
-export function generateMetadata({ params }: Props): Metadata {
-  const cityValue = slugToCityValue(params.city);
-  const cityName = cityValue ?? params.city;
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { city } = await params;
+  const cityValue = slugToCityValue(city);
+  const cityName = cityValue ?? city;
   const title = `Classifieds in ${cityName} — Housing, Cars & More | KSA-Connect`;
   const description = `Browse live housing, car, job, household, and classifieds listings in ${cityName}, Saudi Arabia. Post a free ad or find what you need on KSA-Connect.`;
-  const url = `https://www.myksaconnect.com/ksa-connect/city/${params.city.toLowerCase()}`;
+  const url = `https://www.myksaconnect.com/ksa-connect/city/${city.toLowerCase()}`;
 
   return {
     title,
@@ -37,7 +38,8 @@ export function generateMetadata({ params }: Props): Metadata {
   };
 }
 
-export default function CityPage({ params }: Props) {
-  const cityValue = slugToCityValue(params.city);
-  return <CityListingsClient citySlug={params.city} cityValue={cityValue} />;
+export default async function CityPage({ params }: Props) {
+  const { city } = await params;
+  const cityValue = slugToCityValue(city);
+  return <CityListingsClient citySlug={city} cityValue={cityValue} />;
 }
