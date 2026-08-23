@@ -1,16 +1,63 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "MOA Apps Developer's",
-  description: "Mobile apps and digital tools built to help people around the world.",
-  metadataBase: new URL("https://moaappsdevelopers.com"),
-  openGraph: {
-    title: "MOA Apps Developer's",
-    description: "Mobile apps and digital tools built to help people around the world.",
-    type: "website",
-    url: "https://moaappsdevelopers.com",
-  },
+const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
+
+export const metadata: Metadata = isKsaConnectSite
+  ? {
+      title: "KSA-Connect — Housing, Cars & Classifieds in Saudi Arabia",
+      description:
+        "Browse live classifieds across Riyadh, Jeddah, Dammam, Khobar, Jubail, Yanbu, and Madinah. Housing, cars, household items, services, and more.",
+      metadataBase: new URL("https://www.myksaconnect.com"),
+      openGraph: {
+        title: "KSA-Connect — Housing, Cars & Classifieds in Saudi Arabia",
+        description:
+          "Browse live classifieds across 7 Saudi cities. Housing, cars, household items, services, and more.",
+        type: "website",
+        url: "https://www.myksaconnect.com",
+      },
+    }
+  : {
+      title: "MOA Apps Developer's",
+      description: "Mobile apps and digital tools built to help people around the world.",
+      metadataBase: new URL("https://moaappsdevelopers.com"),
+      openGraph: {
+        title: "MOA Apps Developer's",
+        description: "Mobile apps and digital tools built to help people around the world.",
+        type: "website",
+        url: "https://moaappsdevelopers.com",
+      },
+    };
+
+// Organization + WebSite JSON-LD — only rendered for the KSA-Connect site.
+// Helps Google show rich results and helps AI answer engines (ChatGPT,
+// Perplexity, etc.) correctly identify what KSA-Connect is.
+const ksaConnectSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.myksaconnect.com/#organization",
+      name: "KSA-Connect",
+      url: "https://www.myksaconnect.com",
+      description:
+        "Free classifieds and matrimonial platform for expatriates and residents in Saudi Arabia, covering 7 cities.",
+      areaServed: {
+        "@type": "Country",
+        name: "Saudi Arabia",
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.myksaconnect.com/#website",
+      url: "https://www.myksaconnect.com",
+      name: "KSA-Connect",
+      description:
+        "Browse live classifieds across Riyadh, Jeddah, Dammam, Khobar, Jubail, Yanbu, and Madinah — housing, cars, household items, services, jobs, and more.",
+      publisher: { "@id": "https://www.myksaconnect.com/#organization" },
+      inLanguage: "en",
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -27,6 +74,12 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
+        {isKsaConnectSite && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(ksaConnectSchema) }}
+          />
+        )}
       </head>
       <body>{children}</body>
     </html>
