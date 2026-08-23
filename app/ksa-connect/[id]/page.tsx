@@ -9,6 +9,8 @@ import { timeAgo } from "@/lib/timeago";
 import { useAuth } from "@/lib/useAuth";
 import { ADMIN_EMAILS, isAdmin } from "@/lib/admin";
 
+const IS_KSA_CONNECT_SITE = process.env.NEXT_PUBLIC_SITE_MODE === "ksaconnect";
+
 export default function ListingDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -68,8 +70,8 @@ export default function ListingDetailPage() {
     <>
       <nav className="nav container">
         <a href="/" className="brand">
-          <div className="brand-badge">M</div>
-          MOA Apps Developer&apos;s
+          <div className="brand-badge">{IS_KSA_CONNECT_SITE ? "K" : "M"}</div>
+          {IS_KSA_CONNECT_SITE ? "KSA-Connect" : "MOA Apps Developer's"}
         </a>
       </nav>
 
