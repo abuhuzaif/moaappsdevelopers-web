@@ -9,8 +9,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // myksaconnect.com — SITE_MODE renders KsaConnectPage at root,
     // so these paths are NOT prefixed with /ksa-connect
     const base = "https://www.myksaconnect.com";
+    const cities = ["riyadh", "jeddah", "dammam", "khobar", "jubail", "yanbu", "madinah"];
     return [
       { url: base, lastModified: new Date(), changeFrequency: "hourly", priority: 1 },
+      ...cities.map((slug) => ({
+        url: `${base}/ksa-connect/city/${slug}`,
+        lastModified: new Date(),
+        changeFrequency: "hourly" as const,
+        priority: 0.8,
+      })),
       { url: `${base}/ksa-connect/privacy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
       { url: `${base}/ksa-connect/safety`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.4 },
     ];
