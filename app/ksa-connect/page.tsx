@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { collection, limit, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { db, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
@@ -246,7 +247,24 @@ export default function KsaConnectPage() {
         {featured.length > 0 && (
           <section className="mk-featured">
             <div className="mk-section-head"><h2>Featured Listings</h2><a href="#listings">View all →</a></div>
-            <div className="featured-scroll">{featured.map((l) => <a href={`/ksa-connect/${l.id}`} key={l.id} className="featured-card">{l.imageUrls?.[0] ? <img src={l.imageUrls[0]} alt={l.title} className="featured-image" /> : <div className="featured-image featured-image-empty" />}<span className="featured-tag">⭐ Featured</span><div className="listing-body"><p className="listing-title">{l.title}</p><p className="listing-price">{formattedPrice(l)}</p></div></a>)}</div>
+            <div className="featured-scroll">
+              {featured.map((l) => (
+                <a href={`/ksa-connect/${l.id}`} key={l.id} className="featured-card">
+                  {l.imageUrls?.[0] ? (
+                    <div style={{ position: "relative", width: "100%", height: "100%" }} className="featured-image">
+                      <Image src={l.imageUrls[0]} alt={l.title} fill sizes="280px" style={{ objectFit: "cover" }} />
+                    </div>
+                  ) : (
+                    <div className="featured-image featured-image-empty" />
+                  )}
+                  <span className="featured-tag">⭐ Featured</span>
+                  <div className="listing-body">
+                    <p className="listing-title">{l.title}</p>
+                    <p className="listing-price">{formattedPrice(l)}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
           </section>
         )}
 
@@ -271,7 +289,30 @@ export default function KsaConnectPage() {
               {loading && <div className="listing-grid">{Array.from({ length: 6 }).map((_, i) => <div className="skeleton-card" key={i}><div className="skeleton skeleton-image" /><div className="skeleton-body"><div className="skeleton skeleton-line" style={{ width: "80%" }} /><div className="skeleton skeleton-line" style={{ width: "50%" }} /><div className="skeleton skeleton-line" style={{ width: "65%", marginBottom: 0 }} /></div></div>)}</div>}
               {error && <div className="empty-state" style={{ color: "#b91c1c" }}>Couldn&apos;t load listings: {error}<br /><span style={{ fontSize: 12 }}>(Check Firestore security rules and your .env.local Firebase config.)</span></div>}
               {!loading && !error && filtered.length === 0 && <div className="empty-state"><span className="empty-icon">🔍</span>No listings found. Try a different city, category, or search term.</div>}
-              {!loading && !error && filtered.length > 0 && <div className="listing-grid">{filtered.map((l) => <div className="listing-card" key={l.id}><div style={{ position: "relative" }}>{l.imageUrls?.[0] ? <img src={l.imageUrls[0]} alt={l.title} className="listing-image" /> : <div className="listing-image listing-image-empty" />}{l.createdAt && <span className="date-badge">{timeAgo(l.createdAt)}</span>}<button className="heart-btn" aria-label="Save listing" title="Save listing">🤍</button></div><div className="listing-body"><p className="listing-category-tag">{l.category}</p><p className="listing-title">{l.title}</p><p className="listing-price">{formattedPrice(l)}</p><p className="listing-location">{l.city} · {l.location}</p><a href={`/ksa-connect/${l.id}`} className="view-details-btn">View Details</a></div></div>)}</div>}
+              {!loading && !error && filtered.length > 0 && (
+                <div className="listing-grid">
+                  {filtered.map((l) => (
+                    <div className="listing-card" key={l.id}>
+                      <div style={{ position: "relative" }} className="listing-image">
+                        {l.imageUrls?.[0] ? (
+                          <Image src={l.imageUrls[0]} alt={l.title} fill sizes="(max-width: 640px) 50vw, 280px" style={{ objectFit: "cover" }} />
+                        ) : (
+                          <div className="listing-image-empty" style={{ width: "100%", height: "100%" }} />
+                        )}
+                        {l.createdAt && <span className="date-badge">{timeAgo(l.createdAt)}</span>}
+                        <button className="heart-btn" aria-label="Save listing" title="Save listing">🤍</button>
+                      </div>
+                      <div className="listing-body">
+                        <p className="listing-category-tag">{l.category}</p>
+                        <p className="listing-title">{l.title}</p>
+                        <p className="listing-price">{formattedPrice(l)}</p>
+                        <p className="listing-location">{l.city} · {l.location}</p>
+                        <a href={`/ksa-connect/${l.id}`} className="view-details-btn">View Details</a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>

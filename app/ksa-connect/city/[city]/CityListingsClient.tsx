@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { collection, limit, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Listing, formattedPrice } from "@/lib/types";
@@ -161,12 +162,11 @@ export default function CityListingsClient({ citySlug, cityValue }: Props) {
           <div className="listing-grid">
             {listings.map((l) => (
               <div className="listing-card" key={l.id}>
-                <div style={{ position: "relative" }}>
+                <div style={{ position: "relative" }} className="listing-image">
                   {l.imageUrls?.[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={l.imageUrls[0]} alt={l.title} className="listing-image" />
+                    <Image src={l.imageUrls[0]} alt={l.title} fill sizes="(max-width: 640px) 50vw, 280px" style={{ objectFit: "cover" }} />
                   ) : (
-                    <div className="listing-image listing-image-empty" />
+                    <div className="listing-image-empty" style={{ width: "100%", height: "100%" }} />
                   )}
                   {l.createdAt && <span className="date-badge">{timeAgo(l.createdAt)}</span>}
                 </div>
