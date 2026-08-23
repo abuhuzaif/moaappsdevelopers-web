@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Fraud Prevention & Safety Notice — KSA-Connect",
+  description:
+    "Stay safe on KSA-Connect: verify identity and details before any deal, never share OTPs or bank details, and report suspicious listings.",
+};
+
 export default function SafetyNoticePage() {
   return (
     <div className="mk-page">

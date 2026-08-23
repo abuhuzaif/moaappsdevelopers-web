@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     return [
       { url: base, lastModified: new Date(), changeFrequency: "hourly", priority: 1 },
       { url: `${base}/ksa-connect/privacy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
+      { url: `${base}/ksa-connect/safety`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.4 },
     ];
   }
 
