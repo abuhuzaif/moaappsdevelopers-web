@@ -21,13 +21,13 @@ export const metadata: Metadata = isKsaConnectSite
       title: "MOA Apps Developer's — Smart Apps. Powerful Solutions.",
       description:
         "We design and develop mobile apps, websites, and digital marketing solutions that help businesses grow, connect, and succeed globally.",
-      metadataBase: new URL("https://moaappsdevelopers.com"),
+      metadataBase: new URL("https://www.moaappsdevelopers.com"),
       openGraph: {
         title: "MOA Apps Developer's — Smart Apps. Powerful Solutions.",
         description:
           "We design and develop mobile apps, websites, and digital marketing solutions that help businesses grow, connect, and succeed globally.",
         type: "website",
-        url: "https://moaappsdevelopers.com",
+        url: "https://www.moaappsdevelopers.com",
       },
     };
 
@@ -67,10 +67,10 @@ const moaAppsDevelopersSchema = {
   "@graph": [
     {
       "@type": "Organization",
-      "@id": "https://moaappsdevelopers.com/#organization",
+      "@id": "https://www.moaappsdevelopers.com/#organization",
       name: "MOA Apps Developer's",
       alternateName: "MOA Apps Developers",
-      url: "https://moaappsdevelopers.com",
+      url: "https://www.moaappsdevelopers.com",
       description:
         "MOA Apps Developer's is an independent app and web development studio focused on building smart, reliable digital tools — from community marketplaces to Islamic content apps — designed, built, and maintained end-to-end using Flutter, Firebase, and Next.js.",
       email: "abuman.moa@gmail.com",
@@ -79,12 +79,12 @@ const moaAppsDevelopersSchema = {
     },
     {
       "@type": "WebSite",
-      "@id": "https://moaappsdevelopers.com/#website",
-      url: "https://moaappsdevelopers.com",
+      "@id": "https://www.moaappsdevelopers.com/#website",
+      url: "https://www.moaappsdevelopers.com",
       name: "MOA Apps Developer's",
       description:
         "We design and develop mobile apps, websites, and digital marketing solutions that help businesses grow, connect, and succeed globally.",
-      publisher: { "@id": "https://moaappsdevelopers.com/#organization" },
+      publisher: { "@id": "https://www.moaappsdevelopers.com/#organization" },
       inLanguage: "en",
     },
   ],

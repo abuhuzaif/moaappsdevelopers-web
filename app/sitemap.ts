@@ -27,6 +27,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // moaappsdevelopers.com — main portfolio site. The /ksa-connect pages
   // exist here too (same codebase) but canonicalize to myksaconnect.com,
   // so they're intentionally left out of this site's own sitemap.
-  const base = "https://moaappsdevelopers.com";
+  const base = "https://www.moaappsdevelopers.com";
   return [{ url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1 }];
 }

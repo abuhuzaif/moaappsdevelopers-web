@@ -4,7 +4,7 @@ export default function robots(): MetadataRoute.Robots {
   const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
   const base = isKsaConnectSite
     ? "https://www.myksaconnect.com"
-    : "https://moaappsdevelopers.com";
+    : "https://www.moaappsdevelopers.com";
 
   return {
     rules: [
