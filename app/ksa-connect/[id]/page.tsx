@@ -66,8 +66,43 @@ export default function ListingDetailPage() {
     }
   }
 
+  // Product JSON-LD — lets Google show price/availability/image as a rich
+  // result in search, and helps AI answer engines understand each listing.
+  // "negotiable"/price-on-request listings get no numeric price (Google
+  // disallows fake prices), everything else gets a SAR offer.
+  const listingSchema = listing
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: listing.title,
+        description: listing.description || `${listing.subCategory} in ${listing.city} — ${listing.category} listing on KSA-Connect.`,
+        image: listing.imageUrls?.length ? listing.imageUrls : undefined,
+        category: `${listing.category} > ${listing.subCategory}`,
+        url: `https://www.myksaconnect.com/ksa-connect/${listing.id}`,
+        ...(!listing.negotiable && listing.price
+          ? {
+              offers: {
+                "@type": "Offer",
+                price: listing.price,
+                priceCurrency: "SAR",
+                availability: "https://schema.org/InStock",
+                areaServed: listing.city,
+                url: `https://www.myksaconnect.com/ksa-connect/${listing.id}`,
+              },
+            }
+          : {}),
+      }
+    : null;
+
   return (
     <>
+      {listingSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(listingSchema) }}
+        />
+      )}
+
       <nav className="nav container">
         <a href="/" className="brand">
           <div className="brand-badge">{IS_KSA_CONNECT_SITE ? "K" : "M"}</div>
