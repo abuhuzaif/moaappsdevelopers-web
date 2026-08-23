@@ -1,6 +1,11 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
+  const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
+  const base = isKsaConnectSite
+    ? "https://myksaconnect.com"
+    : "https://moaappsdevelopers.com";
+
   return {
     rules: [
       {
@@ -9,6 +14,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/ksa-connect/post"],
       },
     ],
-    sitemap: "https://moaappsdevelopers.com/sitemap.xml",
+    sitemap: `${base}/sitemap.xml`,
   };
 }

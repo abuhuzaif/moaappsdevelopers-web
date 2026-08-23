@@ -1,11 +1,21 @@
 import type { MetadataRoute } from "next";
 
-// NOTE: This lists the static pages only. Listing detail pages
-// (/ksa-connect/[id]) aren't included here yet since generating them
-// would require fetching all listing IDs at build/request time with
-// Firebase Admin credentials — a good next upgrade once you're ready
-// to set that up.
+// NOTE: Static pages only for now. Listing detail pages would need
+// Firebase Admin fetch at build/request time — good next upgrade.
 export default function sitemap(): MetadataRoute.Sitemap {
+  const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
+
+  if (isKsaConnectSite) {
+    // myksaconnect.com — SITE_MODE renders KsaConnectPage at root,
+    // so these paths are NOT prefixed with /ksa-connect
+    const base = "https://myksaconnect.com";
+    return [
+      { url: base, lastModified: new Date(), changeFrequency: "hourly", priority: 1 },
+      { url: `${base}/privacy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
+    ];
+  }
+
+  // moaappsdevelopers.com — main portfolio site, ksa-connect lives under /ksa-connect
   const base = "https://moaappsdevelopers.com";
   return [
     { url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
