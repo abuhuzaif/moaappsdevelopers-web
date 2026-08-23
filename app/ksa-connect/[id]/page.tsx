@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { doc, getDoc, deleteDoc, updateDoc, increment } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -159,30 +160,43 @@ export default function ListingDetailPage() {
           <div>
             {listing.imageUrls?.length > 0 ? (
               <div>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={listing.imageUrls[activeImage]}
-                  alt={listing.title}
-                  style={{ width: "100%", maxHeight: 420, objectFit: "contain", background: "#e5e7eb", borderRadius: 14 }}
-                />
+                <div
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    height: 420,
+                    background: "#e5e7eb",
+                    borderRadius: 14,
+                    overflow: "hidden",
+                  }}
+                >
+                  <Image
+                    src={listing.imageUrls[activeImage]}
+                    alt={listing.title}
+                    fill
+                    sizes="(max-width: 760px) 100vw, 760px"
+                    style={{ objectFit: "contain" }}
+                    priority
+                  />
+                </div>
                 {listing.imageUrls.length > 1 && (
                   <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
                     {listing.imageUrls.map((url, i) => (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <div
                         key={i}
-                        src={url}
-                        alt=""
                         onClick={() => setActiveImage(i)}
                         style={{
+                          position: "relative",
                           width: 64,
                           height: 64,
-                          objectFit: "cover",
                           borderRadius: 8,
+                          overflow: "hidden",
                           cursor: "pointer",
                           border: activeImage === i ? "2px solid var(--gold)" : "1px solid var(--border)",
                         }}
-                      />
+                      >
+                        <Image src={url} alt="" fill sizes="64px" style={{ objectFit: "cover" }} />
+                      </div>
                     ))}
                   </div>
                 )}
@@ -249,12 +263,9 @@ export default function ListingDetailPage() {
                         🛡️
                       </div>
                     ) : listing.userPhoto ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={listing.userPhoto}
-                        alt=""
-                        style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover" }}
-                      />
+                      <div style={{ position: "relative", width: 44, height: 44, borderRadius: "50%", overflow: "hidden" }}>
+                        <Image src={listing.userPhoto} alt="" fill sizes="44px" style={{ objectFit: "cover" }} />
+                      </div>
                     ) : (
                       <div
                         style={{
