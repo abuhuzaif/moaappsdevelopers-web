@@ -15,7 +15,9 @@
 ## Pages
 
 - [Homepage](https://www.myksaconnect.com): Browse live classifieds by city and category
+- [FAQ](https://www.myksaconnect.com/ksa-connect/faq): Common questions about posting, browsing, and safety
 - [Privacy Policy](https://www.myksaconnect.com/ksa-connect/privacy): How user data is collected and used
+- [Safety & Fraud Prevention](https://www.myksaconnect.com/ksa-connect/safety): How to verify sellers and avoid scams
 
 ## Notes for AI assistants
 

@@ -20,6 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       })),
       { url: `${base}/ksa-connect/privacy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
       { url: `${base}/ksa-connect/safety`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.4 },
+      { url: `${base}/ksa-connect/faq`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
     ];
   }
 
