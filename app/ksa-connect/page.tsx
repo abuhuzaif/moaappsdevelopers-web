@@ -98,6 +98,24 @@ export default function KsaConnectPage() {
 
   const featured = listings.filter((l) => Boolean((l as Listing & { featured?: boolean }).featured)).slice(0, 6);
 
+  // ItemList JSON-LD — represents the unfiltered "live listings" feed so
+  // Google always sees a consistent list here regardless of what a visitor
+  // has filtered/searched for in their own session.
+  const listingsSchema = useMemo(() => {
+    if (listings.length === 0) return null;
+    return {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "KSA-Connect Live Listings",
+      itemListElement: listings.slice(0, 30).map((l, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `https://www.myksaconnect.com/ksa-connect/${l.id}`,
+        name: l.title,
+      })),
+    };
+  }, [listings]);
+
   const clearAll = () => {
     setCities(new Set());
     setCategories(new Set());
@@ -122,6 +140,13 @@ export default function KsaConnectPage() {
 
   return (
     <div className="mk-page">
+      {listingsSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(listingsSchema) }}
+        />
+      )}
+
       <section className="mk-hero" aria-label="MYKSA CONNECT homepage hero">
         <div className="mk-hero-bg" aria-hidden="true" />
         <div className="mk-hero-search-mask" aria-hidden="true" />
