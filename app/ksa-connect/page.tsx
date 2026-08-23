@@ -128,11 +128,6 @@ export default function KsaConnectPage() {
     setter(next);
   };
 
-  const handleCityClick = (value: string) => {
-    setCities(new Set([value]));
-    document.getElementById("listings")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   const handleTrendingClick = (keyword: string) => {
     setSearch(keyword);
     document.getElementById("listings")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -161,7 +156,7 @@ export default function KsaConnectPage() {
               <a href="#listings">Browse Ads⌄</a>
               <a href="#categories">Categories⌄</a>
               <a href="#cities">Cities⌄</a>
-              <a href="#support">Help &amp; Support</a>
+              <a href="/ksa-connect/faq">Help &amp; Support</a>
               <a href="#about">About Us</a>
               {user ? (
                 <button className="mk-login" onClick={() => signOutUser()}>♙ {user.displayName?.split(" ")[0] ?? "Account"}</button>
@@ -219,9 +214,14 @@ export default function KsaConnectPage() {
           <div className="mk-section-head"><h2>Browse Ads by City</h2><button onClick={() => { setCities(new Set()); document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" }); }}>View all cities →</button></div>
           <div className="mk-city-grid">
             {CITY_OPTIONS.map((city, i) => (
-              <button key={city.value} className={`mk-city-card${cities.has(city.value) ? " mk-city-card-active" : ""}`} onClick={() => handleCityClick(city.value)} style={{ backgroundImage: `linear-gradient(180deg, rgba(2,24,34,.02) 35%, rgba(2,12,20,.9) 100%), url('/images/cities/${city.image}.jpg')` }}>
+              <a
+                key={city.value}
+                href={`/ksa-connect/city/${city.value.toLowerCase()}`}
+                className="mk-city-card"
+                style={{ backgroundImage: `linear-gradient(180deg, rgba(2,24,34,.02) 35%, rgba(2,12,20,.9) 100%), url('/images/cities/${city.image}.jpg')` }}
+              >
                 <span className="mk-city-number">{i + 1}</span><span className="mk-city-name">● &nbsp;{city.label}</span>
-              </button>
+              </a>
             ))}
           </div>
         </section>
@@ -240,7 +240,7 @@ export default function KsaConnectPage() {
         <section id="about" className="mk-benefits">
           <div className="mk-why"><p>Why Choose</p><h2>MYKSA <span>CONNECT?</span></h2><ul><li>100% Free to Use</li><li>Post Unlimited Ads</li><li>Chat Directly &amp; Securely</li><li>Reach Local Buyers Faster</li><li>Available Across 7 Major Cities</li></ul></div>
           <div className="mk-map-card"><div className="mk-map-art">✦<br />☀</div><div><strong>One Platform.<br />7 Major Cities.</strong><b>Millions of Opportunities.</b></div></div>
-          <div className="mk-app-card"><div><p className="mk-app-kicker">TAKE MYKSA CONNECT</p><h2>With You Anywhere</h2><p>Post, chat and manage your ads on the go.</p><div className="mk-store-row"><a href="https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect" target="_blank" rel="noreferrer">▶ Google Play</a><a href="#support"> App Store</a></div></div><div className="mk-mini-phone">MYKSA<br /><b>CONNECT</b></div></div>
+          <div className="mk-app-card"><div><p className="mk-app-kicker">TAKE MYKSA CONNECT</p><h2>With You Anywhere</h2><p>Post, chat and manage your ads on the go.</p><div className="mk-store-row"><a href="https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect" target="_blank" rel="noreferrer">▶ Google Play</a><a href="/ksa-connect/faq"> App Store</a></div></div><div className="mk-mini-phone">MYKSA<br /><b>CONNECT</b></div></div>
         </section>
 
         {featured.length > 0 && (
@@ -287,7 +287,12 @@ export default function KsaConnectPage() {
             <div><span>♧</span><strong>24/7 Support</strong><small>We are here to help you anytime.</small></div>
           </section>
         </div>
-        <p><a href="/ksa-connect/privacy">Privacy Policy</a> · <a href="/ksa-connect/safety">Safety &amp; Fraud Prevention</a> · <a href="mailto:abuman.moa@gmail.com">Contact</a></p>
+        <p>
+          <a href="/ksa-connect/faq">FAQ</a> ·{" "}
+          <a href="/ksa-connect/privacy">Privacy Policy</a> ·{" "}
+          <a href="/ksa-connect/safety">Safety &amp; Fraud Prevention</a> ·{" "}
+          <a href="mailto:abuman.moa@gmail.com">Contact</a>
+        </p>
       </footer>
     </div>
   );
