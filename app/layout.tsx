@@ -18,12 +18,14 @@ export const metadata: Metadata = isKsaConnectSite
       },
     }
   : {
-      title: "MOA Apps Developer's",
-      description: "Mobile apps and digital tools built to help people around the world.",
+      title: "MOA Apps Developer's — Smart Apps. Powerful Solutions.",
+      description:
+        "We design and develop mobile apps, websites, and digital marketing solutions that help businesses grow, connect, and succeed globally.",
       metadataBase: new URL("https://moaappsdevelopers.com"),
       openGraph: {
-        title: "MOA Apps Developer's",
-        description: "Mobile apps and digital tools built to help people around the world.",
+        title: "MOA Apps Developer's — Smart Apps. Powerful Solutions.",
+        description:
+          "We design and develop mobile apps, websites, and digital marketing solutions that help businesses grow, connect, and succeed globally.",
         type: "website",
         url: "https://moaappsdevelopers.com",
       },
@@ -70,8 +72,9 @@ const moaAppsDevelopersSchema = {
       alternateName: "MOA Apps Developers",
       url: "https://moaappsdevelopers.com",
       description:
-        "Independent Flutter and Next.js developer building mobile apps and web portals for expatriate communities in Saudi Arabia and for restaurant and business clients.",
+        "MOA Apps Developer's is an independent app and web development studio focused on building smart, reliable digital tools — from community marketplaces to Islamic content apps — designed, built, and maintained end-to-end using Flutter, Firebase, and Next.js.",
       email: "abuman.moa@gmail.com",
+      knowsAbout: ["Mobile App Development", "Website Development", "Digital Marketing"],
       sameAs: ["https://www.myksaconnect.com"],
     },
     {
@@ -79,7 +82,8 @@ const moaAppsDevelopersSchema = {
       "@id": "https://moaappsdevelopers.com/#website",
       url: "https://moaappsdevelopers.com",
       name: "MOA Apps Developer's",
-      description: "Mobile apps and digital tools built to help people around the world.",
+      description:
+        "We design and develop mobile apps, websites, and digital marketing solutions that help businesses grow, connect, and succeed globally.",
       publisher: { "@id": "https://moaappsdevelopers.com/#organization" },
       inLanguage: "en",
     },
