@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export default function robots(): MetadataRoute.Robots {
   const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
   const base = isKsaConnectSite
-    ? "https://myksaconnect.com"
+    ? "https://www.myksaconnect.com"
     : "https://moaappsdevelopers.com";
 
   return {

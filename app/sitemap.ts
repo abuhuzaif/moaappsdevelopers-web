@@ -8,10 +8,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   if (isKsaConnectSite) {
     // myksaconnect.com — SITE_MODE renders KsaConnectPage at root,
     // so these paths are NOT prefixed with /ksa-connect
-    const base = "https://myksaconnect.com";
+    const base = "https://www.myksaconnect.com";
     return [
       { url: base, lastModified: new Date(), changeFrequency: "hourly", priority: 1 },
-      { url: `${base}/privacy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
+      { url: `${base}/ksa-connect/privacy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
     ];
   }
 
