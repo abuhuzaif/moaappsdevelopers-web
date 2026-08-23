@@ -24,11 +24,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ];
   }
 
-  // moaappsdevelopers.com — main portfolio site, ksa-connect lives under /ksa-connect
+  // moaappsdevelopers.com — main portfolio site. The /ksa-connect pages
+  // exist here too (same codebase) but canonicalize to myksaconnect.com,
+  // so they're intentionally left out of this site's own sitemap.
   const base = "https://moaappsdevelopers.com";
-  return [
-    { url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
-    { url: `${base}/ksa-connect`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.9 },
-    { url: `${base}/ksa-connect/privacy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
-  ];
+  return [{ url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1 }];
 }

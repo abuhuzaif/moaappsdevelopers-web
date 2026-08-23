@@ -4,6 +4,9 @@ export const metadata: Metadata = {
   title: "Frequently Asked Questions — KSA-Connect",
   description:
     "Common questions about posting ads, browsing listings, matrimonial matching, and staying safe on KSA-Connect — the free classifieds platform for expats in Saudi Arabia.",
+  alternates: {
+    canonical: "https://www.myksaconnect.com/ksa-connect/faq",
+  },
 };
 
 const FAQS = [

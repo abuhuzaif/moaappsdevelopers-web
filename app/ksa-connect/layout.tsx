@@ -4,6 +4,9 @@ export const metadata: Metadata = {
   title: "KSA-Connect — Housing, Cars & Classifieds in Saudi Arabia",
   description:
     "Browse live classifieds across Riyadh, Jeddah, Dammam, Khobar, Jubail, Yanbu, and Madinah. Housing, cars, household items, services, and more.",
+  alternates: {
+    canonical: "https://www.myksaconnect.com/ksa-connect",
+  },
   openGraph: {
     title: "KSA-Connect — Housing, Cars & Classifieds in Saudi Arabia",
     description:

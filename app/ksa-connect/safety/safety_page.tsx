@@ -4,6 +4,9 @@ export const metadata: Metadata = {
   title: "Fraud Prevention & Safety Notice — KSA-Connect",
   description:
     "Stay safe on KSA-Connect: verify identity and details before any deal, never share OTPs or bank details, and report suspicious listings.",
+  alternates: {
+    canonical: "https://www.myksaconnect.com/ksa-connect/safety",
+  },
 };
 
 export default function SafetyNoticePage() {
