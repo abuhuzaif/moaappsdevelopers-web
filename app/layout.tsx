@@ -29,9 +29,9 @@ export const metadata: Metadata = isKsaConnectSite
       },
     };
 
-// Organization + WebSite JSON-LD — only rendered for the KSA-Connect site.
-// Helps Google show rich results and helps AI answer engines (ChatGPT,
-// Perplexity, etc.) correctly identify what KSA-Connect is.
+// Organization + WebSite JSON-LD — rendered for whichever site is currently
+// building (SITE_MODE decides at build/request time). Helps Google show
+// rich results and helps AI answer engines correctly identify each site.
 const ksaConnectSchema = {
   "@context": "https://schema.org",
   "@graph": [
@@ -60,11 +60,39 @@ const ksaConnectSchema = {
   ],
 };
 
+const moaAppsDevelopersSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://moaappsdevelopers.com/#organization",
+      name: "MOA Apps Developer's",
+      alternateName: "MOA Apps Developers",
+      url: "https://moaappsdevelopers.com",
+      description:
+        "Independent Flutter and Next.js developer building mobile apps and web portals for expatriate communities in Saudi Arabia and for restaurant and business clients.",
+      email: "abuman.moa@gmail.com",
+      sameAs: ["https://www.myksaconnect.com"],
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://moaappsdevelopers.com/#website",
+      url: "https://moaappsdevelopers.com",
+      name: "MOA Apps Developer's",
+      description: "Mobile apps and digital tools built to help people around the world.",
+      publisher: { "@id": "https://moaappsdevelopers.com/#organization" },
+      inLanguage: "en",
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const schema = isKsaConnectSite ? ksaConnectSchema : moaAppsDevelopersSchema;
+
   return (
     <html lang="en">
       <head>
@@ -74,12 +102,10 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
-        {isKsaConnectSite && (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(ksaConnectSchema) }}
-          />
-        )}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
       </head>
       <body>{children}</body>
     </html>
