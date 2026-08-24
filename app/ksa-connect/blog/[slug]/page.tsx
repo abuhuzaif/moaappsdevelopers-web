@@ -91,7 +91,41 @@ export default async function BlogPostPage({ params }: Props) {
           ))}
         </article>
 
-        {post.city && (
+        {post.contentUrdu && post.contentUrdu.length > 0 && (
+          <>
+            <hr style={{ margin: "36px 0 28px", border: "none", borderTop: "1px solid var(--border)" }} />
+            <p
+              style={{
+                display: "inline-block",
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: 0.4,
+                color: "var(--navy)",
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+                borderRadius: 999,
+                padding: "4px 12px",
+                marginBottom: 16,
+              }}
+            >
+              🇵🇰 Roman Urdu / Hindi mein padhein
+            </p>
+            <article>
+              {post.contentUrdu.map((block, i) => (
+                <div key={i} style={{ marginTop: i === 0 ? 0 : 24 }}>
+                  {block.heading && <h2 style={{ fontSize: 19, marginBottom: 10 }}>{block.heading}</h2>}
+                  {block.paragraphs.map((p, j) => (
+                    <p key={j} style={{ color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 12 }}>
+                      {p}
+                    </p>
+                  ))}
+                </div>
+              ))}
+            </article>
+          </>
+        )}
+
+        {post.city ? (
           <div
             style={{
               marginTop: 32,
@@ -110,6 +144,29 @@ export default async function BlogPostPage({ params }: Props) {
               , or{" "}
               <a href="/ksa-connect/post" style={{ textDecoration: "underline" }}>
                 post your own ad
+              </a>
+              .
+            </p>
+          </div>
+        ) : (
+          <div
+            style={{
+              marginTop: 32,
+              padding: "16px 20px",
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: 12,
+            }}
+          >
+            <p style={{ margin: 0, fontWeight: 700, marginBottom: 6 }}>Stay safe on KSA-Connect</p>
+            <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 14 }}>
+              Read our full{" "}
+              <a href="/ksa-connect/safety" style={{ textDecoration: "underline" }}>
+                Safety &amp; Fraud Prevention guide
+              </a>
+              , or{" "}
+              <a href="/ksa-connect" style={{ textDecoration: "underline" }}>
+                browse verified listings
               </a>
               .
             </p>
