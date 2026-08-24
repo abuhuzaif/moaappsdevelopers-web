@@ -6,6 +6,7 @@ import { db, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
 import { isAdmin } from "@/lib/admin";
 import { ACCENT_COLORS, FONT_STYLES, FontStyleKey } from "@/lib/blogStyles";
+import { parseBlogContent } from "@/lib/blogContentFormat";
 
 type PostDoc = {
   slug: string;
@@ -308,6 +309,64 @@ export default function AdminBlogPage() {
                 />
               ))}
             </div>
+
+            {(() => {
+              const previewFont = FONT_STYLES[form.fontStyle] || FONT_STYLES.classic;
+              const previewBlocks = parseBlogContent(form.content);
+              return (
+                <>
+                  <label style={fieldLabel}>Live Preview</label>
+                  {previewFont.googleFontsHref && <link rel="stylesheet" href={previewFont.googleFontsHref} />}
+                  <div style={{ border: "1px solid var(--border)", borderRadius: 12, padding: 20, background: "white" }}>
+                    <h2
+                      style={{
+                        fontSize: 22,
+                        marginBottom: 12,
+                        fontFamily: previewFont.heading,
+                        color: form.accentColor || undefined,
+                      }}
+                    >
+                      {form.title || "Untitled Post"}
+                    </h2>
+                    {previewBlocks.length === 0 && (
+                      <p style={{ color: "var(--text-muted)", fontSize: 13 }}>
+                        Start typing content above to see a preview…
+                      </p>
+                    )}
+                    {previewBlocks.map((block, i) => (
+                      <div key={i} style={{ marginTop: i === 0 ? 0 : 16 }}>
+                        {block.heading && (
+                          <h3
+                            style={{
+                              fontSize: 16,
+                              marginBottom: 6,
+                              fontFamily: previewFont.heading,
+                              color: form.accentColor || undefined,
+                            }}
+                          >
+                            {block.heading}
+                          </h3>
+                        )}
+                        {block.paragraphs.map((p, j) => (
+                          <p
+                            key={j}
+                            style={{
+                              color: "var(--text-muted)",
+                              lineHeight: 1.6,
+                              marginBottom: 8,
+                              fontFamily: previewFont.body,
+                              fontSize: 14,
+                            }}
+                          >
+                            {p}
+                          </p>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
 
             {error && <p style={{ color: "#b91c1c", fontSize: 13, marginTop: 8 }}>{error}</p>}
 
