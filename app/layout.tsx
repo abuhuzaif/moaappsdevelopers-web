@@ -16,6 +16,9 @@ export const metadata: Metadata = isKsaConnectSite
         type: "website",
         url: "https://www.myksaconnect.com",
       },
+      other: {
+        "facebook-domain-verification": "6clnzykpdbwzf363ahl9yqy3olpz25",
+      },
     }
   : {
       title: "MOA Apps Developer's — Smart Apps. Powerful Solutions.",
