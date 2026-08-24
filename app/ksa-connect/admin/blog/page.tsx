@@ -5,6 +5,7 @@ import { collection, deleteDoc, doc, getDocs, orderBy, query, setDoc } from "fir
 import { db, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
 import { isAdmin } from "@/lib/admin";
+import { ACCENT_COLORS, FONT_STYLES, FontStyleKey } from "@/lib/blogStyles";
 
 type PostDoc = {
   slug: string;
@@ -14,6 +15,8 @@ type PostDoc = {
   city: string;
   content: string;
   contentUrdu: string;
+  fontStyle: FontStyleKey;
+  accentColor: string;
 };
 
 const EMPTY_FORM: PostDoc = {
@@ -24,6 +27,8 @@ const EMPTY_FORM: PostDoc = {
   city: "",
   content: "",
   contentUrdu: "",
+  fontStyle: "classic",
+  accentColor: "",
 };
 
 function slugify(title: string): string {
@@ -66,7 +71,7 @@ export default function AdminBlogPage() {
   }
 
   function startEdit(post: PostDoc) {
-    setForm(post);
+    setForm({ ...post, fontStyle: post.fontStyle || "classic", accentColor: post.accentColor || "" });
     setEditingSlug(post.slug);
     setSlugManuallyEdited(true);
     setError(null);
@@ -95,6 +100,8 @@ export default function AdminBlogPage() {
         city: form.city.trim() || null,
         content: form.content,
         contentUrdu: form.contentUrdu.trim() || null,
+        fontStyle: form.fontStyle,
+        accentColor: form.accentColor || null,
       });
       await refreshPosts();
       startNew();
@@ -262,6 +269,39 @@ export default function AdminBlogPage() {
               value={form.contentUrdu}
               onChange={(e) => setForm((f) => ({ ...f, contentUrdu: e.target.value }))}
             />
+
+            <label style={fieldLabel}>Font Style</label>
+            <select
+              style={inputStyle}
+              value={form.fontStyle}
+              onChange={(e) => setForm((f) => ({ ...f, fontStyle: e.target.value as any }))}
+            >
+              {Object.entries(FONT_STYLES).map(([key, style]) => (
+                <option key={key} value={key}>
+                  {style.label}
+                </option>
+              ))}
+            </select>
+
+            <label style={fieldLabel}>Heading Accent Color</label>
+            <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+              {ACCENT_COLORS.map((c) => (
+                <button
+                  key={c.label}
+                  type="button"
+                  onClick={() => setForm((f) => ({ ...f, accentColor: c.value }))}
+                  title={c.label}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: "50%",
+                    border: form.accentColor === c.value ? "2px solid var(--navy)" : "1px solid var(--border)",
+                    background: c.value || "var(--navy)",
+                    cursor: "pointer",
+                  }}
+                />
+              ))}
+            </div>
 
             {error && <p style={{ color: "#b91c1c", fontSize: 13, marginTop: 8 }}>{error}</p>}
 

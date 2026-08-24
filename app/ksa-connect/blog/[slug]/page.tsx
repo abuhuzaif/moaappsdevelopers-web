@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { parseBlogContent } from "@/lib/blogContentFormat";
+import { FONT_STYLES, FontStyleKey } from "@/lib/blogStyles";
 
 export const revalidate = 60;
 
@@ -17,6 +18,8 @@ type PostDoc = {
   city?: string | null;
   content: string;
   contentUrdu?: string | null;
+  fontStyle?: FontStyleKey | null;
+  accentColor?: string | null;
 };
 
 async function getPost(slug: string): Promise<PostDoc | null> {
@@ -58,6 +61,9 @@ export default async function BlogPostPage({ params }: Props) {
   const contentBlocks = parseBlogContent(post.content);
   const contentUrduBlocks = post.contentUrdu ? parseBlogContent(post.contentUrdu) : null;
 
+  const fontConfig = FONT_STYLES[post.fontStyle || "classic"] || FONT_STYLES.classic;
+  const accentColor = post.accentColor || undefined;
+
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -85,6 +91,15 @@ export default async function BlogPostPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
 
+      {/* Next.js hoists <link> tags found anywhere in the tree into <head> */}
+      {fontConfig.googleFontsHref && (
+        <>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link href={fontConfig.googleFontsHref} rel="stylesheet" />
+        </>
+      )}
+
       <nav className="nav container">
         <a href="/" className="brand">
           <div className="brand-badge">K</div>
@@ -94,7 +109,7 @@ export default async function BlogPostPage({ params }: Props) {
 
       <section className="hero" style={{ padding: "36px 0 44px" }}>
         <div className="container">
-          <h1 style={{ fontSize: 28 }}>{post.title}</h1>
+          <h1 style={{ fontSize: 28, fontFamily: fontConfig.heading, color: accentColor }}>{post.title}</h1>
         </div>
       </section>
 
@@ -102,9 +117,16 @@ export default async function BlogPostPage({ params }: Props) {
         <article>
           {contentBlocks.map((block, i) => (
             <div key={i} style={{ marginTop: i === 0 ? 0 : 24 }}>
-              {block.heading && <h2 style={{ fontSize: 19, marginBottom: 10 }}>{block.heading}</h2>}
+              {block.heading && (
+                <h2 style={{ fontSize: 19, marginBottom: 10, fontFamily: fontConfig.heading, color: accentColor }}>
+                  {block.heading}
+                </h2>
+              )}
               {block.paragraphs.map((p, j) => (
-                <p key={j} style={{ color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 12 }}>
+                <p
+                  key={j}
+                  style={{ color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 12, fontFamily: fontConfig.body }}
+                >
                   {p}
                 </p>
               ))}
@@ -134,9 +156,16 @@ export default async function BlogPostPage({ params }: Props) {
             <article>
               {contentUrduBlocks.map((block, i) => (
                 <div key={i} style={{ marginTop: i === 0 ? 0 : 24 }}>
-                  {block.heading && <h2 style={{ fontSize: 19, marginBottom: 10 }}>{block.heading}</h2>}
+                  {block.heading && (
+                    <h2 style={{ fontSize: 19, marginBottom: 10, fontFamily: fontConfig.heading, color: accentColor }}>
+                      {block.heading}
+                    </h2>
+                  )}
                   {block.paragraphs.map((p, j) => (
-                    <p key={j} style={{ color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 12 }}>
+                    <p
+                      key={j}
+                      style={{ color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 12, fontFamily: fontConfig.body }}
+                    >
                       {p}
                     </p>
                   ))}
