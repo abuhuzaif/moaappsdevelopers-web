@@ -71,7 +71,13 @@ export default function AdminBlogPage() {
   }
 
   function startEdit(post: PostDoc) {
-    setForm({ ...post, fontStyle: post.fontStyle || "classic", accentColor: post.accentColor || "" });
+    setForm({
+      ...post,
+      city: post.city || "",
+      contentUrdu: post.contentUrdu || "",
+      fontStyle: post.fontStyle || "classic",
+      accentColor: post.accentColor || "",
+    });
     setEditingSlug(post.slug);
     setSlugManuallyEdited(true);
     setError(null);
