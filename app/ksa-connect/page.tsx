@@ -7,6 +7,7 @@ import { db, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
 import { Listing, formattedPrice } from "@/lib/types";
 import { timeAgo } from "@/lib/timeago";
+import { BLOG_POSTS } from "@/lib/blogPosts";
 
 const CITY_OPTIONS = [
   { value: "Madinah", label: "Madina", image: "madina" },
@@ -262,6 +263,36 @@ export default function KsaConnectPage() {
                     <p className="listing-title">{l.title}</p>
                     <p className="listing-price">{formattedPrice(l)}</p>
                   </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {BLOG_POSTS.length > 0 && (
+          <section className="mk-section" id="guides">
+            <div className="mk-section-head">
+              <h2>Expat Guides</h2>
+              <a href="/ksa-connect/blog">View all →</a>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 16 }}>
+              {BLOG_POSTS.map((post) => (
+                <a
+                  key={post.slug}
+                  href={`/ksa-connect/blog/${post.slug}`}
+                  style={{
+                    display: "block",
+                    padding: 20,
+                    border: "1px solid var(--border)",
+                    borderRadius: 12,
+                    textDecoration: "none",
+                    color: "inherit",
+                  }}
+                >
+                  <h3 style={{ fontSize: 16, marginBottom: 8 }}>{post.title}</h3>
+                  <p style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.6, margin: 0 }}>
+                    {post.description}
+                  </p>
                 </a>
               ))}
             </div>
