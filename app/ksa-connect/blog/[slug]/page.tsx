@@ -1,18 +1,37 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { BLOG_POSTS } from "@/lib/blogPosts";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { parseBlogContent } from "@/lib/blogContentFormat";
+
+export const revalidate = 60;
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return BLOG_POSTS.map((post) => ({ slug: post.slug }));
+type PostDoc = {
+  title: string;
+  description: string;
+  publishedDate: string;
+  city?: string | null;
+  content: string;
+  contentUrdu?: string | null;
+};
+
+async function getPost(slug: string): Promise<PostDoc | null> {
+  try {
+    const snap = await getDoc(doc(db, "blogPosts", slug));
+    if (!snap.exists()) return null;
+    return snap.data() as PostDoc;
+  } catch {
+    return null;
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = BLOG_POSTS.find((p) => p.slug === slug);
+  const post = await getPost(slug);
   if (!post) return {};
 
   const url = `https://www.myksaconnect.com/ksa-connect/blog/${slug}`;
@@ -32,10 +51,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = BLOG_POSTS.find((p) => p.slug === slug);
+  const post = await getPost(slug);
   if (!post) notFound();
 
   const url = `https://www.myksaconnect.com/ksa-connect/blog/${slug}`;
+  const contentBlocks = parseBlogContent(post.content);
+  const contentUrduBlocks = post.contentUrdu ? parseBlogContent(post.contentUrdu) : null;
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -79,7 +100,7 @@ export default async function BlogPostPage({ params }: Props) {
 
       <main className="container" style={{ maxWidth: 760, paddingBottom: 60 }}>
         <article>
-          {post.content.map((block, i) => (
+          {contentBlocks.map((block, i) => (
             <div key={i} style={{ marginTop: i === 0 ? 0 : 24 }}>
               {block.heading && <h2 style={{ fontSize: 19, marginBottom: 10 }}>{block.heading}</h2>}
               {block.paragraphs.map((p, j) => (
@@ -91,7 +112,7 @@ export default async function BlogPostPage({ params }: Props) {
           ))}
         </article>
 
-        {post.contentUrdu && post.contentUrdu.length > 0 && (
+        {contentUrduBlocks && contentUrduBlocks.length > 0 && (
           <>
             <hr style={{ margin: "36px 0 28px", border: "none", borderTop: "1px solid var(--border)" }} />
             <p
@@ -111,7 +132,7 @@ export default async function BlogPostPage({ params }: Props) {
               🇵🇰 Roman Urdu / Hindi mein padhein
             </p>
             <article>
-              {post.contentUrdu.map((block, i) => (
+              {contentUrduBlocks.map((block, i) => (
                 <div key={i} style={{ marginTop: i === 0 ? 0 : 24 }}>
                   {block.heading && <h2 style={{ fontSize: 19, marginBottom: 10 }}>{block.heading}</h2>}
                   {block.paragraphs.map((p, j) => (

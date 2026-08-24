@@ -2,12 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { collection, limit, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import { collection, getDocs, limit, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { db, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
 import { Listing, formattedPrice } from "@/lib/types";
 import { timeAgo } from "@/lib/timeago";
-import { BLOG_POSTS } from "@/lib/blogPosts";
 
 const CITY_OPTIONS = [
   { value: "Madinah", label: "Madina", image: "madina" },
@@ -56,6 +55,24 @@ export default function KsaConnectPage() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortMode>("newest");
   const [citiesExpanded, setCitiesExpanded] = useState(false);
+  const [blogPosts, setBlogPosts] = useState<{ slug: string; title: string; description: string }[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const q = query(collection(db, "blogPosts"), orderBy("publishedDate", "desc"), limit(3));
+        const snap = await getDocs(q);
+        setBlogPosts(
+          snap.docs.map((d) => {
+            const data = d.data() as any;
+            return { slug: d.id, title: data.title, description: data.description };
+          })
+        );
+      } catch {
+        // Non-critical — homepage still works without the guides section.
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     const q = query(
@@ -269,14 +286,14 @@ export default function KsaConnectPage() {
           </section>
         )}
 
-        {BLOG_POSTS.length > 0 && (
+        {blogPosts.length > 0 && (
           <section className="mk-section" id="guides">
             <div className="mk-section-head">
               <h2>Expat Guides</h2>
               <a href="/ksa-connect/blog">View all →</a>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 16 }}>
-              {BLOG_POSTS.map((post) => (
+              {blogPosts.map((post) => (
                 <a
                   key={post.slug}
                   href={`/ksa-connect/blog/${post.slug}`}

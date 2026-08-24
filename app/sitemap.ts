@@ -1,9 +1,19 @@
 import type { MetadataRoute } from "next";
-import { BLOG_POSTS } from "@/lib/blogPosts";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
-// NOTE: Static pages only for now. Listing detail pages would need
-// Firebase Admin fetch at build/request time — good next upgrade.
-export default function sitemap(): MetadataRoute.Sitemap {
+async function getBlogSlugs(): Promise<string[]> {
+  try {
+    const snap = await getDocs(collection(db, "blogPosts"));
+    return snap.docs.map((d) => d.id);
+  } catch {
+    return [];
+  }
+}
+
+// NOTE: Listing detail pages would need Firebase Admin fetch at
+// build/request time — good next upgrade.
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
 
   if (isKsaConnectSite) {
@@ -11,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // so these paths are NOT prefixed with /ksa-connect
     const base = "https://www.myksaconnect.com";
     const cities = ["riyadh", "jeddah", "dammam", "khobar", "jubail", "yanbu", "madinah"];
+    const blogSlugs = await getBlogSlugs();
     return [
       { url: base, lastModified: new Date(), changeFrequency: "hourly", priority: 1 },
       ...cities.map((slug) => ({
@@ -23,9 +34,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       { url: `${base}/ksa-connect/safety`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.4 },
       { url: `${base}/ksa-connect/faq`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
       { url: `${base}/ksa-connect/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.6 },
-      ...BLOG_POSTS.map((post) => ({
-        url: `${base}/ksa-connect/blog/${post.slug}`,
-        lastModified: new Date(post.publishedDate),
+      ...blogSlugs.map((slug) => ({
+        url: `${base}/ksa-connect/blog/${slug}`,
+        lastModified: new Date(),
         changeFrequency: "monthly" as const,
         priority: 0.7,
       })),

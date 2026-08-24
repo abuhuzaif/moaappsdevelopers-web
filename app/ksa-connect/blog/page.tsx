@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { BLOG_POSTS } from "@/lib/blogPosts";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export const metadata: Metadata = {
   title: "Expat Guides & Tips — KSA-Connect Blog",
@@ -10,7 +11,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogIndexPage() {
+// Re-fetch from Firestore at most once a minute, so posts published/edited
+// via the admin page show up quickly without needing a full redeploy.
+export const revalidate = 60;
+
+type PostSummary = { slug: string; title: string; description: string };
+
+async function getPosts(): Promise<PostSummary[]> {
+  try {
+    const q = query(collection(db, "blogPosts"), orderBy("publishedDate", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => {
+      const data = d.data() as any;
+      return { slug: d.id, title: data.title, description: data.description };
+    });
+  } catch {
+    return [];
+  }
+}
+
+export default async function BlogIndexPage() {
+  const posts = await getPosts();
+
   return (
     <div className="mk-page">
       <nav className="nav container">
@@ -30,7 +52,10 @@ export default function BlogIndexPage() {
       </section>
 
       <main className="container" style={{ maxWidth: 760, paddingBottom: 60 }}>
-        {BLOG_POSTS.map((post) => (
+        {posts.length === 0 && (
+          <p style={{ color: "var(--text-muted)" }}>No guides published yet — check back soon.</p>
+        )}
+        {posts.map((post) => (
           <a
             key={post.slug}
             href={`/ksa-connect/blog/${post.slug}`}
