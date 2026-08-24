@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { BLOG_POSTS } from "@/lib/blogPosts";
 
 // NOTE: Static pages only for now. Listing detail pages would need
 // Firebase Admin fetch at build/request time — good next upgrade.
@@ -21,6 +22,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       { url: `${base}/ksa-connect/privacy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
       { url: `${base}/ksa-connect/safety`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.4 },
       { url: `${base}/ksa-connect/faq`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
+      { url: `${base}/ksa-connect/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.6 },
+      ...BLOG_POSTS.map((post) => ({
+        url: `${base}/ksa-connect/blog/${post.slug}`,
+        lastModified: new Date(post.publishedDate),
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+      })),
     ];
   }
 

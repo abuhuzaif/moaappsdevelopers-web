@@ -329,6 +329,7 @@ export default function KsaConnectPage() {
           </section>
         </div>
         <p>
+          <a href="/ksa-connect/blog">Guides</a> ·{" "}
           <a href="/ksa-connect/faq">FAQ</a> ·{" "}
           <a href="/ksa-connect/privacy">Privacy Policy</a> ·{" "}
           <a href="/ksa-connect/safety">Safety &amp; Fraud Prevention</a> ·{" "}

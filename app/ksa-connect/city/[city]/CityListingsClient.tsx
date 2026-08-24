@@ -189,6 +189,7 @@ export default function CityListingsClient({ citySlug, cityValue }: Props) {
 
       <footer className="footer">
         <p>
+          <a href="/ksa-connect/blog">Guides</a> ·{" "}
           <a href="/ksa-connect/privacy">Privacy Policy</a> ·{" "}
           <a href="/ksa-connect/safety">Safety &amp; Fraud Prevention</a>
         </p>
