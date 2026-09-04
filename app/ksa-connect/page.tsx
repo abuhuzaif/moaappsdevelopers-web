@@ -175,6 +175,7 @@ export default function KsaConnectPage() {
               <a href="#listings">Browse Ads⌄</a>
               <a href="#categories">Categories⌄</a>
               <a href="#cities">Cities⌄</a>
+              <a href="/restaurants">🍽️ Digital Menu</a>
               <a href="/ksa-connect/faq">Help &amp; Support</a>
               <a href="#about">About Us</a>
               {user ? (
@@ -228,6 +229,53 @@ export default function KsaConnectPage() {
             Explore in the app
           </a>
         </section>
+
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              .dm-promo-band {
+                width: 100%;
+                padding: 28px 20px;
+                background: radial-gradient(ellipse at center, #4a1204 0%, #2a0a02 70%, #1a0601 100%);
+                position: relative;
+                overflow: hidden;
+              }
+              .dm-promo-band::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background:
+                  radial-gradient(circle at 10% 20%, rgba(246,185,31,0.12) 0%, transparent 35%),
+                  radial-gradient(circle at 90% 80%, rgba(209,69,12,0.18) 0%, transparent 40%);
+                pointer-events: none;
+              }
+              .dm-promo-link {
+                position: relative;
+                display: block;
+                max-width: 1050px;
+                margin: 0 auto;
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: 0 12px 36px rgba(0,0,0,0.45), 0 0 0 3px rgba(246,185,31,0.25);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+              }
+              .dm-promo-link:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 14px 32px rgba(0,0,0,0.18);
+              }
+              .dm-promo-link img {
+                width: 100%;
+                height: auto;
+                display: block;
+              }
+            `,
+          }}
+        />
+        <div className="dm-promo-band">
+          <a href="/restaurants" className="dm-promo-link" aria-label="Browse Digital Menus">
+            <img src="/digital-menu-promo-banner.png" alt="Hungry? Browse Digital Menus — explore, compare, and order online, no app download needed" />
+          </a>
+        </div>
 
         <section id="cities" className="mk-section">
           <div className="mk-section-head"><h2>Browse Ads by City</h2><button onClick={() => { setCities(new Set()); document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" }); }}>View all cities →</button></div>
@@ -286,35 +334,7 @@ export default function KsaConnectPage() {
           </section>
         )}
 
-        {blogPosts.length > 0 && (
-          <section className="mk-section" id="guides">
-            <div className="mk-section-head">
-              <h2>Expat Guides</h2>
-              <a href="/ksa-connect/blog">View all →</a>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 16 }}>
-              {blogPosts.map((post) => (
-                <a
-                  key={post.slug}
-                  href={`/ksa-connect/blog/${post.slug}`}
-                  style={{
-                    display: "block",
-                    padding: 20,
-                    border: "1px solid var(--border)",
-                    borderRadius: 12,
-                    textDecoration: "none",
-                    color: "inherit",
-                  }}
-                >
-                  <h3 style={{ fontSize: 16, marginBottom: 8 }}>{post.title}</h3>
-                  <p style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.6, margin: 0 }}>
-                    {post.description}
-                  </p>
-                </a>
-              ))}
-            </div>
-          </section>
-        )}
+
 
         <section className="mk-listings-area" id="listings">
           <div className="listings-layout">
@@ -365,6 +385,49 @@ export default function KsaConnectPage() {
           </div>
         </section>
       </main>
+
+      {blogPosts.length > 0 && (
+        <section className="mk-section" id="guides" style={{ background: "#f7f5f0", padding: "48px 20px" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+            <div className="mk-section-head">
+              <div>
+                <p style={{ color: "#005744", fontWeight: 700, fontSize: 12.5, letterSpacing: 1, textTransform: "uppercase", margin: 0 }}>
+                  📖 Resources
+                </p>
+                <h2 style={{ margin: "4px 0 0" }}>Expat Guides</h2>
+              </div>
+              <a href="/ksa-connect/blog">View all →</a>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20, marginTop: 20 }}>
+              {blogPosts.map((post) => (
+                <a
+                  key={post.slug}
+                  href={`/ksa-connect/blog/${post.slug}`}
+                  style={{
+                    display: "block",
+                    padding: 24,
+                    background: "#fff",
+                    border: "1px solid rgba(0,87,68,0.1)",
+                    borderRadius: 14,
+                    textDecoration: "none",
+                    color: "inherit",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                  }}
+                >
+                  <h3 style={{ fontSize: 16.5, marginBottom: 8, color: "#0C1730" }}>{post.title}</h3>
+                  <p style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.6, margin: 0 }}>
+                    {post.description}
+                  </p>
+                  <span style={{ display: "inline-block", marginTop: 12, fontSize: 13, fontWeight: 700, color: "#005744" }}>
+                    Read more →
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="mk-final-cta"><div><h2>Ready to Buy, Sell and Connect?</h2><p>Join thousands of expatriates using MYKSA CONNECT every day.</p><a href="/ksa-connect/post" className="mk-btn mk-btn-gold">Post Your Ad Now →</a></div></section>
       <footer className="footer">
