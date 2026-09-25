@@ -27,7 +27,17 @@ const EXPAT_TOOLS = [
   ["💰", "Salary Calculator", "Monthly & yearly salary", "/tools/salary-calculator/"],
   ["💱", "SAR Currency Converter", "SAR to INR, PKR & more", "/tools/sar-currency-converter/"],
   ["🏠", "Rent Split Calculator", "Split rent with roommates", "/tools/rent-split-calculator/"],
-  ["📅", "Days Between Dates", "Calculate the days between two dates", "/tools/days-between-dates/"],
+  ["🧮", "Zakat Calculator", "Calculate your Zakat", "/tools/zakat-calculator/"],
+] as const;
+
+const PROFESSIONAL_TOOLS = [
+  ["🧾", "End of Service Calculator", "Estimate end-of-service benefits", "/tools/end-of-service-calculator/"],
+  ["💰", "GOSI Calculator", "Estimate GOSI contributions", "/tools/gosi-calculator/"],
+  ["⏰", "Overtime Calculator", "Calculate overtime pay", "/tools/overtime-calculator/"],
+  ["🏖️", "Annual Leave Calculator", "Calculate annual leave balance", "/tools/annual-leave-calculator/"],
+  ["📋", "Final Settlement Calculator", "Estimate your final settlement", "/tools/final-settlement-calculator/"],
+  ["🧾", "VAT Calculator", "Calculate Saudi VAT amounts", "/tools/vat-calculator/"],
+  ["⛽", "Fuel Cost Calculator", "Estimate fuel cost for your trip", "/tools/fuel-cost-calculator/"],
 ] as const;
 
 const RESTAURANT_MENU_FEATURES = [
@@ -230,167 +240,37 @@ export default function KsaConnectPage() {
       </section>
 
       <main className="mk-main">
-        <style>{`
-          .mk-tools-showcase {
-            position: relative;
-            overflow: hidden;
-          }
-          .mk-tools-showcase::before {
-            content: "";
-            position: absolute;
-            width: 240px;
-            height: 240px;
-            right: -90px;
-            top: -110px;
-            border-radius: 50%;
-            background: rgba(246,185,31,.08);
-            pointer-events: none;
-          }
-          .mk-tools-showcase-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 28px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-          }
-          .mk-tools-showcase-copy {
-            min-width: 0;
-          }
-          .mk-tools-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 7px 12px;
-            border-radius: 999px;
-            background: #fff6dc;
-            border: 1px solid #f1d98a;
-            color: #7a5a00;
-            font-size: 11px;
-            font-weight: 900;
-            letter-spacing: .55px;
-            margin-bottom: 10px;
-          }
-          .mk-tools-showcase .mk-strip-kicker {
-            margin-bottom: 3px;
-          }
-          .mk-tools-showcase h2 {
-            margin-bottom: 5px;
-          }
-          .mk-tools-showcase-desc {
-            margin: 0;
-            max-width: 760px;
-            color: #5d6a68;
-            line-height: 1.55;
-          }
-          .mk-tools-quick-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 7px;
-            margin-top: 12px;
-          }
-          .mk-tools-quick-tags span {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: #f1f7f4;
-            border: 1px solid #dce9e4;
-            color: #24564b;
-            font-size: 11px;
-            font-weight: 800;
-          }
-          .mk-tools-explore-cta {
-            flex: 0 0 255px;
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            min-height: 72px;
-            padding: 13px 15px;
-            border-radius: 15px;
-            background: linear-gradient(135deg, #005744, #003c31);
-            color: #fff;
-            text-decoration: none;
-            border: 1px solid rgba(246,185,31,.65);
-            box-shadow: 0 10px 24px rgba(0,87,68,.16);
-            transition: transform .18s ease, box-shadow .18s ease;
-          }
-          .mk-tools-explore-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 14px 28px rgba(0,87,68,.22);
-          }
-          .mk-tools-cta-icon {
-            width: 38px;
-            height: 38px;
-            display: grid;
-            place-items: center;
-            flex: 0 0 38px;
-            border-radius: 11px;
-            background: rgba(246,185,31,.16);
-            border: 1px solid rgba(246,185,31,.4);
-            font-size: 20px;
-          }
-          .mk-tools-explore-cta span:nth-child(2) {
-            flex: 1;
-            min-width: 0;
-          }
-          .mk-tools-explore-cta strong {
-            display: block;
-            font-size: 14px;
-            line-height: 1.2;
-          }
-          .mk-tools-explore-cta small {
-            display: block;
-            margin-top: 3px;
-            color: #d7e8e3;
-            font-size: 11px;
-          }
-          .mk-tools-explore-cta b {
-            color: #f6b91f;
-            font-size: 22px;
-          }
-          @media (max-width: 760px) {
-            .mk-tools-showcase-head {
-              align-items: stretch;
-              flex-direction: column;
-              gap: 15px;
-            }
-            .mk-tools-explore-cta {
-              flex-basis: auto;
-              width: 100%;
-            }
-          }
-        `}</style>
-        <section className="mk-tools-strip mk-tools-showcase" aria-labelledby="expat-tools-title">
-          <div className="mk-tools-showcase-head">
-            <div className="mk-tools-showcase-copy">
-              <div className="mk-tools-badge">🧰 &nbsp; 25+ FREE ESSENTIAL TOOLS</div>
-              <p className="mk-strip-kicker">💼 Professional Tools</p>
-              <h2 id="expat-tools-title">Work, Salary &amp; Business Tools</h2>
-              <p className="mk-tools-showcase-desc">
-                One place for everyday Saudi expat needs — Iqama, salary, currency, HR, travel, rent and professional tools.
-              </p>
-              <div className="mk-tools-quick-tags" aria-label="Tool categories">
-                <span>🪪 Iqama</span>
-                <span>💰 Salary</span>
-                <span>💱 Currency</span>
-                <span>⏱️ Work &amp; HR</span>
-                <span>🗺️ GIS</span>
-              </div>
+        <section className="mk-tools-strip" aria-labelledby="expat-tools-title">
+          <div className="mk-strip-head">
+            <div>
+              <p className="mk-strip-kicker">🇸🇦 Saudi Expat Tools</p>
+              <h2 id="expat-tools-title">Useful Tools for Life in Saudi Arabia</h2>
+              <p>Free, fast and simple tools made for Saudi expatriates.</p>
             </div>
-
-            <a href="/tools/" className="mk-tools-explore-cta">
-              <span className="mk-tools-cta-icon">🧰</span>
-              <span>
-                <strong>Explore All Tools</strong>
-                <small>25+ useful calculators &amp; tools</small>
-              </span>
-              <b aria-hidden="true">→</b>
-            </a>
+            <a href="/tools/" className="mk-strip-link">View all tools →</a>
           </div>
-
           <div className="mk-tools-grid">
             {EXPAT_TOOLS.map(([icon, title, description, href]) => (
+              <a key={href} href={href} className="mk-tool-card">
+                <span className="mk-tool-icon" aria-hidden="true">{icon}</span>
+                <span><strong>{title}</strong><small>{description}</small></span>
+                <b aria-hidden="true">→</b>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        <section className="mk-tools-strip" aria-labelledby="professional-tools-title">
+          <div className="mk-strip-head">
+            <div>
+              <p className="mk-strip-kicker">💼 Professional Saudi Tools</p>
+              <h2 id="professional-tools-title">Work, Salary &amp; Business Tools</h2>
+              <p>Useful calculators for employees, expatriates and businesses in Saudi Arabia.</p>
+            </div>
+            <a href="/tools/" className="mk-strip-link">View all tools →</a>
+          </div>
+          <div className="mk-tools-grid">
+            {PROFESSIONAL_TOOLS.map(([icon, title, description, href]) => (
               <a key={href} href={href} className="mk-tool-card">
                 <span className="mk-tool-icon" aria-hidden="true">{icon}</span>
                 <span><strong>{title}</strong><small>{description}</small></span>
