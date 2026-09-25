@@ -308,16 +308,34 @@ export default function GisToolPage({ slug }: { slug: string }) {
               {coordinateResult && (
                 <div style={{marginTop:22,padding:20,borderRadius:16,background:"#eef7f3",border:"1px solid #cfe4dc"}}>
                   {slug === "latlon-to-utm" ? (
-                    <div style={gridResult}>
-                      <Result label="UTM Zone" value={`${coordinateResult.zone}${coordinateResult.hemisphere}`} />
-                      <Result label="Easting" value={Number(coordinateResult.easting).toFixed(3)+" m"} />
-                      <Result label="Northing" value={Number(coordinateResult.northing).toFixed(3)+" m"} />
-                    </div>
+                    (() => {
+                      const utmResult = coordinateResult as {
+                        zone: number;
+                        hemisphere: string;
+                        easting: number;
+                        northing: number;
+                      };
+                      return (
+                        <div style={gridResult}>
+                          <Result label="UTM Zone" value={`${utmResult.zone}${utmResult.hemisphere}`} />
+                          <Result label="Easting" value={Number(utmResult.easting).toFixed(3)+" m"} />
+                          <Result label="Northing" value={Number(utmResult.northing).toFixed(3)+" m"} />
+                        </div>
+                      );
+                    })()
                   ) : (
-                    <div style={gridResult}>
-                      <Result label="Latitude" value={Number(coordinateResult.latitude).toFixed(8)+"°"} />
-                      <Result label="Longitude" value={Number(coordinateResult.longitude).toFixed(8)+"°"} />
-                    </div>
+                    (() => {
+                      const latLonResult = coordinateResult as {
+                        latitude: number;
+                        longitude: number;
+                      };
+                      return (
+                        <div style={gridResult}>
+                          <Result label="Latitude" value={Number(latLonResult.latitude).toFixed(8)+"°"} />
+                          <Result label="Longitude" value={Number(latLonResult.longitude).toFixed(8)+"°"} />
+                        </div>
+                      );
+                    })()
                   )}
                 </div>
               )}
