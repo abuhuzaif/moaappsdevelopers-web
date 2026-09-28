@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import SalaryCalculator from "./calculator";
+import SalaryCalculator from "./cal";
 
 export const metadata: Metadata = {
   title: "Saudi Salary Calculator | Monthly & Annual Salary Calculator | MYKSA CONNECT",
