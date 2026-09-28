@@ -48,38 +48,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const blogSlugs = await getBlogSlugs();
 
     return [
-      { url: base, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
+      { url: `${base}/`, changeFrequency: "daily", priority: 1 },
       {
-        url: `${base}/tools`,
-        lastModified: new Date(),
+        url: `${base}/tools/`,
         changeFrequency: "weekly",
         priority: 0.95,
       },
       ...TOOL_SLUGS.map((slug) => ({
         url: `${base}/tools/${slug}/`,
-        lastModified: new Date(),
         changeFrequency: "monthly" as const,
         priority: 0.8,
       })),
       {
         url: `${base}/restaurants`,
-        lastModified: new Date(),
         changeFrequency: "daily" as const,
         priority: 0.8,
       },
       ...cities.map((slug) => ({
         url: `${base}/ksa-connect/city/${slug}`,
-        lastModified: new Date(),
         changeFrequency: "daily" as const,
         priority: 0.8,
       })),
-      { url: `${base}/ksa-connect/privacy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
-      { url: `${base}/ksa-connect/safety`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.4 },
-      { url: `${base}/ksa-connect/faq`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-      { url: `${base}/ksa-connect/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
+      { url: `${base}/ksa-connect/privacy`, changeFrequency: "yearly", priority: 0.3 },
+      { url: `${base}/ksa-connect/safety`, changeFrequency: "yearly", priority: 0.4 },
+      { url: `${base}/ksa-connect/faq`, changeFrequency: "monthly", priority: 0.6 },
+      { url: `${base}/ksa-connect/blog`, changeFrequency: "weekly", priority: 0.7 },
       ...blogSlugs.map((slug) => ({
         url: `${base}/ksa-connect/blog/${slug}`,
-        lastModified: new Date(),
         changeFrequency: "monthly" as const,
         priority: 0.7,
       })),
@@ -87,5 +82,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const base = "https://www.moaappsdevelopers.com";
-  return [{ url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1 }];
+  return [{ url: `${base}/`, changeFrequency: "weekly", priority: 1 }];
 }
