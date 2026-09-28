@@ -5,16 +5,50 @@ const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
 
 export const metadata: Metadata = isKsaConnectSite
   ? {
-      title: "KSA-Connect — Housing, Cars & Classifieds in Saudi Arabia",
+      title: {
+        default: "MYKSA CONNECT — Saudi Arabia Classifieds & Expat Tools",
+        template: "%s | MYKSA CONNECT",
+      },
       description:
-        "Browse live classifieds across Riyadh, Jeddah, Dammam, Khobar, Jubail, Yanbu, and Madinah. Housing, cars, household items, services, and more.",
+        "MYKSA CONNECT helps expatriates and residents in Saudi Arabia find classifieds, housing, cars, services, restaurants and free Saudi expat tools.",
       metadataBase: new URL("https://www.myksaconnect.com"),
+      alternates: {
+        canonical: "/",
+      },
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+          "max-video-preview": -1,
+        },
+      },
       openGraph: {
-        title: "KSA-Connect — Housing, Cars & Classifieds in Saudi Arabia",
+        title: "MYKSA CONNECT — Saudi Arabia Classifieds & Expat Tools",
         description:
-          "Browse live classifieds across 7 Saudi cities. Housing, cars, household items, services, and more.",
+          "Find housing, cars, services, restaurants and useful free tools for life and work in Saudi Arabia.",
         type: "website",
         url: "https://www.myksaconnect.com",
+        siteName: "MYKSA CONNECT",
+        locale: "en_SA",
+        images: [
+          {
+            url: "/images/myksa-tools-banner.png",
+            width: 1200,
+            height: 630,
+            alt: "MYKSA CONNECT — Saudi Arabia classifieds and expat tools",
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "MYKSA CONNECT — Saudi Arabia Classifieds & Expat Tools",
+        description:
+          "Classifieds, services and free Saudi expat tools for residents across Saudi Arabia.",
+        images: ["/images/myksa-tools-banner.png"],
       },
       other: {
         "facebook-domain-verification": "6clnzykpdbwzf363ahl9yqy3olpz25",
@@ -25,6 +59,9 @@ export const metadata: Metadata = isKsaConnectSite
       description:
         "We design and develop mobile apps, websites, and digital marketing solutions that help businesses grow, connect, and succeed globally.",
       metadataBase: new URL("https://www.moaappsdevelopers.com"),
+      alternates: {
+        canonical: "/",
+      },
       openGraph: {
         title: "MOA Apps Developer's — Smart Apps. Powerful Solutions.",
         description:
@@ -34,19 +71,17 @@ export const metadata: Metadata = isKsaConnectSite
       },
     };
 
-// Organization + WebSite JSON-LD — rendered for whichever site is currently
-// building (SITE_MODE decides at build/request time). Helps Google show
-// rich results and helps AI answer engines correctly identify each site.
 const ksaConnectSchema = {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "Organization",
       "@id": "https://www.myksaconnect.com/#organization",
-      name: "KSA-Connect",
+      name: "MYKSA CONNECT",
+      alternateName: "KSA-Connect",
       url: "https://www.myksaconnect.com",
       description:
-        "Free classifieds and matrimonial platform for expatriates and residents in Saudi Arabia, covering 7 cities.",
+        "Classifieds, services, restaurants and free digital tools for expatriates and residents in Saudi Arabia.",
       areaServed: {
         "@type": "Country",
         name: "Saudi Arabia",
@@ -56,11 +91,11 @@ const ksaConnectSchema = {
       "@type": "WebSite",
       "@id": "https://www.myksaconnect.com/#website",
       url: "https://www.myksaconnect.com",
-      name: "KSA-Connect",
+      name: "MYKSA CONNECT",
       description:
-        "Browse live classifieds across Riyadh, Jeddah, Dammam, Khobar, Jubail, Yanbu, and Madinah — housing, cars, household items, services, jobs, and more.",
+        "Saudi Arabia classifieds and free expat tools for housing, cars, services, work and everyday life.",
       publisher: { "@id": "https://www.myksaconnect.com/#organization" },
-      inLanguage: "en",
+      inLanguage: "en-SA",
     },
   ],
 };
