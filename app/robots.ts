@@ -11,7 +11,11 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/ksa-connect/post"],
+        disallow: [
+          "/ksa-connect/admin",
+          "/ksa-connect/post",
+          "/api/",
+        ],
       },
     ],
     sitemap: `${base}/sitemap.xml`,
