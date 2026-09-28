@@ -5,16 +5,11 @@ const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
 
 export const metadata: Metadata = isKsaConnectSite
   ? {
-      title: {
-        default: "MYKSA CONNECT — Saudi Arabia Classifieds & Expat Tools",
-        template: "%s | MYKSA CONNECT",
-      },
+      title: "MYKSA CONNECT — Saudi Arabia Classifieds & Expat Tools",
       description:
         "MYKSA CONNECT helps expatriates and residents in Saudi Arabia find classifieds, housing, cars, services, restaurants and free Saudi expat tools.",
       metadataBase: new URL("https://www.myksaconnect.com"),
-      alternates: {
-        canonical: "/",
-      },
+      alternates: { canonical: "/" },
       robots: {
         index: true,
         follow: true,
@@ -59,9 +54,7 @@ export const metadata: Metadata = isKsaConnectSite
       description:
         "We design and develop mobile apps, websites, and digital marketing solutions that help businesses grow, connect, and succeed globally.",
       metadataBase: new URL("https://www.moaappsdevelopers.com"),
-      alternates: {
-        canonical: "/",
-      },
+      alternates: { canonical: "/" },
       openGraph: {
         title: "MOA Apps Developer's — Smart Apps. Powerful Solutions.",
         description:
@@ -82,10 +75,7 @@ const ksaConnectSchema = {
       url: "https://www.myksaconnect.com",
       description:
         "Classifieds, services, restaurants and free digital tools for expatriates and residents in Saudi Arabia.",
-      areaServed: {
-        "@type": "Country",
-        name: "Saudi Arabia",
-      },
+      areaServed: { "@type": "Country", name: "Saudi Arabia" },
     },
     {
       "@type": "WebSite",
@@ -128,11 +118,7 @@ const moaAppsDevelopersSchema = {
   ],
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const schema = isKsaConnectSite ? ksaConnectSchema : moaAppsDevelopersSchema;
 
   return (
@@ -144,10 +130,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       </head>
       <body>{children}</body>
     </html>
