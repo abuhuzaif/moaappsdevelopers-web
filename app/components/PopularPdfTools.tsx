@@ -29,25 +29,26 @@ export default function PopularPdfTools() {
         .mk-pdf-popular {
           position: relative;
           overflow: hidden;
-          margin: 0 0 34px;
-          padding: 28px;
-          border-radius: 22px;
+          margin: 4px auto 38px;
+          padding: 30px;
+          width: min(1500px, 92vw);
+          border-radius: 24px;
           background:
-            radial-gradient(circle at 100% 0%, rgba(246,185,31,.10), transparent 28%),
-            linear-gradient(145deg, #ffffff 0%, #f7fbf9 100%);
-          border: 1px solid #dce8e3;
-          box-shadow: 0 12px 32px rgba(0,55,43,.07);
+            radial-gradient(circle at 100% 0%, rgba(246,185,31,.13), transparent 25%),
+            radial-gradient(circle at 0% 100%, rgba(0,87,68,.055), transparent 28%),
+            linear-gradient(145deg, #ffffff 0%, #f8fbfa 100%);
+          border: 1px solid #d9e7e1;
+          box-shadow: 0 16px 38px rgba(0,55,43,.075);
         }
-        .mk-pdf-popular::before {
+        .mk-pdf-popular::after {
           content: "";
           position: absolute;
-          left: -100px;
-          bottom: -120px;
-          width: 260px;
-          height: 260px;
-          border-radius: 50%;
-          background: rgba(0,87,68,.035);
-          pointer-events: none;
+          left: 0;
+          right: 0;
+          top: 0;
+          height: 3px;
+          background: linear-gradient(90deg, #3b82f6, #22c55e, #eab308, #8b5cf6, #f97316, #06b6d4, #ec4899, #7c3aed);
+          opacity: .9;
         }
         .mk-pdf-head {
           position: relative;
@@ -56,37 +57,54 @@ export default function PopularPdfTools() {
           align-items: flex-end;
           justify-content: space-between;
           gap: 24px;
-          margin-bottom: 20px;
+          margin-bottom: 21px;
         }
         .mk-pdf-heading-wrap { min-width: 0; }
         .mk-pdf-kicker {
           display: inline-flex;
           align-items: center;
           gap: 7px;
-          margin: 0 0 8px;
-          padding: 6px 10px;
+          margin: 0 0 9px;
+          padding: 6px 11px;
           border-radius: 999px;
           background: #fff6dc;
           border: 1px solid #f1d98a;
           color: #7a5a00;
           font-size: 10px;
           font-weight: 900;
-          letter-spacing: .65px;
+          letter-spacing: .7px;
           text-transform: uppercase;
         }
         .mk-pdf-head h2 {
           margin: 0;
           color: #102f29;
-          font-size: clamp(23px, 2.5vw, 29px);
-          line-height: 1.12;
-          letter-spacing: -.45px;
+          font-size: clamp(24px, 2.6vw, 31px);
+          line-height: 1.1;
+          letter-spacing: -.6px;
         }
         .mk-pdf-head p:not(.mk-pdf-kicker) {
-          margin: 7px 0 0;
-          max-width: 650px;
+          margin: 8px 0 0;
+          max-width: 720px;
           color: #64736e;
           font-size: 13px;
-          line-height: 1.55;
+          line-height: 1.58;
+        }
+        .mk-pdf-trust {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 7px;
+          margin-top: 12px;
+        }
+        .mk-pdf-trust span {
+          display: inline-flex;
+          align-items: center;
+          padding: 5px 9px;
+          border-radius: 999px;
+          background: rgba(0,87,68,.045);
+          border: 1px solid #dce9e4;
+          color: #24564b;
+          font-size: 10px;
+          font-weight: 800;
         }
         .mk-pdf-all {
           display: inline-flex;
@@ -94,20 +112,20 @@ export default function PopularPdfTools() {
           gap: 7px;
           flex: 0 0 auto;
           white-space: nowrap;
-          padding: 10px 13px;
-          border-radius: 11px;
-          background: #005744;
-          border: 1px solid #006b55;
+          padding: 11px 15px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, #006650, #004936);
+          border: 1px solid rgba(246,185,31,.55);
           color: #fff;
           text-decoration: none;
           font-weight: 900;
           font-size: 12px;
-          box-shadow: 0 7px 16px rgba(0,87,68,.13);
+          box-shadow: 0 8px 18px rgba(0,87,68,.15);
           transition: transform .18s ease, box-shadow .18s ease;
         }
         .mk-pdf-all:hover {
           transform: translateY(-2px);
-          box-shadow: 0 11px 22px rgba(0,87,68,.18);
+          box-shadow: 0 12px 25px rgba(0,87,68,.22);
         }
         .mk-pdf-grid {
           position: relative;
@@ -121,7 +139,7 @@ export default function PopularPdfTools() {
           display: flex;
           align-items: center;
           gap: 11px;
-          min-height: 92px;
+          min-height: 94px;
           padding: 14px 13px;
           border-radius: 16px;
           text-decoration: none;
@@ -132,8 +150,12 @@ export default function PopularPdfTools() {
         }
         .mk-pdf-card:hover {
           transform: translateY(-4px);
-          filter: saturate(1.04);
-          box-shadow: 0 13px 26px rgba(0,55,43,.12);
+          filter: saturate(1.06);
+          box-shadow: 0 14px 28px rgba(0,55,43,.13);
+        }
+        .mk-pdf-card:focus-visible {
+          outline: 3px solid rgba(0,87,68,.22);
+          outline-offset: 2px;
         }
         .mk-pdf-card strong {
           display: block;
@@ -149,14 +171,14 @@ export default function PopularPdfTools() {
           line-height: 1.38;
         }
         .mk-pdf-icon {
-          width: 44px;
-          height: 44px;
+          width: 45px;
+          height: 45px;
           display: grid;
           place-items: center;
-          flex: 0 0 44px;
+          flex: 0 0 45px;
           border-radius: 12px;
           font-size: 22px;
-          box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
+          box-shadow: inset 0 0 0 1px rgba(255,255,255,.45);
         }
         .mk-pdf-arrow {
           margin-left: auto;
@@ -188,13 +210,13 @@ export default function PopularPdfTools() {
           .mk-pdf-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
         }
         @media (max-width: 650px) {
-          .mk-pdf-popular { padding: 19px; border-radius: 18px; }
+          .mk-pdf-popular { width: 92vw; padding: 20px; border-radius: 19px; }
           .mk-pdf-head { align-items: flex-start; flex-direction: column; gap: 13px; }
           .mk-pdf-all { align-self: flex-start; }
         }
         @media (max-width: 520px) {
           .mk-pdf-grid { grid-template-columns: 1fr; }
-          .mk-pdf-card { min-height: 78px; }
+          .mk-pdf-card { min-height: 80px; }
         }
       `}</style>
 
@@ -203,6 +225,11 @@ export default function PopularPdfTools() {
           <p className="mk-pdf-kicker">🔥 Most Popular PDF Tools</p>
           <h2 id="popular-pdf-tools-title">Free Online PDF Tools</h2>
           <p>Fast, simple browser-based tools for converting, merging, compressing, splitting, signing and working with PDF files.</p>
+          <div className="mk-pdf-trust" aria-label="PDF tool benefits">
+            <span>✓ Free to use</span>
+            <span>✓ No desktop software</span>
+            <span>✓ Browser based</span>
+          </div>
         </div>
         <a className="mk-pdf-all" href="/tools/">View All PDF Tools <span aria-hidden="true">→</span></a>
       </div>
