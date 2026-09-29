@@ -34,10 +34,9 @@ export default function PopularPdfTools() {
   return (
     <section className="mk-pdf-popular" aria-labelledby="popular-pdf-tools-title">
       <style>{`
-        /* The homepage now keeps the 12 most useful tools together in one block.
-           The older secondary tools strip is intentionally hidden so the remaining
-           tools stay available from Explore All Tools without duplicating cards. */
-        :global(.mk-tools-showcase) { display: none !important; }
+        /* Keep the 12 featured tools together on the homepage.
+           The remaining tools stay available through Explore All Tools. */
+        :global(section.mk-tools-showcase) { display: none !important; }
 
         .mk-pdf-popular {
           position: relative;
