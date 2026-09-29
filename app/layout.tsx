@@ -131,6 +131,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
         <link rel="stylesheet" href="/myksa-tool-colors.css?v=2" />
+        <style>{`
+          /* The homepage now keeps the 12 featured PDF + expat tools together.
+             Hide the older duplicate Work, Salary & Business Tools strip. */
+          .mk-page .mk-tools-showcase {
+            display: none !important;
+          }
+        `}</style>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       </head>
       <body>{children}</body>
