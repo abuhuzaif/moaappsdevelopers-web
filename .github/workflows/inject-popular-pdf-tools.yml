@@ -1,0 +1,37 @@
+name: Add PDF tools homepage section
+on:
+  push:
+    branches: [feature/sign-pdf-editor]
+permissions:
+  contents: write
+jobs:
+  inject:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Inject section into homepage
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('app/page.tsx')
+          s = p.read_text(encoding='utf-8')
+          import_line = 'import PopularPdfTools from "@/app/components/PopularPdfTools";\n'
+          marker = '        <section className="mk-tools-strip mk-tools-showcase" aria-labelledby="expat-tools-title">'
+          if 'PopularPdfTools from "@/app/components/PopularPdfTools"' not in s:
+              s = s.replace('import Image from "next/image";\n', 'import Image from "next/image";\n' + import_line, 1)
+          if '<PopularPdfTools />' not in s:
+              if marker not in s:
+                  raise SystemExit('Homepage tools section marker not found')
+              s = s.replace(marker, '        <PopularPdfTools />\n\n' + marker, 1)
+          p.write_text(s, encoding='utf-8')
+      - name: Remove this one-shot workflow
+        run: rm -f .github/workflows/inject-popular-pdf-tools.yml
+      - name: Commit homepage update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/page.tsx .github/workflows/inject-popular-pdf-tools.yml
+          git diff --cached --quiet || git commit -m "Add popular PDF tools to homepage"
+          git push
