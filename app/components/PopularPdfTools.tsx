@@ -9,6 +9,10 @@ const TOOLS = [
   ["✂️", "Split PDF", "Split a PDF and extract only the pages you need.", "/tools/split-pdf/"],
   ["✍️", "Sign PDF", "Add, move and resize your signature on a PDF.", "/tools/sign-pdf/", "NEW"],
   ["🔎", "PDF OCR", "Extract searchable text from scanned PDFs.", "/tools/pdf-ocr/"],
+  ["🪪", "Iqama Expiry Calculator", "Check your Iqama expiry date quickly.", "/tools/iqama-expiry-calculator/"],
+  ["🔄", "Hijri / Gregorian Converter", "Convert Hijri and Gregorian dates instantly.", "/tools/hijri-gregorian-converter/"],
+  ["💰", "Salary Calculator", "Calculate monthly and yearly salary.", "/tools/salary-calculator/"],
+  ["💱", "SAR Currency Converter", "Convert SAR to INR, PKR and more.", "/tools/sar-currency-converter/"],
 ] as const;
 
 const COLORS = [
@@ -20,12 +24,21 @@ const COLORS = [
   "cyan",
   "pink",
   "violet",
+  "sky",
+  "emerald",
+  "gold",
+  "indigo",
 ];
 
 export default function PopularPdfTools() {
   return (
     <section className="mk-pdf-popular" aria-labelledby="popular-pdf-tools-title">
       <style>{`
+        /* The homepage now keeps the 12 most useful tools together in one block.
+           The older secondary tools strip is intentionally hidden so the remaining
+           tools stay available from Explore All Tools without duplicating cards. */
+        :global(.mk-tools-showcase) { display: none !important; }
+
         .mk-pdf-popular {
           position: relative;
           overflow: hidden;
@@ -47,7 +60,7 @@ export default function PopularPdfTools() {
           right: 0;
           top: 0;
           height: 3px;
-          background: linear-gradient(90deg, #3b82f6, #22c55e, #eab308, #8b5cf6, #f97316, #06b6d4, #ec4899, #7c3aed);
+          background: linear-gradient(90deg, #3b82f6, #22c55e, #eab308, #8b5cf6, #f97316, #06b6d4, #ec4899, #7c3aed, #38bdf8, #10b981, #f59e0b, #6366f1);
           opacity: .9;
         }
         .mk-pdf-head {
@@ -194,6 +207,10 @@ export default function PopularPdfTools() {
         .mk-pdf-card.cyan { background:#eafbff; border-color:#a5f3fc; border-top-color:#06b6d4; }.mk-pdf-card.cyan .mk-pdf-icon{background:#cffafe}.mk-pdf-card.cyan .mk-pdf-arrow{color:#0891b2}
         .mk-pdf-card.pink { background:#fff0f7; border-color:#fbcfe8; border-top-color:#ec4899; }.mk-pdf-card.pink .mk-pdf-icon{background:#fce7f3}.mk-pdf-card.pink .mk-pdf-arrow{color:#db2777}
         .mk-pdf-card.violet { background:#f2f0ff; border-color:#c4b5fd; border-top-color:#7c3aed; }.mk-pdf-card.violet .mk-pdf-icon{background:#ede9fe}.mk-pdf-card.violet .mk-pdf-arrow{color:#6d28d9}
+        .mk-pdf-card.sky { background:#edf8ff; border-color:#bae6fd; border-top-color:#38bdf8; }.mk-pdf-card.sky .mk-pdf-icon{background:#e0f2fe}.mk-pdf-card.sky .mk-pdf-arrow{color:#0284c7}
+        .mk-pdf-card.emerald { background:#ecfdf7; border-color:#a7f3d0; border-top-color:#10b981; }.mk-pdf-card.emerald .mk-pdf-icon{background:#d1fae5}.mk-pdf-card.emerald .mk-pdf-arrow{color:#059669}
+        .mk-pdf-card.gold { background:#fff8df; border-color:#fcd34d; border-top-color:#f59e0b; }.mk-pdf-card.gold .mk-pdf-icon{background:#fef3c7}.mk-pdf-card.gold .mk-pdf-arrow{color:#d97706}
+        .mk-pdf-card.indigo { background:#eef2ff; border-color:#c7d2fe; border-top-color:#6366f1; }.mk-pdf-card.indigo .mk-pdf-icon{background:#e0e7ff}.mk-pdf-card.indigo .mk-pdf-arrow{color:#4f46e5}
         .mk-pdf-new {
           position: absolute;
           right: 9px;
@@ -222,16 +239,16 @@ export default function PopularPdfTools() {
 
       <div className="mk-pdf-head">
         <div className="mk-pdf-heading-wrap">
-          <p className="mk-pdf-kicker">🔥 Most Popular PDF Tools</p>
-          <h2 id="popular-pdf-tools-title">Free Online PDF Tools</h2>
-          <p>Fast, simple browser-based tools for converting, merging, compressing, splitting, signing and working with PDF files.</p>
-          <div className="mk-pdf-trust" aria-label="PDF tool benefits">
+          <p className="mk-pdf-kicker">🔥 Most Popular Tools</p>
+          <h2 id="popular-pdf-tools-title">Free Online PDF &amp; Expat Tools</h2>
+          <p>Fast, simple browser-based tools for PDFs plus the essential calculators Saudi Arabia expats use every day.</p>
+          <div className="mk-pdf-trust" aria-label="Tool benefits">
             <span>✓ Free to use</span>
             <span>✓ No desktop software</span>
             <span>✓ Browser based</span>
           </div>
         </div>
-        <a className="mk-pdf-all" href="/tools/">View All PDF Tools <span aria-hidden="true">→</span></a>
+        <a className="mk-pdf-all" href="/tools/">Explore All Tools <span aria-hidden="true">→</span></a>
       </div>
 
       <div className="mk-pdf-grid">
