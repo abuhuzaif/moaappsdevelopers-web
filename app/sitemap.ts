@@ -20,6 +20,16 @@ const TOOL_SLUGS = [
   "travel-currency-calculator",
   "working-hours-calculator",
   "days-between-dates",
+  "gaz-square-meter-converter",
+  "square-feet-square-meter-converter",
+  "marla-converter",
+  "acre-hectare-square-meter-converter",
+  "feet-inches-centimeter-converter",
+  "bmi-calculator",
+  "age-calculator",
+  "percentage-calculator",
+  "loan-emi-calculator",
+  "saudi-vat-calculator",
   "end-of-service-calculator",
   "gosi-calculator",
   "overtime-calculator",
@@ -49,35 +59,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     return [
       { url: `${base}/`, changeFrequency: "daily", priority: 1 },
-      {
-        url: `${base}/tools/`,
-        changeFrequency: "weekly",
-        priority: 0.95,
-      },
-      ...TOOL_SLUGS.map((slug) => ({
-        url: `${base}/tools/${slug}/`,
-        changeFrequency: "monthly" as const,
-        priority: 0.8,
-      })),
-      {
-        url: `${base}/restaurants`,
-        changeFrequency: "daily" as const,
-        priority: 0.8,
-      },
-      ...cities.map((slug) => ({
-        url: `${base}/ksa-connect/city/${slug}`,
-        changeFrequency: "daily" as const,
-        priority: 0.8,
-      })),
+      { url: `${base}/tools/`, changeFrequency: "weekly", priority: 0.95 },
+      ...TOOL_SLUGS.map((slug) => ({ url: `${base}/tools/${slug}/`, changeFrequency: "monthly" as const, priority: 0.8 })),
+      { url: `${base}/restaurants`, changeFrequency: "daily" as const, priority: 0.8 },
+      ...cities.map((slug) => ({ url: `${base}/ksa-connect/city/${slug}`, changeFrequency: "daily" as const, priority: 0.8 })),
       { url: `${base}/ksa-connect/privacy`, changeFrequency: "yearly", priority: 0.3 },
       { url: `${base}/ksa-connect/safety`, changeFrequency: "yearly", priority: 0.4 },
       { url: `${base}/ksa-connect/faq`, changeFrequency: "monthly", priority: 0.6 },
       { url: `${base}/ksa-connect/blog`, changeFrequency: "weekly", priority: 0.7 },
-      ...blogSlugs.map((slug) => ({
-        url: `${base}/ksa-connect/blog/${slug}`,
-        changeFrequency: "monthly" as const,
-        priority: 0.7,
-      })),
+      ...blogSlugs.map((slug) => ({ url: `${base}/ksa-connect/blog/${slug}`, changeFrequency: "monthly" as const, priority: 0.7 })),
     ];
   }
 
