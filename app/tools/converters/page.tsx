@@ -15,15 +15,22 @@ const categoryTitles = {
 } as const;
 
 const categoryStyles = {
-  document: { border: "#b9d9ff", iconBg: "#e8f2ff", accent: "#1976d2", arrow: "#1976d2" },
-  pdf: { border: "#ffd0d0", iconBg: "#fff0f0", accent: "#d83a3a", arrow: "#d83a3a" },
-  data: { border: "#c9edda", iconBg: "#eaf9f0", accent: "#14804a", arrow: "#14804a" },
-  image: { border: "#e0cffd", iconBg: "#f3ebff", accent: "#7a42c8", arrow: "#7a42c8" },
+  document: { border: "#248bd8", iconBg: "rgba(36,139,216,.18)", accent: "#70c4ff", arrow: "#70c4ff" },
+  pdf: { border: "#e05b5b", iconBg: "rgba(224,91,91,.18)", accent: "#ff9696", arrow: "#ff9696" },
+  data: { border: "#2dbb78", iconBg: "rgba(45,187,120,.18)", accent: "#72e0ad", arrow: "#72e0ad" },
+  image: { border: "#9a68e5", iconBg: "rgba(154,104,229,.18)", accent: "#c19aff", arrow: "#c19aff" },
 } as const;
 
 export default function ConverterDirectoryPage() {
   return (
     <main style={{ minHeight: "100vh", background: "#fbfaf7", padding: "32px 20px 70px" }}>
+      <style>{`
+        .converter-dark-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 16px 32px rgba(6,23,42,.22) !important;
+          filter: brightness(1.08);
+        }
+      `}</style>
       <div style={{ maxWidth: 1120, margin: "0 auto" }}>
         <nav style={{ fontSize: 13, marginBottom: 22 }}>
           <a href="/tools/" style={{ color: "#005744", fontWeight: 800, textDecoration: "none" }}>← All Tools</a>
@@ -45,22 +52,23 @@ export default function ConverterDirectoryPage() {
                   <a
                     key={tool.slug}
                     href={`/tools/${tool.slug}/`}
+                    className="converter-dark-card"
                     style={{
                       textDecoration: "none",
                       color: "inherit",
-                      background: "#fff",
+                      background: "linear-gradient(145deg,#132b3c 0%,#0b1d2b 100%)",
                       border: `1px solid ${style.border}`,
                       borderRadius: 16,
                       padding: 18,
-                      boxShadow: "0 6px 18px rgba(6,23,42,.05)",
-                      transition: "transform .18s ease, box-shadow .18s ease, border-color .18s ease",
+                      boxShadow: "0 7px 20px rgba(6,23,42,.14)",
+                      transition: "transform .18s ease, box-shadow .18s ease, filter .18s ease",
                     }}
                   >
-                    <span style={{ display: "inline-flex", width: 32, height: 32, alignItems: "center", justifyContent: "center", borderRadius: 10, background: style.iconBg, color: style.accent, fontWeight: 900, fontSize: 14, marginBottom: 10 }}>
+                    <span style={{ display: "inline-flex", width: 34, height: 34, alignItems: "center", justifyContent: "center", borderRadius: 10, background: style.iconBg, color: style.accent, fontWeight: 900, fontSize: 13, marginBottom: 11, border: `1px solid ${style.border}66` }}>
                       {category === "document" ? "▤" : category === "pdf" ? "PDF" : category === "data" ? "{}" : "◆"}
                     </span>
-                    <strong style={{ display: "block", color: "#06172a", marginBottom: 7 }}>{tool.name}</strong>
-                    <span style={{ display: "block", color: "#65716f", fontSize: 13, lineHeight: 1.5 }}>{tool.shortDescription}</span>
+                    <strong style={{ display: "block", color: "#ffffff", marginBottom: 7, fontSize: 14 }}>{tool.name}</strong>
+                    <span style={{ display: "block", color: "#b9c8d3", fontSize: 13, lineHeight: 1.5 }}>{tool.shortDescription}</span>
                     <span style={{ display: "block", color: style.arrow, fontSize: 12, fontWeight: 800, marginTop: 13 }}>Open tool →</span>
                   </a>
                 ))}
