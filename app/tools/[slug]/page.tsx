@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CONVERTER_DEFINITIONS } from "@/lib/converters/converterTypes";
 import ConverterClient from "../_components/ConverterClient";
 import ServerConverterClient from "../_components/ServerConverterClient";
+import AdvancedPdfToolClient from "../_components/AdvancedPdfToolClient";
 import TxtToPdfClient from "../_components/TxtToPdfClient";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -13,7 +14,15 @@ const INTERACTIVE_CONVERTER_SLUGS = new Set([
   "txt-to-pdf", "jpg-to-pdf", "images-to-pdf", "merge-pdf", "split-pdf", "rotate-pdf", "extract-pdf-pages",
 ]);
 
-const SERVER_CONVERTER_SLUGS = new Set(["word-to-pdf", "pdf-to-word", "pdf-to-csv", "ppt-to-pdf", "pdf-to-ppt"]);
+const SERVER_CONVERTER_SLUGS = new Set([
+  "word-to-pdf", "pdf-to-word", "pdf-to-csv", "pdf-to-excel", "pdf-to-text", "pdf-ocr", "pdf-to-html", "pdf-to-markdown",
+  "ppt-to-pdf", "pdf-to-ppt",
+]);
+
+const ADVANCED_PDF_SLUGS = new Set([
+  "add-pdf-page-numbers", "watermark-pdf", "protect-pdf", "unlock-pdf", "remove-pdf-pages", "reorder-pdf-pages",
+  "extract-images-from-pdf", "sign-pdf", "compare-pdf", "repair-pdf",
+]);
 
 export function generateStaticParams() {
   return CONVERTER_DEFINITIONS.map(({ slug }) => ({ slug }));
@@ -37,6 +46,7 @@ export default async function ConverterToolPage({ params }: Props) {
   if (!tool) notFound();
   const interactive = INTERACTIVE_CONVERTER_SLUGS.has(slug);
   const serverSide = SERVER_CONVERTER_SLUGS.has(slug);
+  const advancedPdf = ADVANCED_PDF_SLUGS.has(slug);
 
   return (
     <main style={{ minHeight: "70vh", padding: "56px 20px", background: "#fbfaf7" }}>
@@ -47,10 +57,12 @@ export default async function ConverterToolPage({ params }: Props) {
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", margin: "24px 0" }}>
           <span style={{ padding: "9px 13px", borderRadius: 999, background: "#eef7f3", color: "#005744", fontWeight: 700 }}>Input: {tool.input}</span>
           <span style={{ padding: "9px 13px", borderRadius: 999, background: "#fff7df", color: "#725600", fontWeight: 700 }}>Output: {tool.output}</span>
-          {serverSide && <span style={{ padding: "9px 13px", borderRadius: 999, background: "#edf3fb", color: "#174a78", fontWeight: 700 }}>Server-side</span>}
-          {!serverSide && tool.clientSide && <span style={{ padding: "9px 13px", borderRadius: 999, background: "#edf3fb", color: "#174a78", fontWeight: 700 }}>Browser-based</span>}
+          {(serverSide || advancedPdf) && <span style={{ padding: "9px 13px", borderRadius: 999, background: "#edf3fb", color: "#174a78", fontWeight: 700 }}>Server-side</span>}
+          {!serverSide && !advancedPdf && tool.clientSide && <span style={{ padding: "9px 13px", borderRadius: 999, background: "#edf3fb", color: "#174a78", fontWeight: 700 }}>Browser-based</span>}
         </div>
-        {serverSide ? (
+        {advancedPdf ? (
+          <AdvancedPdfToolClient slug={slug} />
+        ) : serverSide ? (
           <ServerConverterClient slug={slug} />
         ) : slug === "txt-to-pdf" ? (
           <TxtToPdfClient />
