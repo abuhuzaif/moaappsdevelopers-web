@@ -1,0 +1,32 @@
+/* MYKSA CONNECT — colorful homepage tool cards */
+.mk-tools-grid .mk-tool-card:nth-child(1){background:linear-gradient(145deg,#eaf5ff 0%,#ffffff 72%);border-color:#b9dcff;}
+.mk-tools-grid .mk-tool-card:nth-child(1) .mk-tool-icon{background:#d8edff;color:#1671c4;}
+.mk-tools-grid .mk-tool-card:nth-child(1)>b{color:#1671c4;}
+
+.mk-tools-grid .mk-tool-card:nth-child(2){background:linear-gradient(145deg,#e9fbf3 0%,#ffffff 72%);border-color:#b9e8d2;}
+.mk-tools-grid .mk-tool-card:nth-child(2) .mk-tool-icon{background:#d6f5e6;color:#16845a;}
+.mk-tools-grid .mk-tool-card:nth-child(2)>b{color:#16845a;}
+
+.mk-tools-grid .mk-tool-card:nth-child(3){background:linear-gradient(145deg,#fff7df 0%,#ffffff 72%);border-color:#f4dfa1;}
+.mk-tools-grid .mk-tool-card:nth-child(3) .mk-tool-icon{background:#fff0bf;color:#bd8200;}
+.mk-tools-grid .mk-tool-card:nth-child(3)>b{color:#bd8200;}
+
+.mk-tools-grid .mk-tool-card:nth-child(4){background:linear-gradient(145deg,#f3edff 0%,#ffffff 72%);border-color:#d9c9f6;}
+.mk-tools-grid .mk-tool-card:nth-child(4) .mk-tool-icon{background:#e9ddff;color:#7143bd;}
+.mk-tools-grid .mk-tool-card:nth-child(4)>b{color:#7143bd;}
+
+.mk-tools-grid .mk-tool-card:nth-child(5){background:linear-gradient(145deg,#fff0e5 0%,#ffffff 72%);border-color:#f5cda9;}
+.mk-tools-grid .mk-tool-card:nth-child(5) .mk-tool-icon{background:#ffe2cc;color:#d66a12;}
+.mk-tools-grid .mk-tool-card:nth-child(5)>b{color:#d66a12;}
+
+.mk-tools-grid .mk-tool-card:nth-child(6){background:linear-gradient(145deg,#eaf8ff 0%,#ffffff 72%);border-color:#bee2ef;}
+.mk-tools-grid .mk-tool-card:nth-child(6) .mk-tool-icon{background:#d9f1fb;color:#1583a5;}
+.mk-tools-grid .mk-tool-card:nth-child(6)>b{color:#1583a5;}
+
+.mk-tools-grid .mk-tool-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(6,23,42,.11);}
+.mk-tools-grid .mk-tool-card:nth-child(1):hover{border-color:#74baf3;}
+.mk-tools-grid .mk-tool-card:nth-child(2):hover{border-color:#70cda1;}
+.mk-tools-grid .mk-tool-card:nth-child(3):hover{border-color:#e4bd55;}
+.mk-tools-grid .mk-tool-card:nth-child(4):hover{border-color:#aa89df;}
+.mk-tools-grid .mk-tool-card:nth-child(5):hover{border-color:#e7a36b;}
+.mk-tools-grid .mk-tool-card:nth-child(6):hover{border-color:#75c2da;}
