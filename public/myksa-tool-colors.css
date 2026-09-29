@@ -1,32 +1,27 @@
 /* MYKSA CONNECT — colorful homepage tool cards */
-.mk-tools-grid .mk-tool-card:nth-child(1){background:linear-gradient(145deg,#eaf5ff 0%,#ffffff 72%);border-color:#b9dcff;}
-.mk-tools-grid .mk-tool-card:nth-child(1) .mk-tool-icon{background:#d8edff;color:#1671c4;}
-.mk-tools-grid .mk-tool-card:nth-child(1)>b{color:#1671c4;}
-
-.mk-tools-grid .mk-tool-card:nth-child(2){background:linear-gradient(145deg,#e9fbf3 0%,#ffffff 72%);border-color:#b9e8d2;}
-.mk-tools-grid .mk-tool-card:nth-child(2) .mk-tool-icon{background:#d6f5e6;color:#16845a;}
-.mk-tools-grid .mk-tool-card:nth-child(2)>b{color:#16845a;}
-
-.mk-tools-grid .mk-tool-card:nth-child(3){background:linear-gradient(145deg,#fff7df 0%,#ffffff 72%);border-color:#f4dfa1;}
-.mk-tools-grid .mk-tool-card:nth-child(3) .mk-tool-icon{background:#fff0bf;color:#bd8200;}
-.mk-tools-grid .mk-tool-card:nth-child(3)>b{color:#bd8200;}
-
-.mk-tools-grid .mk-tool-card:nth-child(4){background:linear-gradient(145deg,#f3edff 0%,#ffffff 72%);border-color:#d9c9f6;}
-.mk-tools-grid .mk-tool-card:nth-child(4) .mk-tool-icon{background:#e9ddff;color:#7143bd;}
-.mk-tools-grid .mk-tool-card:nth-child(4)>b{color:#7143bd;}
-
-.mk-tools-grid .mk-tool-card:nth-child(5){background:linear-gradient(145deg,#fff0e5 0%,#ffffff 72%);border-color:#f5cda9;}
-.mk-tools-grid .mk-tool-card:nth-child(5) .mk-tool-icon{background:#ffe2cc;color:#d66a12;}
-.mk-tools-grid .mk-tool-card:nth-child(5)>b{color:#d66a12;}
-
-.mk-tools-grid .mk-tool-card:nth-child(6){background:linear-gradient(145deg,#eaf8ff 0%,#ffffff 72%);border-color:#bee2ef;}
-.mk-tools-grid .mk-tool-card:nth-child(6) .mk-tool-icon{background:#d9f1fb;color:#1583a5;}
-.mk-tools-grid .mk-tool-card:nth-child(6)>b{color:#1583a5;}
-
-.mk-tools-grid .mk-tool-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(6,23,42,.11);}
-.mk-tools-grid .mk-tool-card:nth-child(1):hover{border-color:#74baf3;}
-.mk-tools-grid .mk-tool-card:nth-child(2):hover{border-color:#70cda1;}
-.mk-tools-grid .mk-tool-card:nth-child(3):hover{border-color:#e4bd55;}
-.mk-tools-grid .mk-tool-card:nth-child(4):hover{border-color:#aa89df;}
-.mk-tools-grid .mk-tool-card:nth-child(5):hover{border-color:#e7a36b;}
-.mk-tools-grid .mk-tool-card:nth-child(6):hover{border-color:#75c2da;}
+/* Stronger fills + !important so the colors remain visible after the base theme. */
+.mk-tools-grid .mk-tool-card:nth-child(1){background:linear-gradient(145deg,#dff0ff 0%,#f8fcff 100%) !important;border:1px solid #8fc7f7 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(1) .mk-tool-icon{background:#c5e5ff !important;color:#1268b0 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(1)>b{color:#1268b0 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(2){background:linear-gradient(145deg,#dcf7ea 0%,#f7fffb 100%) !important;border:1px solid #86d8b1 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(2) .mk-tool-icon{background:#bcefd7 !important;color:#08794f !important;}
+.mk-tools-grid .mk-tool-card:nth-child(2)>b{color:#08794f !important;}
+.mk-tools-grid .mk-tool-card:nth-child(3){background:linear-gradient(145deg,#fff0b9 0%,#fffdf3 100%) !important;border:1px solid #e8c75e !important;}
+.mk-tools-grid .mk-tool-card:nth-child(3) .mk-tool-icon{background:#ffe7a0 !important;color:#a66b00 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(3)>b{color:#a66b00 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(4){background:linear-gradient(145deg,#eee2ff 0%,#fcf9ff 100%) !important;border:1px solid #c8a9ee !important;}
+.mk-tools-grid .mk-tool-card:nth-child(4) .mk-tool-icon{background:#dfcaff !important;color:#6735a8 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(4)>b{color:#6735a8 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(5){background:linear-gradient(145deg,#ffe4d0 0%,#fffaf6 100%) !important;border:1px solid #efb27f !important;}
+.mk-tools-grid .mk-tool-card:nth-child(5) .mk-tool-icon{background:#ffd2b5 !important;color:#c55c0b !important;}
+.mk-tools-grid .mk-tool-card:nth-child(5)>b{color:#c55c0b !important;}
+.mk-tools-grid .mk-tool-card:nth-child(6){background:linear-gradient(145deg,#dcf4ff 0%,#f8fdff 100%) !important;border:1px solid #8bcce2 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(6) .mk-tool-icon{background:#c3ebfa !important;color:#08728e !important;}
+.mk-tools-grid .mk-tool-card:nth-child(6)>b{color:#08728e !important;}
+.mk-tools-grid .mk-tool-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(6,23,42,.13);}
+.mk-tools-grid .mk-tool-card:nth-child(1):hover{border-color:#4d9fe8 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(2):hover{border-color:#3eaf7b !important;}
+.mk-tools-grid .mk-tool-card:nth-child(3):hover{border-color:#d2a82d !important;}
+.mk-tools-grid .mk-tool-card:nth-child(4):hover{border-color:#986bd0 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(5):hover{border-color:#df8743 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(6):hover{border-color:#4aaac8 !important;}
