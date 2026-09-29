@@ -9,8 +9,10 @@ declare global {
 const PDF_SOURCES = [
   { src: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js", worker: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js" },
   { src: "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js", worker: "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js" },
+  { src: "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js", worker: "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js" },
 ];
 const PDF_LIB = "https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js";
+let activePdfWorker = PDF_SOURCES[0].worker;
 
 function loadScript(src: string, id: string) {
   return new Promise<void>((resolve, reject) => {
@@ -26,12 +28,16 @@ function loadScript(src: string, id: string) {
 }
 
 async function loadPdfEngine() {
-  if (window.pdfjsLib) return;
+  if (window.pdfjsLib) {
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = activePdfWorker;
+    return;
+  }
   let last: unknown;
   for (const source of PDF_SOURCES) {
     try {
       await loadScript(source.src, "myska-pdfjs-v2");
       if (window.pdfjsLib) {
+        activePdfWorker = source.worker;
         window.pdfjsLib.GlobalWorkerOptions.workerSrc = source.worker;
         return;
       }
@@ -74,8 +80,7 @@ export default function SignPdfToolClientV2() {
     try {
       const data = await f.arrayBuffer();
       setFile(f); setBytes(data); setPage(1); setPages(0); setSignature(null); setMessage("PDF selected. Preparing preview…");
-      if (!window.pdfjsLib) await loadPdfEngine();
-      if (window.pdfjsLib) window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDF_SOURCES[0].worker;
+      await loadPdfEngine();
       setEngineReady(true);
       await render(data, 1);
     } catch (e) {
@@ -88,17 +93,28 @@ export default function SignPdfToolClientV2() {
     if (!window.pdfjsLib || !canvasRef.current) return;
     setLoading(true);
     try {
-      const doc = await window.pdfjsLib.getDocument({ data: data.slice(0) }).promise;
+      let doc;
+      try {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = activePdfWorker;
+        doc = await window.pdfjsLib.getDocument({ data: data.slice(0) }).promise;
+      } catch (workerError) {
+        console.warn("PDF worker failed; retrying without worker", workerError);
+        doc = await window.pdfjsLib.getDocument({ data: data.slice(0), disableWorker: true }).promise;
+      }
       const p = await doc.getPage(n);
       const base = p.getViewport({ scale: 1 });
       const width = Math.min(850, Math.max(380, (pageWrapRef.current?.clientWidth || 760) - 20));
       const viewport = p.getViewport({ scale: Math.min(1.5, width / base.width) });
       const canvas = canvasRef.current;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Your browser could not create a PDF preview canvas.");
       canvas.width = Math.ceil(viewport.width); canvas.height = Math.ceil(viewport.height);
-      await p.render({ canvasContext: canvas.getContext("2d")!, viewport }).promise;
+      await p.render({ canvasContext: context, viewport }).promise;
       setPages(doc.numPages); setPage(n); setMessage("");
-    } catch (e) { setMessage(e instanceof Error ? e.message : "This PDF could not be rendered."); }
-    finally { setLoading(false); }
+    } catch (e) {
+      console.error(e);
+      setMessage(e instanceof Error ? `Preview failed: ${e.message}` : "This PDF could not be rendered.");
+    } finally { setLoading(false); }
   }
 
   async function addSignatureImage(f: File | null) {
@@ -145,5 +161,5 @@ export default function SignPdfToolClientV2() {
 
   if (!file) return <div className="spv"><style>{css}</style><div className="spv-card" style={{padding:26}}><div className="spv-drop"><div style={{fontSize:42}}>✍️</div><h2>Upload your PDF</h2><p style={{color:"#65736e"}}>Choose a PDF to start. Your document stays in your browser.</p><input ref={inputRef} type="file" accept="application/pdf,.pdf" onChange={e => { void selectPdf(e.target.files?.[0] || null); e.currentTarget.value=""; }} style={{display:"block",margin:"18px auto",maxWidth:"100%"}}/><p style={{color:"#65736e",fontSize:13}}>PDF only • Up to 25 MB</p></div>{engineError && <div className="spv-msg">PDF viewer engine: {engineError}</div>}{message && <div className="spv-msg">{message}</div>}</div></div>;
 
-  return <div className="spv"><style>{css}</style><div className="spv-card" style={{padding:14,marginBottom:14,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}><div><strong>{file.name}</strong><div style={{fontSize:13,color:"#65736e"}}>{pages ? `${pages} pages • Page ${page}` : "PDF selected"}</div></div><label className="spv-btn spv-primary">Replace PDF<input type="file" accept="application/pdf,.pdf" hidden onChange={e=>{void selectPdf(e.target.files?.[0]||null);e.currentTarget.value=""}}/></label></div>{!pages ? <div className="spv-card" style={{padding:30,textAlign:"center"}}><h3>PDF selected</h3><p style={{color:"#65736e"}}>The file is loaded. {loading ? "Preparing preview…" : engineError ? "The preview engine could not load." : "Preparing preview…"}</p>{message&&<div className="spv-msg">{message}</div>}</div> : <div className="spv-layout" style={{display:"grid",gridTemplateColumns:"180px minmax(0,1fr) 260px",gap:14}}><aside className="spv-card" style={{padding:10}}>{Array.from({length:pages},(_,i)=><button key={i} className="spv-btn" style={{width:"100%",marginBottom:8,background:page===i+1?"#eef8f4":"#f8faf9"}} onClick={()=>{setPage(i+1);if(bytes)void render(bytes,i+1)}}>Page {i+1}</button>)}</aside><section className="spv-card" style={{padding:14,background:"#eef2f0",overflow:"auto"}}><strong>PDF Preview</strong><div ref={pageWrapRef} style={{display:"flex",justifyContent:"center",padding:14,minHeight:520}}><div className="spv-preview"><canvas ref={canvasRef}/>{signature&&<div className="spv-sig" style={{left:sigPos.x,top:sigPos.y,width:sigPos.w,height:sigPos.h}} onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={()=>setDrag(null)}><img src={signature} alt="Signature"/></div>}</div></div></section><aside className="spv-card" style={{padding:16}}><h3 style={{marginTop:0}}>Add Signature</h3><input type="file" accept="image/png,image/jpeg,.png,.jpg,.jpeg" onChange={e=>{void addSignatureImage(e.target.files?.[0]||null);e.currentTarget.value=""}}/><button className="spv-btn" style={{marginTop:12,width:"100%"}} onClick={download} disabled={!signature||loading}>{loading?"Creating…":"Download Signed PDF"}</button>{message&&<div className="spv-msg">{message}</div>}</aside></div>}</div>;
+  return <div className="spv"><style>{css}</style><div className="spv-card" style={{padding:14,marginBottom:14,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}><div><strong>{file.name}</strong><div style={{fontSize:13,color:"#65736e"}}>{pages ? `${pages} pages • Page ${page}` : "PDF selected"}</div></div><label className="spv-btn spv-primary">Replace PDF<input type="file" accept="application/pdf,.pdf" hidden onChange={e=>{void selectPdf(e.target.files?.[0]||null);e.currentTarget.value=""}}/></label></div>{!pages ? <div className="spv-card" style={{padding:30,textAlign:"center"}}><h3>PDF selected</h3><p style={{color:"#65736e"}}>{loading ? "Preparing preview…" : engineError ? `Preview engine issue: ${engineError}` : "Preparing preview…"}</p>{message&&<div className="spv-msg">{message}</div>}</div> : <div className="spv-layout" style={{display:"grid",gridTemplateColumns:"180px minmax(0,1fr) 260px",gap:14}}><aside className="spv-card" style={{padding:10}}>{Array.from({length:pages},(_,i)=><button key={i} className="spv-btn" style={{width:"100%",marginBottom:8,background:page===i+1?"#eef8f4":"#f8faf9"}} onClick={()=>{setPage(i+1);if(bytes)void render(bytes,i+1)}}>Page {i+1}</button>)}</aside><section className="spv-card" style={{padding:14,background:"#eef2f0",overflow:"auto"}}><strong>PDF Preview</strong><div ref={pageWrapRef} style={{display:"flex",justifyContent:"center",padding:14,minHeight:520}}><div className="spv-preview"><canvas ref={canvasRef}/>{signature&&<div className="spv-sig" style={{left:sigPos.x,top:sigPos.y,width:sigPos.w,height:sigPos.h}} onPointerDown={startDrag} onPointerMove={moveDrag} onPointerUp={()=>setDrag(null)}><img src={signature} alt="Signature"/></div>}</div></div></section><aside className="spv-card" style={{padding:16}}><h3 style={{marginTop:0}}>Add Signature</h3><input type="file" accept="image/png,image/jpeg,.png,.jpg,.jpeg" onChange={e=>{void addSignatureImage(e.target.files?.[0]||null);e.currentTarget.value=""}}/><button className="spv-btn" style={{marginTop:12,width:"100%"}} onClick={download} disabled={!signature||loading}>{loading?"Creating…":"Download Signed PDF"}</button>{message&&<div className="spv-msg">{message}</div>}</aside></div>}</div>;
 }
