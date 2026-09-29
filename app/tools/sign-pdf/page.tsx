@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import SignPdfToolClient from "../_components/SignPdfToolClient";
+import SignPdfToolClient from "../_components/SignPdfToolClientV2";
 
 export const metadata: Metadata = {
   title: "Sign PDF Online Free – Add Signature to PDF | MYKSA CONNECT",
