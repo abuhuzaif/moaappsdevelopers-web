@@ -6,6 +6,11 @@ const CONFIG: Record<string, { accept: string; hint: string; button: string }> =
   "word-to-pdf": { accept: ".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document", hint: "DOCX only • text and tables are converted server-side.", button: "Convert Word → PDF" },
   "pdf-to-word": { accept: ".pdf,application/pdf", hint: "PDF text is extracted into an editable DOCX.", button: "Convert PDF → Word" },
   "pdf-to-csv": { accept: ".pdf,application/pdf", hint: "Tables are extracted when detected; text-only PDFs fall back to page/text rows.", button: "Extract PDF → CSV" },
+  "pdf-to-excel": { accept: ".pdf,application/pdf", hint: "Detected PDF tables are written to an XLSX workbook, one sheet per page/table group.", button: "Convert PDF → Excel" },
+  "pdf-to-text": { accept: ".pdf,application/pdf", hint: "Extract selectable/searchable PDF text into a UTF-8 text file.", button: "Extract PDF → Text" },
+  "pdf-ocr": { accept: ".pdf,application/pdf", hint: "Extract text from the PDF. Scanned PDFs without an embedded text layer need an OCR runtime with Tesseract enabled on the server.", button: "Run PDF OCR" },
+  "pdf-to-html": { accept: ".pdf,application/pdf", hint: "Convert extracted PDF text into a clean standalone HTML document.", button: "Convert PDF → HTML" },
+  "pdf-to-markdown": { accept: ".pdf,application/pdf", hint: "Convert extracted PDF text into Markdown with page headings.", button: "Convert PDF → Markdown" },
   "ppt-to-pdf": { accept: ".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation", hint: "PPTX slide text is converted into a PDF document.", button: "Convert PowerPoint → PDF" },
   "pdf-to-ppt": { accept: ".pdf,application/pdf", hint: "Each PDF page becomes an editable PowerPoint slide with extracted text.", button: "Convert PDF → PowerPoint" },
 };
@@ -39,7 +44,11 @@ export default function ServerConverterClient({ slug }: { slug: string }) {
       const blob = await response.blob();
       const disposition = response.headers.get("Content-Disposition") || "";
       const match = disposition.match(/filename="?([^";]+)"?/i);
-      const fallback = `${file.name.replace(/\.[^.]+$/, "") || "converted"}.${slug === "pdf-to-word" ? "docx" : slug === "pdf-to-csv" ? "csv" : slug === "pdf-to-ppt" ? "pptx" : "pdf"}`;
+      const ext: Record<string, string> = {
+        "pdf-to-word": "docx", "pdf-to-csv": "csv", "pdf-to-excel": "xlsx", "pdf-to-text": "txt", "pdf-ocr": "txt",
+        "pdf-to-html": "html", "pdf-to-markdown": "md", "pdf-to-ppt": "pptx", "word-to-pdf": "pdf", "ppt-to-pdf": "pdf",
+      };
+      const fallback = `${file.name.replace(/\.[^.]+$/, "") || "converted"}.${ext[slug] || "bin"}`;
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
