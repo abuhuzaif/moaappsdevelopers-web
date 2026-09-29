@@ -33,3 +33,37 @@
 .mk-tools-grid .mk-tool-card:nth-child(4):hover{border-color:#8145c5 !important;}
 .mk-tools-grid .mk-tool-card:nth-child(5):hover{border-color:#e56d22 !important;}
 .mk-tools-grid .mk-tool-card:nth-child(6):hover{border-color:#1599c3 !important;}
+
+/* MYKSA CONNECT — colorful Browse by Category cards */
+.mk-category-grid .mk-category-card{position:relative;overflow:hidden;min-height:122px;border-width:2px !important;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease !important;}
+.mk-category-grid .mk-category-card::before{content:"";position:absolute;left:0;top:0;right:0;height:5px;}
+.mk-category-grid .mk-category-card .mk-category-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;font-size:23px;line-height:1;}
+.mk-category-grid .mk-category-card:nth-child(1){background:linear-gradient(145deg,#c9f3df 0%,#effcf5 100%) !important;border-color:#62cf99 !important;box-shadow:0 5px 18px rgba(28,150,91,.10) !important;}
+.mk-category-grid .mk-category-card:nth-child(1)::before{background:#16a765;}
+.mk-category-grid .mk-category-card:nth-child(1) .mk-category-icon{background:#a8e9c8;color:#087344;}
+.mk-category-grid .mk-category-card:nth-child(2){background:linear-gradient(145deg,#ffe0bf 0%,#fff4e9 100%) !important;border-color:#efa76a !important;box-shadow:0 5px 18px rgba(198,91,25,.10) !important;}
+.mk-category-grid .mk-category-card:nth-child(2)::before{background:#e56d22;}
+.mk-category-grid .mk-category-card:nth-child(2) .mk-category-icon{background:#ffcda9;color:#b64d08;}
+.mk-category-grid .mk-category-card:nth-child(3){background:linear-gradient(145deg,#cfe1ff 0%,#eff5ff 100%) !important;border-color:#78aaf4 !important;box-shadow:0 5px 18px rgba(37,91,190,.10) !important;}
+.mk-category-grid .mk-category-card:nth-child(3)::before{background:#2867d7;}
+.mk-category-grid .mk-category-card:nth-child(3) .mk-category-icon{background:#b3d0ff;color:#2356b7;}
+.mk-category-grid .mk-category-card:nth-child(4){background:linear-gradient(145deg,#ffd3e4 0%,#fff0f6 100%) !important;border-color:#ef8fba !important;box-shadow:0 5px 18px rgba(200,31,99,.10) !important;}
+.mk-category-grid .mk-category-card:nth-child(4)::before{background:#d62a72;}
+.mk-category-grid .mk-category-card:nth-child(4) .mk-category-icon{background:#ffc0d8;color:#b51c5d;}
+.mk-category-grid .mk-category-card:nth-child(5){background:linear-gradient(145deg,#e1d0ff 0%,#f7f1ff 100%) !important;border-color:#b993eb !important;box-shadow:0 5px 18px rgba(112,64,174,.10) !important;}
+.mk-category-grid .mk-category-card:nth-child(5)::before{background:#8145c5;}
+.mk-category-grid .mk-category-card:nth-child(5) .mk-category-icon{background:#d1b5fa;color:#63319f;}
+.mk-category-grid .mk-category-card:nth-child(6){background:linear-gradient(145deg,#c9f3dc 0%,#effcf5 100%) !important;border-color:#62cf99 !important;box-shadow:0 5px 18px rgba(28,150,91,.10) !important;}
+.mk-category-grid .mk-category-card:nth-child(6)::before{background:#0a9c58;}
+.mk-category-grid .mk-category-card:nth-child(6) .mk-category-icon{background:#a8e9c8;color:#087344;}
+.mk-category-grid .mk-category-card:nth-child(7){background:linear-gradient(145deg,#ffe59a 0%,#fff8df 100%) !important;border-color:#e5b92f !important;box-shadow:0 5px 18px rgba(190,143,0,.11) !important;}
+.mk-category-grid .mk-category-card:nth-child(7)::before{background:#d99a00;}
+.mk-category-grid .mk-category-card:nth-child(7) .mk-category-icon{background:#ffdb70;color:#8a5a00;}
+.mk-category-grid .mk-category-card:hover{transform:translateY(-5px) !important;box-shadow:0 14px 30px rgba(6,23,42,.16) !important;}
+.mk-category-grid .mk-category-card:nth-child(1):hover{border-color:#16a765 !important;}
+.mk-category-grid .mk-category-card:nth-child(2):hover{border-color:#e56d22 !important;}
+.mk-category-grid .mk-category-card:nth-child(3):hover{border-color:#2867d7 !important;}
+.mk-category-grid .mk-category-card:nth-child(4):hover{border-color:#d62a72 !important;}
+.mk-category-grid .mk-category-card:nth-child(5):hover{border-color:#8145c5 !important;}
+.mk-category-grid .mk-category-card:nth-child(6):hover{border-color:#0a9c58 !important;}
+.mk-category-grid .mk-category-card:nth-child(7):hover{border-color:#d99a00 !important;}
