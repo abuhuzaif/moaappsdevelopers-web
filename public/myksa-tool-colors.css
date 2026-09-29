@@ -1,27 +1,35 @@
-/* MYKSA CONNECT — colorful homepage tool cards */
-/* Stronger fills + !important so the colors remain visible after the base theme. */
-.mk-tools-grid .mk-tool-card:nth-child(1){background:linear-gradient(145deg,#dff0ff 0%,#f8fcff 100%) !important;border:1px solid #8fc7f7 !important;}
-.mk-tools-grid .mk-tool-card:nth-child(1) .mk-tool-icon{background:#c5e5ff !important;color:#1268b0 !important;}
-.mk-tools-grid .mk-tool-card:nth-child(1)>b{color:#1268b0 !important;}
-.mk-tools-grid .mk-tool-card:nth-child(2){background:linear-gradient(145deg,#dcf7ea 0%,#f7fffb 100%) !important;border:1px solid #86d8b1 !important;}
-.mk-tools-grid .mk-tool-card:nth-child(2) .mk-tool-icon{background:#bcefd7 !important;color:#08794f !important;}
-.mk-tools-grid .mk-tool-card:nth-child(2)>b{color:#08794f !important;}
-.mk-tools-grid .mk-tool-card:nth-child(3){background:linear-gradient(145deg,#fff0b9 0%,#fffdf3 100%) !important;border:1px solid #e8c75e !important;}
-.mk-tools-grid .mk-tool-card:nth-child(3) .mk-tool-icon{background:#ffe7a0 !important;color:#a66b00 !important;}
-.mk-tools-grid .mk-tool-card:nth-child(3)>b{color:#a66b00 !important;}
-.mk-tools-grid .mk-tool-card:nth-child(4){background:linear-gradient(145deg,#eee2ff 0%,#fcf9ff 100%) !important;border:1px solid #c8a9ee !important;}
-.mk-tools-grid .mk-tool-card:nth-child(4) .mk-tool-icon{background:#dfcaff !important;color:#6735a8 !important;}
-.mk-tools-grid .mk-tool-card:nth-child(4)>b{color:#6735a8 !important;}
-.mk-tools-grid .mk-tool-card:nth-child(5){background:linear-gradient(145deg,#ffe4d0 0%,#fffaf6 100%) !important;border:1px solid #efb27f !important;}
-.mk-tools-grid .mk-tool-card:nth-child(5) .mk-tool-icon{background:#ffd2b5 !important;color:#c55c0b !important;}
-.mk-tools-grid .mk-tool-card:nth-child(5)>b{color:#c55c0b !important;}
-.mk-tools-grid .mk-tool-card:nth-child(6){background:linear-gradient(145deg,#dcf4ff 0%,#f8fdff 100%) !important;border:1px solid #8bcce2 !important;}
-.mk-tools-grid .mk-tool-card:nth-child(6) .mk-tool-icon{background:#c3ebfa !important;color:#08728e !important;}
-.mk-tools-grid .mk-tool-card:nth-child(6)>b{color:#08728e !important;}
-.mk-tools-grid .mk-tool-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(6,23,42,.13);}
-.mk-tools-grid .mk-tool-card:nth-child(1):hover{border-color:#4d9fe8 !important;}
-.mk-tools-grid .mk-tool-card:nth-child(2):hover{border-color:#3eaf7b !important;}
-.mk-tools-grid .mk-tool-card:nth-child(3):hover{border-color:#d2a82d !important;}
-.mk-tools-grid .mk-tool-card:nth-child(4):hover{border-color:#986bd0 !important;}
-.mk-tools-grid .mk-tool-card:nth-child(5):hover{border-color:#df8743 !important;}
-.mk-tools-grid .mk-tool-card:nth-child(6):hover{border-color:#4aaac8 !important;}
+/* MYKSA CONNECT — strong colorful homepage tool cards */
+/* Deliberately high-contrast pastel fills so the color is obvious on desktop and mobile. */
+.mk-tools-grid .mk-tool-card{position:relative;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease !important;}
+.mk-tools-grid .mk-tool-card::before{content:"";position:absolute;left:0;top:0;right:0;height:5px;border-radius:16px 16px 0 0;}
+.mk-tools-grid .mk-tool-card:nth-child(1){background:linear-gradient(145deg,#cfe9ff 0%,#edf7ff 100%) !important;border:2px solid #69b5f3 !important;box-shadow:0 5px 18px rgba(37,128,207,.10) !important;}
+.mk-tools-grid .mk-tool-card:nth-child(1)::before{background:#1683dc;}
+.mk-tools-grid .mk-tool-card:nth-child(1) .mk-tool-icon{background:#a9d8ff !important;color:#075a9e !important;}
+.mk-tools-grid .mk-tool-card:nth-child(1)>b{color:#075a9e !important;}
+.mk-tools-grid .mk-tool-card:nth-child(2){background:linear-gradient(145deg,#c9f3dc 0%,#effcf5 100%) !important;border:2px solid #62cf99 !important;box-shadow:0 5px 18px rgba(28,150,91,.10) !important;}
+.mk-tools-grid .mk-tool-card:nth-child(2)::before{background:#16a765;}
+.mk-tools-grid .mk-tool-card:nth-child(2) .mk-tool-icon{background:#a8e9c8 !important;color:#087344 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(2)>b{color:#087344 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(3){background:linear-gradient(145deg,#ffe59a 0%,#fff8df 100%) !important;border:2px solid #e5b92f !important;box-shadow:0 5px 18px rgba(190,143,0,.11) !important;}
+.mk-tools-grid .mk-tool-card:nth-child(3)::before{background:#d99a00;}
+.mk-tools-grid .mk-tool-card:nth-child(3) .mk-tool-icon{background:#ffdb70 !important;color:#8a5a00 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(3)>b{color:#8a5a00 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(4){background:linear-gradient(145deg,#e1d0ff 0%,#f6f0ff 100%) !important;border:2px solid #b58be8 !important;box-shadow:0 5px 18px rgba(112,64,174,.10) !important;}
+.mk-tools-grid .mk-tool-card:nth-child(4)::before{background:#8145c5;}
+.mk-tools-grid .mk-tool-card:nth-child(4) .mk-tool-icon{background:#d1b5fa !important;color:#63319f !important;}
+.mk-tools-grid .mk-tool-card:nth-child(4)>b{color:#63319f !important;}
+.mk-tools-grid .mk-tool-card:nth-child(5){background:linear-gradient(145deg,#ffd8bf 0%,#fff1e8 100%) !important;border:2px solid #e99a62 !important;box-shadow:0 5px 18px rgba(198,91,25,.10) !important;}
+.mk-tools-grid .mk-tool-card:nth-child(5)::before{background:#e56d22;}
+.mk-tools-grid .mk-tool-card:nth-child(5) .mk-tool-icon{background:#ffc39d !important;color:#ad4b08 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(5)>b{color:#ad4b08 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(6){background:linear-gradient(145deg,#c9edff 0%,#eaf9ff 100%) !important;border:2px solid #61c1df !important;box-shadow:0 5px 18px rgba(20,137,174,.10) !important;}
+.mk-tools-grid .mk-tool-card:nth-child(6)::before{background:#1599c3;}
+.mk-tools-grid .mk-tool-card:nth-child(6) .mk-tool-icon{background:#a9e2f6 !important;color:#066b89 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(6)>b{color:#066b89 !important;}
+.mk-tools-grid .mk-tool-card:hover{transform:translateY(-5px) !important;box-shadow:0 14px 30px rgba(6,23,42,.16) !important;}
+.mk-tools-grid .mk-tool-card:nth-child(1):hover{border-color:#1683dc !important;}
+.mk-tools-grid .mk-tool-card:nth-child(2):hover{border-color:#16a765 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(3):hover{border-color:#d99a00 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(4):hover{border-color:#8145c5 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(5):hover{border-color:#e56d22 !important;}
+.mk-tools-grid .mk-tool-card:nth-child(6):hover{border-color:#1599c3 !important;}
