@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CONVERTER_DEFINITIONS } from "@/lib/converters/converterTypes";
 import ConverterClient from "../_components/ConverterClient";
+import TxtToPdfClient from "../_components/TxtToPdfClient";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -44,7 +45,9 @@ export default async function ConverterToolPage({ params }: Props) {
           <span style={{ padding: "9px 13px", borderRadius: 999, background: "#fff7df", color: "#725600", fontWeight: 700 }}>Output: {tool.output}</span>
           {tool.clientSide && <span style={{ padding: "9px 13px", borderRadius: 999, background: "#edf3fb", color: "#174a78", fontWeight: 700 }}>Browser-based</span>}
         </div>
-        {interactive ? (
+        {slug === "txt-to-pdf" ? (
+          <TxtToPdfClient />
+        ) : interactive ? (
           <ConverterClient slug={slug} input={tool.input} output={tool.output} />
         ) : (
           <div style={{ padding: 20, borderRadius: 16, background: "#f6f8f7", border: "1px dashed #cbd8d3" }}>
