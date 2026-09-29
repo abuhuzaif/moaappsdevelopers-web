@@ -36,7 +36,7 @@ export const CONVERTER_DEFINITIONS: ConverterDefinition[] = [
   { slug: "remove-pdf-pages", name: "Remove PDF Pages", shortDescription: "Remove selected pages from a PDF.", category: "pdf", input: "PDF", output: "PDF", clientSide: false },
   { slug: "reorder-pdf-pages", name: "Reorder PDF Pages", shortDescription: "Reorder PDF pages using a page-number sequence.", category: "pdf", input: "PDF", output: "PDF", clientSide: false },
   { slug: "extract-images-from-pdf", name: "Extract Images from PDF", shortDescription: "Extract embedded raster images from a PDF as a ZIP file.", category: "pdf", input: "PDF", output: "ZIP", clientSide: false },
-  { slug: "sign-pdf", name: "Sign PDF", shortDescription: "Add a typed signature block to the last page of a PDF.", category: "pdf", input: "PDF", output: "PDF", clientSide: false },
+  { slug: "sign-pdf", name: "Sign PDF", shortDescription: "Add a signature image, drawn signature or typed signature to a PDF and position it precisely.", category: "pdf", input: "PDF", output: "PDF", clientSide: true },
   { slug: "compare-pdf", name: "Compare PDF", shortDescription: "Compare extracted text from two PDF documents and download a report.", category: "pdf", input: "2 PDFs", output: "TXT", clientSide: false },
   { slug: "repair-pdf", name: "Repair PDF", shortDescription: "Rewrite a readable PDF into a fresh PDF file.", category: "pdf", input: "PDF", output: "PDF", clientSide: false },
   { slug: "images-to-pdf", name: "Images to PDF", shortDescription: "Combine images into a single PDF.", category: "pdf", input: "JPG/PNG/WebP", output: "PDF", clientSide: true },
