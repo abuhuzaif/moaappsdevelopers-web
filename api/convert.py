@@ -5,6 +5,7 @@ import io
 import re
 from pathlib import Path
 from typing import Annotated
+from xml.sax.saxutils import escape
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import Response
@@ -24,7 +25,7 @@ ALLOWED = {
     "word-to-pdf": {".docx"},
     "pdf-to-word": {".pdf"},
     "pdf-to-csv": {".pdf"},
-    "ppt-to-pdf": {".pptx", ".ppt"},
+    "ppt-to-pdf": {".pptx"},
     "pdf-to-ppt": {".pdf"},
 }
 
@@ -57,7 +58,7 @@ def make_pdf_from_docx(data: bytes) -> bytes:
             story.append(Spacer(1, 7))
             continue
         style = styles["Title"] if p.style and p.style.name.lower().startswith("title") else styles["BodyText"]
-        story.append(Paragraph(text.replace("&", "&amp;"), style))
+        story.append(Paragraph(escape(text), style))
         story.append(Spacer(1, 5))
     for table in doc.tables:
         rows = [[cell.text.strip() for cell in row.cells] for row in table.rows]
@@ -124,7 +125,7 @@ def make_pdf_from_pptx(data: bytes) -> bytes:
                 continue
             text = (shape.text or "").strip()
             if text:
-                story.append(Paragraph(text.replace("&", "&amp;"), styles["BodyText"]))
+                story.append(Paragraph(escape(text), styles["BodyText"]))
                 story.append(Spacer(1, 7))
         if index < len(prs.slides):
             story.append(Spacer(1, 18))
