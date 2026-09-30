@@ -36,12 +36,10 @@ export default function AdvancedPdfToolClient({ slug }: { slug: string }) {
     if (!file) return setMessage("Please choose a PDF first.");
     if (slug === "compare-pdf" && !secondFile) return setMessage("Please choose the second PDF.");
     if (field && !value.trim()) return setMessage(`Please enter ${field.label.toLowerCase()}.`);
-    setBusy(true);
-    setMessage("");
+    setBusy(true); setMessage("");
     try {
       const form = new FormData();
-      form.append("operation", slug);
-      form.append("file", file);
+      form.append("operation", slug); form.append("file", file);
       if (secondFile) form.append("file2", secondFile);
       if (value.trim()) form.append("value", value.trim());
       const response = await fetch("/api/convert", { method: "POST", body: form });
@@ -55,46 +53,34 @@ export default function AdvancedPdfToolClient({ slug }: { slug: string }) {
       const match = disposition.match(/filename="?([^";]+)"?/i);
       const fallback = `${file.name.replace(/\.[^.]+$/, "") || "document"}-${slug}.${config.output}`;
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = match?.[1] || fallback;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      const a = document.createElement("a"); a.href = url; a.download = match?.[1] || fallback; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      setMessage("Completed successfully. Your download should start automatically.");
+      setMessage("Completed successfully. A new output file was created; your original PDF remains unchanged.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "PDF operation failed.");
-    } finally {
-      setBusy(false);
-    }
+    } finally { setBusy(false); }
   }
 
   return (
     <div style={{ padding: 20, borderRadius: 16, background: "#f6f8f7", border: "1px solid #d7e3de" }}>
       <label style={{ display: "block", fontWeight: 800, color: "#06172a", marginBottom: 8 }}>PDF file</label>
       <input type="file" accept={config.accept} onChange={(e) => setFile(e.target.files?.[0] ?? null)} style={{ display: "block", width: "100%", marginBottom: 16 }} />
+      {file && <div style={{ marginBottom: 16, padding: "10px 12px", borderRadius: 10, background: "#eef7f3", color: "#005744", fontSize: 13, fontWeight: 700 }}>Source selected • {file.name} • Original file will not be modified.</div>}
 
-      {slug === "compare-pdf" && (
-        <>
-          <label style={{ display: "block", fontWeight: 800, color: "#06172a", marginBottom: 8 }}>Second PDF</label>
-          <input type="file" accept={config.accept} onChange={(e) => setSecondFile(e.target.files?.[0] ?? null)} style={{ display: "block", width: "100%", marginBottom: 16 }} />
-        </>
-      )}
+      {slug === "compare-pdf" && <>
+        <label style={{ display: "block", fontWeight: 800, color: "#06172a", marginBottom: 8 }}>Second PDF</label>
+        <input type="file" accept={config.accept} onChange={(e) => setSecondFile(e.target.files?.[0] ?? null)} style={{ display: "block", width: "100%", marginBottom: 16 }} />
+      </>}
 
-      {field && (
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: "block", fontWeight: 800, color: "#06172a", marginBottom: 8 }}>{field.label}</label>
-          <input type={field.type} value={value} onChange={(e) => setValue(e.target.value)} placeholder={field.placeholder} style={{ width: "100%", boxSizing: "border-box", padding: "12px 13px", border: "1px solid #cbd8d3", borderRadius: 10, background: "#fff" }} />
-        </div>
-      )}
+      {field && <div style={{ marginBottom: 16 }}>
+        <label style={{ display: "block", fontWeight: 800, color: "#06172a", marginBottom: 8 }}>{field.label}</label>
+        <input type={field.type} value={value} onChange={(e) => setValue(e.target.value)} placeholder={field.placeholder} style={{ width: "100%", boxSizing: "border-box", padding: "12px 13px", border: "1px solid #cbd8d3", borderRadius: 10, background: "#fff" }} />
+      </div>}
 
       <p style={{ margin: "0 0 14px", color: "#65716f", fontSize: 13, lineHeight: 1.6 }}>{config.hint}</p>
-      <p style={{ margin: "0 0 14px", color: "#725600", fontSize: 12, fontWeight: 700 }}>Server processing • Please keep uploads under 4 MB for now.</p>
-      <button type="button" onClick={run} disabled={busy || !file} style={{ border: 0, borderRadius: 10, padding: "13px 18px", background: busy || !file ? "#9ab7ad" : "#005744", color: "#fff", fontWeight: 800, cursor: busy || !file ? "not-allowed" : "pointer" }}>
-        {busy ? "Processing…" : config.button}
-      </button>
-      {message && <p style={{ margin: "14px 0 0", color: "#42504d", fontSize: 13 }}>{message}</p>}
+      <p style={{ margin: "0 0 14px", color: "#725600", fontSize: 12, fontWeight: 700 }}>Server processing • The uploaded PDF is read as input and the result is returned as a separate download. The source is never overwritten.</p>
+      <button type="button" onClick={run} disabled={busy || !file} style={{ border: 0, borderRadius: 10, padding: "13px 18px", background: busy || !file ? "#9ab7ad" : "#005744", color: "#fff", fontWeight: 800, cursor: busy || !file ? "not-allowed" : "pointer" }}>{busy ? "Processing…" : config.button}</button>
+      {message && <p style={{ margin: "14px 0 0", color: message.startsWith("Completed") ? "#005744" : "#42504d", fontSize: 13 }}>{message}</p>}
     </div>
   );
 }
