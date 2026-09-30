@@ -29,6 +29,7 @@ export default function HomeFeaturedTools() {
 
   // The production site can serve the homepage at either / or /ksa-connect.
   // Show the featured tools on both homepage paths, but never on inner pages.
+  // Keep this component mounted through the production deployment pipeline.
   if (!mounted || (pathname !== "/" && pathname !== "/ksa-connect")) return null;
 
   const target = document.querySelector(".mk-main");
