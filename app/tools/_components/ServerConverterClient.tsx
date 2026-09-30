@@ -22,23 +22,14 @@ export default function ServerConverterClient({ slug }: { slug: string }) {
   const config = useMemo(() => CONFIG[slug] ?? CONFIG["word-to-pdf"], [slug]);
 
   async function run() {
-    if (!file) {
-      setMessage("Please choose a file first.");
-      return;
-    }
-    setBusy(true);
-    setMessage("");
+    if (!file) { setMessage("Please choose a file first."); return; }
+    setBusy(true); setMessage("");
     try {
-      const form = new FormData();
-      form.append("operation", slug);
-      form.append("file", file);
+      const form = new FormData(); form.append("operation", slug); form.append("file", file);
       const response = await fetch("/api/convert", { method: "POST", body: form });
       if (!response.ok) {
         let error = "Conversion failed. Please try again.";
-        try {
-          const data = await response.json();
-          if (data?.detail) error = data.detail;
-        } catch {}
+        try { const data = await response.json(); if (data?.detail) error = data.detail; } catch {}
         throw new Error(error);
       }
       const blob = await response.blob();
@@ -48,42 +39,24 @@ export default function ServerConverterClient({ slug }: { slug: string }) {
         "pdf-to-word": "docx", "pdf-to-csv": "csv", "pdf-to-excel": "xlsx", "pdf-to-text": "txt", "pdf-ocr": "txt",
         "pdf-to-html": "html", "pdf-to-markdown": "md", "pdf-to-ppt": "pptx", "word-to-pdf": "pdf", "ppt-to-pdf": "pdf",
       };
-      const fallback = `${file.name.replace(/\.[^.]+$/, "") || "converted"}.${ext[slug] || "bin"}`;
+      const fallback = `${file.name.replace(/\.[^.]+$/, "") || "converted"}-${slug}-output.${ext[slug] || "bin"}`;
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = match?.[1] || fallback;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      const a = document.createElement("a"); a.href = url; a.download = match?.[1] || fallback; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      setMessage("Conversion completed. Your file download should start automatically.");
+      setMessage("Conversion completed. A new output file was created; your original file remains unchanged.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Conversion failed.");
-    } finally {
-      setBusy(false);
-    }
+    } finally { setBusy(false); }
   }
 
   return (
     <div style={{ padding: 20, borderRadius: 16, background: "#f6f8f7", border: "1px solid #d7e3de" }}>
-      <input
-        type="file"
-        accept={config.accept}
-        onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-        style={{ display: "block", width: "100%", marginBottom: 14 }}
-      />
+      <input type="file" accept={config.accept} onChange={(event) => setFile(event.target.files?.[0] ?? null)} style={{ display: "block", width: "100%", marginBottom: 14 }} />
+      {file && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 10, background: "#eef7f3", color: "#005744", fontSize: 13, fontWeight: 700 }}>Source selected • {file.name} • Original file will not be modified.</div>}
       <p style={{ margin: "0 0 14px", color: "#65716f", fontSize: 13, lineHeight: 1.6 }}>{config.hint}</p>
-      <p style={{ margin: "0 0 14px", color: "#725600", fontSize: 12, fontWeight: 700 }}>Server processing • Please keep the upload under 4 MB for now.</p>
-      <button
-        type="button"
-        onClick={run}
-        disabled={busy || !file}
-        style={{ border: 0, borderRadius: 10, padding: "13px 18px", background: busy || !file ? "#9ab7ad" : "#005744", color: "#fff", fontWeight: 800, cursor: busy || !file ? "not-allowed" : "pointer" }}
-      >
-        {busy ? "Converting…" : config.button}
-      </button>
-      {message && <p style={{ margin: "14px 0 0", color: "#42504d", fontSize: 13 }}>{message}</p>}
+      <p style={{ margin: "0 0 14px", color: "#725600", fontSize: 12, fontWeight: 700 }}>Server processing • The source is read into memory only. It is not overwritten; the result is returned as a separate download.</p>
+      <button type="button" onClick={run} disabled={busy || !file} style={{ border: 0, borderRadius: 10, padding: "13px 18px", background: busy || !file ? "#9ab7ad" : "#005744", color: "#fff", fontWeight: 800, cursor: busy || !file ? "not-allowed" : "pointer" }}>{busy ? "Converting…" : config.button}</button>
+      {message && <p style={{ margin: "14px 0 0", color: message.startsWith("Conversion completed") ? "#005744" : "#42504d", fontSize: 13 }}>{message}</p>}
     </div>
   );
 }
