@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import SalaryCalculator from "./cal";
+import SalaryCalculator from "./calculator";
 import ToolSeoSchema from "../_components/ToolSeoSchema";
 
 export const metadata: Metadata = {
