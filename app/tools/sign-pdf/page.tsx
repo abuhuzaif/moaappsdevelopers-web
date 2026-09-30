@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import SignPdfToolClient from "../_components/SignPdfToolClientV2";
+import SignPdfToolClient from "../_components/SignPdfToolClientV3";
 
 export const metadata: Metadata = {
   title: "Sign PDF Online Free – Add Signature to PDF | MYKSA CONNECT",
@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 const faqs = [
   ["Can I upload my own signature image?", "Yes. Upload a PNG or JPG signature and place it anywhere on the PDF. Transparent PNG files give the cleanest result."],
   ["Can I resize and move my signature?", "Yes. Drag the signature on the PDF preview to position it, then use the resize handle to make it larger or smaller."],
-  ["Can I sign more than one PDF page?", "Yes. You can apply the same signature to the current page, every page, or selected pages such as 1,3,5-7."],
+  ["Can I sign more than one PDF page?", "Yes. You can apply the same signature to the current page or every page."],
   ["Can I draw my signature instead of uploading an image?", "Yes. The tool includes Draw, Type and Upload signature options."],
-  ["Are my PDF and signature uploaded to a server?", "No. The editor is designed to process the PDF and signature in your browser before generating the signed PDF."],
+  ["Are my PDF and signature uploaded to a server?", "No. The editor processes the PDF and signature in your browser before generating the signed PDF."],
 ];
 
 export default function SignPdfPage() {
@@ -28,7 +28,7 @@ export default function SignPdfPage() {
         <SignPdfToolClient />
         <section style={{ marginTop: 34, background: "#fff", borderRadius: 20, padding: "30px 26px", border: "1px solid #dbe7e2" }}>
           <h2 style={{ marginTop: 0, color: "#102027" }}>How to sign a PDF online</h2>
-          <ol style={{ color: "#52615d", lineHeight: 1.8, paddingLeft: 22 }}><li>Upload the PDF document you need to sign.</li><li>Choose Upload, Draw, or Type to create your signature.</li><li>Drag the signature to the required location on the PDF.</li><li>Resize the signature with the corner handle.</li><li>Choose the current page, all pages, or custom pages.</li><li>Download the completed signed PDF.</li></ol>
+          <ol style={{ color: "#52615d", lineHeight: 1.8, paddingLeft: 22 }}><li>Upload the PDF document you need to sign.</li><li>Choose Upload, Draw, or Type to create your signature.</li><li>Drag the signature to the required location on the PDF.</li><li>Resize the signature with the corner handle.</li><li>Choose the current page or all pages.</li><li>Download the completed signed PDF.</li></ol>
           <h2 style={{ color: "#102027", marginTop: 28 }}>Why use MYKSA CONNECT Sign PDF?</h2>
           <p style={{ color: "#52615d", lineHeight: 1.75 }}>The tool is designed for quick browser-based signing without requiring a desktop PDF editor. It supports signature images, drawn signatures and typed signatures, with direct positioning and resizing on the PDF preview.</p>
         </section>
