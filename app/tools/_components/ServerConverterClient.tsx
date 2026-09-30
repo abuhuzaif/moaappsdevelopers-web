@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 
 const CONFIG: Record<string, { accept: string; hint: string; button: string }> = {
   "word-to-pdf": { accept: ".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document", hint: "DOCX only • text and tables are converted server-side.", button: "Convert Word → PDF" },
-  "pdf-to-word": { accept: ".pdf,application/pdf", hint: "PDF text is extracted into an editable DOCX.", button: "Convert PDF → Word" },
+  "pdf-to-word": { accept: ".pdf,application/pdf", hint: "Layout-aware PDF → DOCX conversion • tables, borders, merged cells and text positioning are reconstructed as editable Word content.", button: "Convert PDF → Word" },
   "pdf-to-csv": { accept: ".pdf,application/pdf", hint: "Tables are extracted when detected; text-only PDFs fall back to page/text rows.", button: "Extract PDF → CSV" },
   "pdf-to-excel": { accept: ".pdf,application/pdf", hint: "Detected PDF tables are written to an XLSX workbook, one sheet per page/table group.", button: "Convert PDF → Excel" },
   "pdf-to-text": { accept: ".pdf,application/pdf", hint: "Extract selectable/searchable PDF text into a UTF-8 text file.", button: "Extract PDF → Text" },
@@ -25,8 +25,12 @@ export default function ServerConverterClient({ slug }: { slug: string }) {
     if (!file) { setMessage("Please choose a file first."); return; }
     setBusy(true); setMessage("");
     try {
-      const form = new FormData(); form.append("operation", slug); form.append("file", file);
-      const response = await fetch("/api/convert", { method: "POST", body: form });
+      const form = new FormData();
+      form.append("file", file);
+      const endpoint = slug === "pdf-to-word" ? "/api/pdf-to-word" : "/api/convert";
+      if (slug !== "pdf-to-word") form.append("operation", slug);
+
+      const response = await fetch(endpoint, { method: "POST", body: form });
       if (!response.ok) {
         let error = "Conversion failed. Please try again.";
         try { const data = await response.json(); if (data?.detail) error = data.detail; } catch {}
