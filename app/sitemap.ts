@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { SEO_POSTS } from "@/lib/seoContent";
 
 async function getBlogSlugs(): Promise<string[]> {
   try {
@@ -33,6 +34,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const base = "https://www.myksaconnect.com";
     const cities = ["riyadh", "jeddah", "dammam", "khobar", "jubail", "yanbu", "madinah"];
     const blogSlugs = await getBlogSlugs();
+    const seoSlugs = SEO_POSTS.map((post) => post.slug);
+    const allBlogSlugs = [...new Set([...seoSlugs, ...blogSlugs])];
+
     return [
       { url: `${base}/`, changeFrequency: "daily", priority: 1 },
       { url: `${base}/tools/`, changeFrequency: "weekly", priority: 0.95 },
@@ -44,8 +48,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { url: `${base}/ksa-connect/privacy`, changeFrequency: "yearly", priority: 0.3 },
       { url: `${base}/ksa-connect/safety`, changeFrequency: "yearly", priority: 0.4 },
       { url: `${base}/ksa-connect/faq`, changeFrequency: "monthly", priority: 0.6 },
-      { url: `${base}/ksa-connect/blog`, changeFrequency: "weekly", priority: 0.7 },
-      ...blogSlugs.map((slug) => ({ url: `${base}/ksa-connect/blog/${slug}`, changeFrequency: "monthly" as const, priority: 0.7 })),
+      { url: `${base}/ksa-connect/blog`, changeFrequency: "weekly", priority: 0.8 },
+      ...allBlogSlugs.map((slug) => ({ url: `${base}/ksa-connect/blog/${slug}`, changeFrequency: "monthly" as const, priority: 0.75 })),
     ];
   }
   const base = "https://www.moaappsdevelopers.com";
