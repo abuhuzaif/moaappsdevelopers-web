@@ -16,27 +16,17 @@ const TOOLS = [
 ] as const;
 
 const COLORS = [
-  "blue",
-  "green",
-  "yellow",
-  "purple",
-  "orange",
-  "cyan",
-  "pink",
-  "violet",
-  "sky",
-  "emerald",
-  "gold",
-  "indigo",
+  "blue", "green", "yellow", "purple", "orange", "cyan",
+  "pink", "violet", "sky", "emerald", "gold", "indigo",
 ];
 
 export default function PopularPdfTools() {
   return (
     <section className="mk-pdf-popular" aria-labelledby="popular-pdf-tools-title">
       <style>{`
-        /* Keep the 12 featured tools together on the homepage.
-           The remaining tools stay available through Explore All Tools. */
-        :global(section.mk-tools-showcase) { display: none !important; }
+        /* The homepage should show the 12 featured tools only once.
+           The secondary tools showcase remains available through /tools/. */
+        .mk-tools-showcase { display: none !important; }
 
         .mk-pdf-popular {
           position: relative;
@@ -169,35 +159,10 @@ export default function PopularPdfTools() {
           outline: 3px solid rgba(0,87,68,.22);
           outline-offset: 2px;
         }
-        .mk-pdf-card strong {
-          display: block;
-          color: #173b33;
-          font-size: 13.5px;
-          line-height: 1.2;
-        }
-        .mk-pdf-card small {
-          display: block;
-          margin-top: 5px;
-          color: #5f6f6a;
-          font-size: 10.5px;
-          line-height: 1.38;
-        }
-        .mk-pdf-icon {
-          width: 45px;
-          height: 45px;
-          display: grid;
-          place-items: center;
-          flex: 0 0 45px;
-          border-radius: 12px;
-          font-size: 22px;
-          box-shadow: inset 0 0 0 1px rgba(255,255,255,.45);
-        }
-        .mk-pdf-arrow {
-          margin-left: auto;
-          padding-left: 4px;
-          font-size: 18px;
-          font-weight: 900;
-        }
+        .mk-pdf-card strong { display: block; color: #173b33; font-size: 13.5px; line-height: 1.2; }
+        .mk-pdf-card small { display: block; margin-top: 5px; color: #5f6f6a; font-size: 10.5px; line-height: 1.38; }
+        .mk-pdf-icon { width: 45px; height: 45px; display: grid; place-items: center; flex: 0 0 45px; border-radius: 12px; font-size: 22px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.45); }
+        .mk-pdf-arrow { margin-left: auto; padding-left: 4px; font-size: 18px; font-weight: 900; }
         .mk-pdf-card.blue { background:#eef6ff; border-color:#bfdbfe; border-top-color:#3b82f6; }.mk-pdf-card.blue .mk-pdf-icon{background:#dbeafe}.mk-pdf-card.blue .mk-pdf-arrow{color:#2563eb}
         .mk-pdf-card.green { background:#ecfdf5; border-color:#a7f3d0; border-top-color:#22c55e; }.mk-pdf-card.green .mk-pdf-icon{background:#d1fae5}.mk-pdf-card.green .mk-pdf-arrow{color:#16a34a}
         .mk-pdf-card.yellow { background:#fff9df; border-color:#fde68a; border-top-color:#eab308; }.mk-pdf-card.yellow .mk-pdf-icon{background:#fef3c7}.mk-pdf-card.yellow .mk-pdf-arrow{color:#ca8a04}
@@ -210,30 +175,10 @@ export default function PopularPdfTools() {
         .mk-pdf-card.emerald { background:#ecfdf7; border-color:#a7f3d0; border-top-color:#10b981; }.mk-pdf-card.emerald .mk-pdf-icon{background:#d1fae5}.mk-pdf-card.emerald .mk-pdf-arrow{color:#059669}
         .mk-pdf-card.gold { background:#fff8df; border-color:#fcd34d; border-top-color:#f59e0b; }.mk-pdf-card.gold .mk-pdf-icon{background:#fef3c7}.mk-pdf-card.gold .mk-pdf-arrow{color:#d97706}
         .mk-pdf-card.indigo { background:#eef2ff; border-color:#c7d2fe; border-top-color:#6366f1; }.mk-pdf-card.indigo .mk-pdf-icon{background:#e0e7ff}.mk-pdf-card.indigo .mk-pdf-arrow{color:#4f46e5}
-        .mk-pdf-new {
-          position: absolute;
-          right: 9px;
-          top: 8px;
-          padding: 3px 7px;
-          border-radius: 999px;
-          background: #f6b91f;
-          color: #4e3900;
-          font-size: 7.5px;
-          font-weight: 900;
-          letter-spacing: .55px;
-        }
-        @media (max-width: 1000px) {
-          .mk-pdf-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
-        }
-        @media (max-width: 650px) {
-          .mk-pdf-popular { width: 92vw; padding: 20px; border-radius: 19px; }
-          .mk-pdf-head { align-items: flex-start; flex-direction: column; gap: 13px; }
-          .mk-pdf-all { align-self: flex-start; }
-        }
-        @media (max-width: 520px) {
-          .mk-pdf-grid { grid-template-columns: 1fr; }
-          .mk-pdf-card { min-height: 80px; }
-        }
+        .mk-pdf-new { position: absolute; right: 9px; top: 8px; padding: 3px 7px; border-radius: 999px; background: #f6b91f; color: #4e3900; font-size: 7.5px; font-weight: 900; letter-spacing: .55px; }
+        @media (max-width: 1000px) { .mk-pdf-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+        @media (max-width: 650px) { .mk-pdf-popular { width: 92vw; padding: 20px; border-radius: 19px; } .mk-pdf-head { align-items: flex-start; flex-direction: column; gap: 13px; } .mk-pdf-all { align-self: flex-start; } }
+        @media (max-width: 520px) { .mk-pdf-grid { grid-template-columns: 1fr; } .mk-pdf-card { min-height: 80px; } }
       `}</style>
 
       <div className="mk-pdf-head">
