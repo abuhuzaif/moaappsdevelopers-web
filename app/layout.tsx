@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import HomeFeaturedTools from "@/components/HomeFeaturedTools";
 
 const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
 
@@ -159,10 +158,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}</style>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       </head>
-      <body>
-        {children}
-        <HomeFeaturedTools />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
