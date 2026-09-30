@@ -73,7 +73,7 @@ export default function BrowserPdfWordClient() {
 
     setBusy(true);
     setProgress(0);
-    setMessage("Opening PDF and preserving the original page geometry…");
+    setMessage("Opening PDF and locking each page to its original geometry…");
 
     try {
       await loadPdfEngine();
@@ -84,75 +84,116 @@ export default function BrowserPdfWordClient() {
 
       const sections: any[] = [];
 
-      // Fidelity-first conversion:
-      // Each source PDF page is rendered as a high-resolution page image and
-      // placed on a DOCX page with the exact PDF page dimensions. This avoids
-      // the common PDF->DOCX failure where extracted text reflows into extra
-      // pages and destroys tables, columns, borders and signatures.
-      // The source PDF is read-only; only a brand-new DOCX is generated.
+      // Fidelity-first conversion. The PDF page is rendered as a single
+      // high-resolution image and anchored to the PAGE, not to the paragraph.
+      // This prevents Word's normal text-flow engine from moving, shrinking,
+      // splitting or reflowing tables, columns, borders and signatures.
+      // A completely new DOCX is generated; the source PDF is read-only.
       for (let i = 1; i <= pdf.numPages; i++) {
         setProgress(Math.round(((i - 1) / pdf.numPages) * 90));
         setMessage(`Preserving page ${i} of ${pdf.numPages} exactly…`);
 
         const page = await pdf.getPage(i);
         const baseViewport = page.getViewport({ scale: 1 });
-        const scale = Math.min(2.25, Math.max(1.75, 1600 / Math.max(baseViewport.width, baseViewport.height)));
-        const viewport = page.getViewport({ scale });
+
+        // Render at a useful quality without making the browser unnecessarily
+        // heavy. The final Word dimensions are derived from the PDF's physical
+        // point dimensions, so rendering scale never changes page geometry.
+        const renderScale = Math.min(
+          3,
+          Math.max(2, 1800 / Math.max(baseViewport.width, baseViewport.height))
+        );
+        const renderViewport = page.getViewport({ scale: renderScale });
 
         const canvas = document.createElement("canvas");
-        canvas.width = Math.ceil(viewport.width);
-        canvas.height = Math.ceil(viewport.height);
+        canvas.width = Math.ceil(renderViewport.width);
+        canvas.height = Math.ceil(renderViewport.height);
         const context = canvas.getContext("2d", { alpha: false });
         if (!context) throw new Error("Could not create the PDF rendering canvas.");
 
         context.fillStyle = "#ffffff";
         context.fillRect(0, 0, canvas.width, canvas.height);
-        await page.render({ canvasContext: context, viewport }).promise;
+        await page.render({ canvasContext: context, viewport: renderViewport }).promise;
 
         const dataUrl = canvas.toDataURL("image/png");
         const base64 = dataUrl.split(",")[1];
         if (!base64) throw new Error(`Could not render PDF page ${i}.`);
+
         const binary = atob(base64);
         const imageBytes = new Uint8Array(binary.length);
         for (let j = 0; j < binary.length; j++) imageBytes[j] = binary.charCodeAt(j);
 
-        // PDF points -> DOCX twips for the physical page size.
+        // DOCX page dimensions are twentieths of a point (twips).
         const pageWidthTwips = Math.round(baseViewport.width * 20);
         const pageHeightTwips = Math.round(baseViewport.height * 20);
 
-        // Display the high-resolution image at the PDF's original physical size.
-        // Word's ImageRun uses CSS-pixel dimensions; 96 CSS px = 72 PDF points.
-        const imageWidthPx = Math.round((baseViewport.width * 96) / 72);
-        const imageHeightPx = Math.round((baseViewport.height * 96) / 72);
+        // ImageRun dimensions are pixels at Word's 96-DPI image convention.
+        // Keep them derived from the PDF points rather than from the render
+        // canvas so a high-resolution render never creates an oversized page.
+        const imageWidthPx = Math.max(1, Math.round((baseViewport.width * 96) / 72));
+        const imageHeightPx = Math.max(1, Math.round((baseViewport.height * 96) / 72));
+
+        const image = new ImageRun({
+          type: "png",
+          data: imageBytes,
+          transformation: {
+            width: imageWidthPx,
+            height: imageHeightPx,
+          },
+          // Critical fix: anchor the page image to the physical page edge.
+          // Inline images participate in paragraph layout and can cause the
+          // image to spill onto another page. A page-anchored image cannot.
+          floating: {
+            horizontalPosition: {
+              relative: "page",
+              align: "left",
+            },
+            verticalPosition: {
+              relative: "page",
+              align: "top",
+            },
+            wrap: {
+              type: "none",
+            },
+            allowOverlap: false,
+            lockAnchor: true,
+            behindDocument: false,
+            margins: {
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+            },
+          },
+        });
 
         sections.push({
           properties: {
             page: {
               width: pageWidthTwips,
               height: pageHeightTwips,
-              margin: { top: 0, right: 0, bottom: 0, left: 0 },
+              margin: {
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
+                header: 0,
+                footer: 0,
+                gutter: 0,
+              },
             },
           },
           children: [
             new Paragraph({
               spacing: { before: 0, after: 0, line: 240 },
-              children: [
-                new ImageRun({
-                  type: "png",
-                  data: imageBytes,
-                  transformation: {
-                    width: imageWidthPx,
-                    height: imageHeightPx,
-                  },
-                }),
-              ],
+              children: [image],
             }),
           ],
         });
       }
 
       setProgress(95);
-      setMessage("Building a new Word document without changing the source PDF…");
+      setMessage("Building the new fixed-layout Word document…");
 
       const document = new Document({ sections });
       const output = await Packer.toBlob(document);
@@ -160,7 +201,7 @@ export default function BrowserPdfWordClient() {
       download(output, `${cleanName(file.name)}.docx`);
       setProgress(100);
       setMessage(
-        `Done — ${pdf.numPages} source page${pdf.numPages === 1 ? "" : "s"} preserved as ${pdf.numPages} Word page${pdf.numPages === 1 ? "" : "s"}. Tables, columns, borders, signatures and page positioning are kept visually intact. The original PDF was not modified.`
+        `Done — ${pdf.numPages} source page${pdf.numPages === 1 ? "" : "s"} preserved as ${pdf.numPages} Word page${pdf.numPages === 1 ? "" : "s"}. Tables, columns, borders, signatures and page positioning are locked to the original PDF layout. The original PDF was not modified.`
       );
     } catch (error) {
       console.error(error);
@@ -196,7 +237,7 @@ export default function BrowserPdfWordClient() {
         )}
 
         <small style={{ color: "#65716f", lineHeight: 1.6 }}>
-          Browser-based, fidelity-first PDF → Word conversion. Each original PDF page is preserved as a fixed-layout Word page so tables, columns, borders, stamps and signatures do not reflow into different pages. Your original PDF is never edited, deleted or overwritten.
+          Browser-based, fidelity-first PDF → Word conversion. Each PDF page is rendered once and anchored to the physical Word page so tables, columns, borders, stamps and signatures cannot reflow. Your original PDF is never edited, deleted or overwritten.
         </small>
 
         <button
