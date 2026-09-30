@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import PopularPdfTools from "@/app/components/PopularPdfTools";
 import { collection, getDocs, limit, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { db, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
@@ -361,6 +362,8 @@ export default function KsaConnectPage() {
             }
           }
         `}</style>
+        <PopularPdfTools />
+
         <section className="mk-tools-strip mk-tools-showcase" aria-labelledby="expat-tools-title">
           <div className="mk-tools-showcase-head">
             <div className="mk-tools-showcase-copy">
