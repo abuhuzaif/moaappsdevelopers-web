@@ -126,11 +126,12 @@ export default function SplitPdfClient() {
           {mode === "remove" ? "Pages to remove" : "Pages to extract"}
           <input value={pages} onChange={(e) => setPages(e.target.value)} placeholder="Example: 1, 3, 5-8" style={{ padding: 11, borderRadius: 10, border: "1px solid #cbd8d3", font: "inherit" }} />
         </label>
-        <small style={{ color: "#65716f" }}>Use commas and ranges, for example <strong>1, 3, 5-8</strong>. Processing happens in your browser; the PDF is not uploaded.</small>
+        <small style={{ color: "#65716f" }}>Use commas and ranges, for example <strong>1, 3, 5-8</strong>. Processing happens in your browser; the original PDF is never edited, deleted, or overwritten.</small>
         <button type="button" onClick={run} disabled={busy || !file} style={{ border: 0, borderRadius: 12, padding: "13px 18px", background: busy || !file ? "#9ab7ad" : "#005744", color: "#fff", fontWeight: 800, cursor: busy || !file ? "not-allowed" : "pointer" }}>
           {busy ? "Processing…" : "Split PDF"}
         </button>
         {message && <p style={{ margin: 0, color: message.startsWith("Done") || message.startsWith("Created") ? "#005744" : "#9a4d00", fontWeight: 700 }}>{message}</p>}
+        <p style={{ margin: 0, color: "#65716f", fontSize: 12 }}>Every result is a new PDF download; your source file remains unchanged.</p>
       </div>
     </div>
   );
