@@ -6,10 +6,25 @@ const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
 
 export const metadata: Metadata = isKsaConnectSite
   ? {
-      title: "MYKSA CONNECT — Saudi Arabia Classifieds & Expat Tools",
+      title: "MYKSA CONNECT — Saudi Arabia Classifieds, Expat Tools & Local Services",
       description:
-        "MYKSA CONNECT helps expatriates and residents in Saudi Arabia find classifieds, housing, cars, services, restaurants and free Saudi expat tools.",
+        "MYKSA CONNECT helps expatriates and residents in Saudi Arabia find housing, cars, jobs, services, restaurants and free online tools for everyday life.",
       metadataBase: new URL("https://www.myksaconnect.com"),
+      keywords: [
+        "Saudi Arabia classifieds",
+        "Saudi expat classifieds",
+        "Saudi Arabia expat tools",
+        "Riyadh classifieds",
+        "Jeddah classifieds",
+        "Saudi housing",
+        "rooms for rent Saudi Arabia",
+        "cars for sale Saudi Arabia",
+        "Iqama expiry calculator",
+        "Hijri Gregorian converter",
+        "Saudi salary calculator",
+        "SAR currency converter",
+        "Saudi online tools",
+      ],
       alternates: { canonical: "/" },
       robots: {
         index: true,
@@ -23,9 +38,9 @@ export const metadata: Metadata = isKsaConnectSite
         },
       },
       openGraph: {
-        title: "MYKSA CONNECT — Saudi Arabia Classifieds & Expat Tools",
+        title: "MYKSA CONNECT — Saudi Arabia Classifieds, Expat Tools & Local Services",
         description:
-          "Find housing, cars, services, restaurants and useful free tools for life and work in Saudi Arabia.",
+          "Find housing, cars, jobs, services, restaurants and useful free tools for life and work in Saudi Arabia.",
         type: "website",
         url: "https://www.myksaconnect.com",
         siteName: "MYKSA CONNECT",
@@ -35,7 +50,7 @@ export const metadata: Metadata = isKsaConnectSite
             url: "/images/myksa-tools-banner.png",
             width: 1200,
             height: 630,
-            alt: "MYKSA CONNECT — Saudi Arabia classifieds and expat tools",
+            alt: "MYKSA CONNECT Saudi Arabia classifieds and expat tools",
           },
         ],
       },
@@ -43,7 +58,7 @@ export const metadata: Metadata = isKsaConnectSite
         card: "summary_large_image",
         title: "MYKSA CONNECT — Saudi Arabia Classifieds & Expat Tools",
         description:
-          "Classifieds, services and free Saudi expat tools for residents across Saudi Arabia.",
+          "Classifieds, local services and free Saudi expat tools for residents across Saudi Arabia.",
         images: ["/images/myksa-tools-banner.png"],
       },
       other: {
@@ -75,7 +90,7 @@ const ksaConnectSchema = {
       alternateName: "KSA-Connect",
       url: "https://www.myksaconnect.com",
       description:
-        "Classifieds, services, restaurants and free digital tools for expatriates and residents in Saudi Arabia.",
+        "Saudi Arabia classifieds, local services, restaurants and free digital tools for expatriates and residents.",
       areaServed: { "@type": "Country", name: "Saudi Arabia" },
     },
     {
@@ -87,6 +102,11 @@ const ksaConnectSchema = {
         "Saudi Arabia classifieds and free expat tools for housing, cars, services, work and everyday life.",
       publisher: { "@id": "https://www.myksaconnect.com/#organization" },
       inLanguage: "en-SA",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: "https://www.myksaconnect.com/ksa-connect?q={search_term_string}",
+        "query-input": "required name=search_term_string",
+      },
     },
   ],
 };
@@ -133,8 +153,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <link rel="stylesheet" href="/myksa-tool-colors.css?v=2" />
         <style>{`
-          /* The homepage now keeps the 12 featured PDF + expat tools together.
-             Hide the older duplicate Work, Salary & Business Tools strip. */
           .mk-page .mk-tools-showcase {
             display: none !important;
           }
