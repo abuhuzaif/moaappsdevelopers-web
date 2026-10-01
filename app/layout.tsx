@@ -12,7 +12,6 @@ export const metadata: Metadata = isKsaConnectSite
       metadataBase: new URL("https://www.myksaconnect.com"),
       keywords: [
         "Saudi Arabia classifieds",
-        "Saudi expat classifieds",
         "Saudi Arabia expat tools",
         "Riyadh classifieds",
         "Jeddah classifieds",
@@ -157,6 +156,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             display: none !important;
           }
           .tool-page > .shell > .banner {
+            display: none !important;
+          }
+          .tool-page .banner,
+          .tool-page .hero-banner,
+          .tool-page img[src*="myksa-tools-banner.png"] {
             display: none !important;
           }
         `}</style>
