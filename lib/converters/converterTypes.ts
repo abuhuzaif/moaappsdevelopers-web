@@ -53,8 +53,5 @@ export const CONVERTER_DEFINITIONS: ConverterDefinition[] = [
   { slug: "image-merger", name: "Image Merger", shortDescription: "Merge multiple images vertically or horizontally.", category: "image", input: "JPG/PNG/WebP", output: "JPG/PNG/WebP", clientSide: true },
   { slug: "image-compressor", name: "Image Compressor", shortDescription: "Compress images in your browser.", category: "image", input: "JPG/PNG/WebP", output: "JPG/PNG/WebP", clientSide: true },
   { slug: "image-resizer", name: "Image Resizer", shortDescription: "Resize images to custom dimensions.", category: "image", input: "JPG/PNG/WebP", output: "JPG/PNG/WebP", clientSide: true },
-  { slug: "dwg-to-dxf", name: "DWG → DXF", shortDescription: "Convert AutoCAD DWG drawings to DXF format.", category: "cad", input: "DWG", output: "DXF", clientSide: false },
-  { slug: "dwg-to-pdf", name: "DWG → PDF", shortDescription: "Convert AutoCAD DWG drawings to PDF.", category: "cad", input: "DWG", output: "PDF", clientSide: false },
-  { slug: "dwg-to-svg", name: "DWG → SVG", shortDescription: "Convert DWG drawings to scalable SVG graphics.", category: "cad", input: "DWG", output: "SVG", clientSide: false },
-  { slug: "dxf-to-svg", name: "DXF → SVG", shortDescription: "Convert DXF drawings to scalable SVG graphics.", category: "cad", input: "DXF", output: "SVG", clientSide: false },
+  { slug: "cad-tools", name: "CAD Tools", shortDescription: "DWG and DXF conversion tools for CAD drawings.", category: "cad", input: "DWG / DXF", output: "DXF / PDF / SVG", clientSide: false },
 ];
