@@ -12,7 +12,6 @@ export const metadata: Metadata = isKsaConnectSite
       metadataBase: new URL("https://www.myksaconnect.com"),
       keywords: [
         "Saudi Arabia classifieds",
-        "Saudi expat classifieds",
         "Saudi Arabia expat tools",
         "Riyadh classifieds",
         "Jeddah classifieds",
@@ -154,6 +153,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href="/myksa-tool-colors.css?v=2" />
         <style>{`
           .mk-page .mk-tools-showcase {
+            display: none !important;
+          }
+
+          /* Individual tool pages use the shared banner from ToolsBanner.
+             Hide any duplicate page-level banner while keeping the GIS pages'
+             own banner because ToolsBanner intentionally skips those pages. */
+          .tool-page > .shell > .banner {
             display: none !important;
           }
         `}</style>
