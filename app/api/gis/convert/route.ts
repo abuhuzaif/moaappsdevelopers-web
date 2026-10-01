@@ -5,13 +5,23 @@ export const dynamic = "force-dynamic";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 type Point = [number, number];
-type Geometry = { type: "point"; point: Point } | { type: "line" | "polygon"; points: Point[] };
+type Geometry =
+  | { type: "point"; point: Point }
+  | { type: "line" | "polygon"; points: Point[] };
 type Pair = { code: number; value: string };
 type Unit = "m" | "ft" | "in";
 
-function error(message: string, status = 400) { return NextResponse.json({ error: message }, { status }); }
-function xml(value: string) { return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&apos;"); }
+function error(message: string, status = 400) {
+  return NextResponse.json({ error: message }, { status });
+}
+function xml(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&apos;");
+}
 function kmlCoord(p: Point) { return `${p[0]},${p[1]},0`; }
+function outputBaseName(filename: string) {
+  const base = filename.replace(/\.[^.\/]+$/, "");
+  return base.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^[-_.]+|[-_.]+$/g, "") || "converted";
+}
 function buildKml(geometries: Geometry[], name: string) {
   const placemarks = geometries.map((g, i) => {
     if (g.type === "point") return `<Placemark><name>Point ${i + 1}</name><Point><coordinates>${kmlCoord(g.point)}</coordinates></Point></Placemark>`;
@@ -22,7 +32,6 @@ function buildKml(geometries: Geometry[], name: string) {
   }).join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>${xml(name)}</name>${placemarks}</Document></kml>`;
 }
-
 function shpPoint(buffer: Buffer, offset: number): Point { return [buffer.readDoubleLE(offset), buffer.readDoubleLE(offset + 8)]; }
 function readShp(buffer: Buffer): Geometry[] {
   if (buffer.length < 100 || buffer.readInt32BE(0) !== 9994) throw new Error("The uploaded file is not a valid ESRI Shapefile (.SHP).");
@@ -46,20 +55,24 @@ function readShp(buffer: Buffer): Geometry[] {
               for (let i = from; i < to; i++) points.push(shpPoint(buffer, pointsOffset + i * 16));
               if (points.length < 2) continue;
               const polygon = shape === 5 || shape === 15 || shape === 25;
-              if (polygon && points.length >= 3) { if (points[0][0] !== points.at(-1)![0] || points[0][1] !== points.at(-1)![1]) points.push(points[0]); geometries.push({ type: "polygon", points }); }
-              else geometries.push({ type: "line", points });
+              if (polygon && points.length >= 3) {
+                if (points[0][0] !== points.at(-1)![0] || points[0][1] !== points.at(-1)![1]) points.push(points[0]);
+                geometries.push({ type: "polygon", points });
+              } else geometries.push({ type: "line", points });
             }
           }
         }
       } else if (shape === 8 || shape === 18 || shape === 28) {
-        if (start + 40 <= end) { const count = buffer.readInt32LE(start + 36), pointsOffset = start + 40; if (count > 0 && count <= 5000000 && pointsOffset + count * 16 <= end) for (let i = 0; i < count; i++) geometries.push({ type: "point", point: shpPoint(buffer, pointsOffset + i * 16) }); }
+        if (start + 40 <= end) {
+          const count = buffer.readInt32LE(start + 36), pointsOffset = start + 40;
+          if (count > 0 && count <= 5000000 && pointsOffset + count * 16 <= end) for (let i = 0; i < count; i++) geometries.push({ type: "point", point: shpPoint(buffer, pointsOffset + i * 16) });
+        }
       }
     } catch { /* skip malformed record */ }
     offset = end;
   }
   return geometries;
 }
-
 function pairsFromDxf(text: string): Pair[] { const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/), pairs: Pair[] = []; for (let i = 0; i + 1 < lines.length; i += 2) { const code = Number(lines[i].trim()); if (Number.isFinite(code)) pairs.push({ code, value: lines[i + 1].trim() }); } return pairs; }
 function num(v: string | undefined) { const n = Number(v); return Number.isFinite(n) ? n : undefined; }
 function entityValues(entity: Pair[]) { const m = new Map<number, string[]>(); for (const p of entity) m.set(p.code, [...(m.get(p.code) ?? []), p.value]); return m; }
@@ -95,23 +108,35 @@ function georef(geometries: Geometry[], originLat: number, originLon: number, un
 export async function POST(request: Request) {
   try {
     const form = await request.formData(), tool = String(form.get("tool") ?? ""), value = form.get("file");
-    if (!(value instanceof File)) return error("Please upload a file."); if (value.size === 0) return error("The uploaded file is empty."); if (value.size > MAX_FILE_BYTES) return error("Please keep GIS files under 10 MB.", 413);
-    const buffer = Buffer.from(await value.arrayBuffer()), filename = value.name.toLowerCase();
+    if (!(value instanceof File)) return error("Please upload a file.");
+    if (value.size === 0) return error("The uploaded file is empty.");
+    if (value.size > MAX_FILE_BYTES) return error("Please keep GIS files under 10 MB.", 413);
+    const buffer = Buffer.from(await value.arrayBuffer()), originalFilename = value.name || "converted", filename = originalFilename.toLowerCase(), baseName = outputBaseName(originalFilename);
+
     if (tool === "shp-to-kml" || tool === "shp-to-geojson") {
       if (!filename.endsWith(".shp")) return error("SHP conversion currently expects the .SHP file itself. Please select the .shp file.");
-      let geometries: Geometry[]; try { geometries = readShp(buffer); } catch (e) { return error(e instanceof Error ? e.message : "Could not read the Shapefile.", 422); }
+      let geometries: Geometry[];
+      try { geometries = readShp(buffer); } catch (e) { return error(e instanceof Error ? e.message : "Could not read the Shapefile.", 422); }
       if (!geometries.length) return error("No supported geometry was found in this Shapefile. Supported types include Point, PolyLine, Polygon and MultiPoint.", 422);
-      if (tool === "shp-to-kml") { const content = buildKml(geometries, "MYKSA CONNECT SHP conversion"); return new NextResponse(content, { headers: { "Content-Type": "application/vnd.google-earth.kml+xml; charset=utf-8", "Content-Disposition": 'attachment; filename="converted.kml"', "Cache-Control": "no-store" } }); }
+      if (tool === "shp-to-kml") {
+        const content = buildKml(geometries, `${baseName}.kml`);
+        return new NextResponse(content, { headers: { "Content-Type": "application/vnd.google-earth.kml+xml; charset=utf-8", "Content-Disposition": `attachment; filename="${baseName}.kml"`, "Cache-Control": "no-store" } });
+      }
       const features = geometries.map(g => g.type === "point" ? { type: "Feature", properties: {}, geometry: { type: "Point", coordinates: g.point } } : { type: "Feature", properties: {}, geometry: { type: g.type === "polygon" ? "Polygon" : "LineString", coordinates: g.type === "polygon" ? [g.points] : g.points } });
-      return new NextResponse(JSON.stringify({ type: "FeatureCollection", features }), { headers: { "Content-Type": "application/geo+json; charset=utf-8", "Content-Disposition": 'attachment; filename="converted.geojson"', "Cache-Control": "no-store" } });
+      return new NextResponse(JSON.stringify({ type: "FeatureCollection", features }), { headers: { "Content-Type": "application/geo+json; charset=utf-8", "Content-Disposition": `attachment; filename="${baseName}.geojson"`, "Cache-Control": "no-store" } });
     }
+
     if (tool !== "dxf-to-kml") return error("Unsupported GIS conversion operation.");
     if (!filename.endsWith(".dxf")) return error("DXF → KML expects a .DXF file.");
     const originLat = Number(form.get("originLat")), originLon = Number(form.get("originLon")), unitValue = String(form.get("unit") ?? "m"), unit: Unit = unitValue === "ft" || unitValue === "in" ? unitValue : "m";
     if (!Number.isFinite(originLat) || originLat < -80 || originLat > 84 || !Number.isFinite(originLon) || originLon < -180 || originLon > 180) return error("Please enter a valid reference latitude and longitude.", 422);
     if (buffer.subarray(0, 22).toString("ascii").startsWith("AutoCAD Binary DXF")) return error("Binary DXF is not supported yet. Please save/export as ASCII DXF and try again.", 422);
-    const geometries = parseDxf(pairsFromDxf(buffer.toString("utf8"))); if (!geometries.length) return error("No supported DXF geometry was found. Supported entities include POINT, LINE and LWPOLYLINE.", 422);
-    const content = buildKml(georef(geometries, originLat, originLon, unit), "MYKSA CONNECT DXF conversion");
-    return new NextResponse(content, { headers: { "Content-Type": "application/vnd.google-earth.kml+xml; charset=utf-8", "Content-Disposition": 'attachment; filename="converted.kml"', "Cache-Control": "no-store" } });
-  } catch (e) { console.error("GIS conversion error", e); return error(e instanceof Error ? e.message : "GIS conversion failed.", 500); }
+    const geometries = parseDxf(pairsFromDxf(buffer.toString("utf8")));
+    if (!geometries.length) return error("No supported DXF geometry was found. Supported entities include POINT, LINE and LWPOLYLINE.", 422);
+    const content = buildKml(georef(geometries, originLat, originLon, unit), `${baseName}.kml`);
+    return new NextResponse(content, { headers: { "Content-Type": "application/vnd.google-earth.kml+xml; charset=utf-8", "Content-Disposition": `attachment; filename="${baseName}.kml"`, "Cache-Control": "no-store" } });
+  } catch (e) {
+    console.error("GIS conversion error", e);
+    return error(e instanceof Error ? e.message : "GIS conversion failed.", 500);
+  }
 }
