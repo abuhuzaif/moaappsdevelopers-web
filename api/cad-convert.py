@@ -26,7 +26,9 @@ OPERATIONS = {
 
 
 def cloudconvert_job(payload: dict) -> dict:
-    token = os.getenv("CLOUDCONVERT_API_TOKEN")
+    # Support the variable already documented in this project, plus the
+    # more explicit TOKEN name if it is used in the hosting environment.
+    token = os.getenv("CLOUDCONVERT_API_TOKEN") or os.getenv("CLOUDCONVERT_API_KEY")
     if not token:
         raise HTTPException(500, "CAD conversion service is not configured yet.")
 
