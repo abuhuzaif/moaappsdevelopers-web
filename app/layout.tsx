@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ToolsBanner from "./_components/ToolsBanner";
 
 const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
 
@@ -158,7 +159,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}</style>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <ToolsBanner />
+        {children}
+      </body>
     </html>
   );
 }
