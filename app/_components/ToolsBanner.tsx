@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 const DEDICATED_TOOL_SLUGS = new Set([
@@ -56,16 +57,39 @@ const DEDICATED_TOOL_SLUGS = new Set([
 
 export default function ToolsBanner() {
   const pathname = usePathname();
+  const [showFallbackBanner, setShowFallbackBanner] = useState(false);
+
+  useEffect(() => {
+    if (!pathname?.startsWith("/tools")) return;
+
+    // Some dedicated Everyday Saudi Tools render their banner inside the
+    // calculator component. Only add the shared banner when the page does
+    // not already contain one, preventing duplicate banners.
+    const hasInlineBanner = Boolean(
+      document.querySelector('img[src="/images/myksa-tools-banner.png"]')
+    );
+    setShowFallbackBanner(!hasInlineBanner);
+
+    // Keep the public tool name simple: Currency Converter.
+    if (pathname === "/tools" || pathname === "/tools/") {
+      document.querySelectorAll("body *").forEach((element) => {
+        if (element.childElementCount === 0 && element.textContent?.trim() === "SAR Currency Converter") {
+          element.textContent = "Currency Converter";
+        }
+      });
+    }
+  }, [pathname]);
 
   if (!pathname?.startsWith("/tools")) return null;
 
-  // /tools has its own directory hero. Dedicated tool pages also render
-  // their own banner inside their page component. The shared banner is only
-  // needed for the generic dynamic converter pages under /tools/[slug].
   const parts = pathname.replace(/^\/tools\/?/, "").split("/").filter(Boolean);
   const slug = parts[0] || "";
   if (!slug) return null;
-  if (DEDICATED_TOOL_SLUGS.has(slug)) return null;
+
+  // Dedicated tool pages normally render their own banner. If a page is
+  // missing it, show one here as a safe fallback. This keeps every tool page
+  // branded while avoiding the duplicate-banner problem.
+  if (DEDICATED_TOOL_SLUGS.has(slug) && !showFallbackBanner) return null;
 
   return (
     <div
