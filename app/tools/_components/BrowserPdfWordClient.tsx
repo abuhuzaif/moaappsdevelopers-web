@@ -195,8 +195,8 @@ export default function BrowserPdfWordClient() {
       setProgress(95);
       setMessage("Building the new fixed-layout Word document…");
 
-      const document = new Document({ sections });
-      const output = await Packer.toBlob(document);
+      const wordDocument = new Document({ sections });
+      const output = await Packer.toBlob(wordDocument);
 
       download(output, `${cleanName(file.name)}.docx`);
       setProgress(100);
