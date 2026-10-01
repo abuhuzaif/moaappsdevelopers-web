@@ -71,13 +71,11 @@ export default function ToolsBanner() {
     setShowFallbackBanner(!hasInlineBanner);
 
     // Keep the public tool name simple: Currency Converter.
-    if (pathname === "/tools" || pathname === "/tools/") {
-      document.querySelectorAll("body *").forEach((element) => {
-        if (element.childElementCount === 0 && element.textContent?.trim() === "SAR Currency Converter") {
-          element.textContent = "Currency Converter";
-        }
-      });
-    }
+    document.querySelectorAll("body *").forEach((element) => {
+      if (element.childElementCount === 0 && element.textContent?.trim() === "SAR Currency Converter") {
+        element.textContent = "Currency Converter";
+      }
+    });
   }, [pathname]);
 
   if (!pathname?.startsWith("/tools")) return null;
