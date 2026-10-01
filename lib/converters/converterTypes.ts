@@ -44,7 +44,7 @@ export const CONVERTER_DEFINITIONS: ConverterDefinition[] = [
   { slug: "csv-to-json", name: "CSV to JSON", shortDescription: "Convert CSV data into JSON.", category: "data", input: "CSV", output: "JSON", clientSide: true },
   { slug: "json-to-csv", name: "JSON to CSV", shortDescription: "Convert JSON arrays into CSV.", category: "data", input: "JSON", output: "CSV", clientSide: true },
   { slug: "xml-to-json", name: "XML to JSON", shortDescription: "Convert XML data into JSON.", category: "data", input: "XML", output: "JSON", clientSide: true },
-  { slug: "json-to-xml", name: "JSON to XML", shortDescription: "Convert JSON data into XML.", category: "data", input: "JSON", output: "XML", clientSide: true },
+  { slug: "json-to-xml", name: "JSON to XML", shortDescription: "Convert JSON data to XML.", category: "data", input: "JSON", output: "XML", clientSide: true },
   { slug: "json-formatter", name: "JSON Formatter & Validator", shortDescription: "Format, validate and inspect JSON data.", category: "data", input: "JSON", output: "JSON", clientSide: true },
   { slug: "jpg-to-webp", name: "JPG to WebP", shortDescription: "Convert JPG images to WebP.", category: "image", input: "JPG", output: "WebP", clientSide: true },
   { slug: "png-to-webp", name: "PNG to WebP", shortDescription: "Convert PNG images to WebP.", category: "image", input: "PNG", output: "WebP", clientSide: true },
@@ -53,5 +53,4 @@ export const CONVERTER_DEFINITIONS: ConverterDefinition[] = [
   { slug: "image-merger", name: "Image Merger", shortDescription: "Merge multiple images vertically or horizontally.", category: "image", input: "JPG/PNG/WebP", output: "JPG/PNG/WebP", clientSide: true },
   { slug: "image-compressor", name: "Image Compressor", shortDescription: "Compress images in your browser.", category: "image", input: "JPG/PNG/WebP", output: "JPG/PNG/WebP", clientSide: true },
   { slug: "image-resizer", name: "Image Resizer", shortDescription: "Resize images to custom dimensions.", category: "image", input: "JPG/PNG/WebP", output: "JPG/PNG/WebP", clientSide: true },
-  { slug: "cad-tools", name: "CAD Tools", shortDescription: "DWG and DXF conversion tools for CAD drawings.", category: "cad", input: "DWG / DXF", output: "DXF / PDF / SVG", clientSide: false },
 ];
