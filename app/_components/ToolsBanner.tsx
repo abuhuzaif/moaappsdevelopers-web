@@ -20,10 +20,14 @@ export default function ToolsBanner() {
 
   if (!pathname?.startsWith("/tools")) return null;
 
-  // GIS/Engineering tool pages already render this banner inside their page layout.
-  // Keep one copy there instead of showing a duplicate from the root layout.
+  // The main /tools directory already has its own hero/banner.
+  // Keep the shared banner for individual tool pages only.
   const parts = pathname.replace(/^\/tools\/?/, "").split("/").filter(Boolean);
   const slug = parts[0] || "";
+  if (!slug) return null;
+
+  // GIS/Engineering tool pages already render this banner inside their page layout.
+  // Keep one copy there instead of showing a duplicate from the root layout.
   if (GIS_TOOL_SLUGS.has(slug)) return null;
 
   return (
