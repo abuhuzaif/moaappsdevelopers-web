@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { SEO_POSTS } from "@/lib/seoContent";
 
@@ -12,11 +12,26 @@ async function getBlogSlugs(): Promise<string[]> {
   }
 }
 
+// Active listing IDs so each classified ad gets its own sitemap entry.
+// Capped at 500 most relevant (active) listings to keep sitemap generation
+// fast — well under Google's per-sitemap limit either way.
+async function getActiveListingIds(): Promise<string[]> {
+  try {
+    const q = query(collection(db, "listings"), where("status", "==", "active"), limit(500));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => d.id);
+  } catch {
+    return [];
+  }
+}
+
 const TOOL_SLUGS = [
   "iqama-expiry-calculator", "hijri-gregorian-converter", "salary-calculator", "sar-currency-converter", "rent-split-calculator", "travel-currency-calculator", "working-hours-calculator", "days-between-dates",
   "gaz-square-meter-converter", "square-feet-square-meter-converter", "marla-converter", "acre-hectare-square-meter-converter", "feet-inches-centimeter-converter", "bmi-calculator", "age-calculator", "percentage-calculator", "loan-emi-calculator", "saudi-vat-calculator",
   "end-of-service-calculator", "gosi-calculator", "overtime-calculator", "annual-leave-calculator", "final-settlement-calculator", "vat-calculator", "fuel-cost-calculator",
   "shp-to-kml", "kml-to-shp", "shp-to-geojson", "geojson-to-kml", "csv-to-kml", "kml-to-csv", "dxf-to-kml", "kml-to-dxf", "latlon-to-utm", "utm-to-latlon",
+  // CAD/DWG tools — previously had their own page.tsx files but were missing from the sitemap
+  "dwg-to-pdf", "dwg-to-dxf", "dwg-to-svg", "dxf-to-svg", "cad",
 ];
 
 const CONVERTER_SLUGS = [
@@ -36,15 +51,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const blogSlugs = await getBlogSlugs();
     const seoSlugs = SEO_POSTS.map((post) => post.slug);
     const allBlogSlugs = [...new Set([...seoSlugs, ...blogSlugs])];
+    const listingIds = await getActiveListingIds();
 
     return [
       { url: `${base}/`, changeFrequency: "daily", priority: 1 },
+      { url: `${base}/ksa-connect`, changeFrequency: "hourly", priority: 0.95 },
       { url: `${base}/tools/`, changeFrequency: "weekly", priority: 0.95 },
       { url: `${base}/tools/converters/`, changeFrequency: "weekly", priority: 0.9 },
       ...TOOL_SLUGS.map((slug) => ({ url: `${base}/tools/${slug}/`, changeFrequency: "monthly" as const, priority: 0.8 })),
       ...CONVERTER_SLUGS.map((slug) => ({ url: `${base}/tools/${slug}/`, changeFrequency: "monthly" as const, priority: 0.8 })),
       { url: `${base}/restaurants`, changeFrequency: "daily" as const, priority: 0.8 },
       ...cities.map((slug) => ({ url: `${base}/ksa-connect/city/${slug}`, changeFrequency: "daily" as const, priority: 0.8 })),
+      ...listingIds.map((id) => ({ url: `${base}/ksa-connect/${id}`, changeFrequency: "weekly" as const, priority: 0.6 })),
       { url: `${base}/ksa-connect/privacy`, changeFrequency: "yearly", priority: 0.3 },
       { url: `${base}/ksa-connect/safety`, changeFrequency: "yearly", priority: 0.4 },
       { url: `${base}/ksa-connect/faq`, changeFrequency: "monthly", priority: 0.6 },
