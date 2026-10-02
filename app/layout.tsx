@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import "./globals.css";
 import ToolsBanner from "./_components/ToolsBanner";
 
@@ -144,6 +144,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        {/* Preload the homepage hero image (LCP element on myksaconnect.com)
+            so the browser fetches it immediately instead of discovering it
+            only after parsing globals.css's background-image rule. */}
+        {isKsaConnectSite && (
+          <link
+            rel="preload"
+            as="image"
+            href="/images/ksa-connect-hero.webp"
+            // @ts-expect-error -- fetchPriority is valid HTML but not yet in React's type defs
+            fetchpriority="high"
+          />
+        )}
         <meta name="google-site-verification" content="googleeed0f7655921d9e45" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
