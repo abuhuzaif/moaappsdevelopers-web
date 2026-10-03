@@ -37,6 +37,7 @@ function PostListingForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [priceNote, setPriceNote] = useState("");
   const [negotiable, setNegotiable] = useState(false);
   const [location, setLocation] = useState("");
   const [phone, setPhone] = useState("");
@@ -78,6 +79,7 @@ function PostListingForm() {
         setTitle(data.title ?? "");
         setDescription(data.description ?? "");
         setPrice(data.price ? Number(data.price).toLocaleString("en-US") : "");
+        setPriceNote(data.priceNote ?? "");
         setNegotiable(!!data.negotiable);
         setLocation(data.location ?? "");
         setPhone(data.phone ?? "");
@@ -197,6 +199,7 @@ function PostListingForm() {
         title: title.trim(),
         description: description.trim(),
         price: priceNum,
+        priceNote: priceNote.trim() || null,
         negotiable,
         location: location.trim(),
         phone: phone.trim(),
@@ -525,6 +528,17 @@ function PostListingForm() {
                 }}
                 placeholder="e.g. 2,000"
               />
+
+              <label style={{ ...fieldLabel, marginTop: 10 }}>Price Note (optional)</label>
+              <input
+                style={{ ...inputStyle, opacity: negotiable ? 0.5 : 1 }}
+                type="text"
+                disabled={negotiable}
+                value={priceNote}
+                onChange={(e) => setPriceNote(e.target.value)}
+                placeholder="e.g. per month, per night, OBO"
+              />
+
               <label
                 style={{
                   display: "flex",
@@ -533,7 +547,7 @@ function PostListingForm() {
                   fontSize: 13.5,
                   fontWeight: 600,
                   color: "var(--text-muted)",
-                  margin: "8px 0 4px",
+                  margin: "12px 0 4px",
                   cursor: "pointer",
                 }}
               >
