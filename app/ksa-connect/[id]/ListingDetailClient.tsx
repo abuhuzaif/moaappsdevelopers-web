@@ -164,17 +164,39 @@ export default function ListingDetailClient() {
               <h3 style={{ fontSize: 16 }}>Seller Information</h3>
               {(() => {
                 const isAdminListing = !!listing.userEmail && ADMIN_EMAILS.includes(listing.userEmail.toLowerCase());
-                const displayName = isAdminListing ? "KSA-Connect Team" : listing.userName;
+                // Owner opted in (via the "Show my email to buyers" checkbox on the
+                // post form) and this isn't an admin listing, which never shows
+                // contact details beyond the phone number.
+                const showEmail = !isAdminListing && !!(listing as any).showEmail && !!listing.userEmail;
+
+                if (isAdminListing) {
+                  // Admin-posted listings show only the phone number — no name,
+                  // no "KSA-Connect Team" label, no avatar.
+                  return (
+                    <div style={{ marginTop: 10 }}>
+                      <p style={{ margin: 0, fontWeight: 700 }}>+966{listing.phone}</p>
+                    </div>
+                  );
+                }
+
                 return (
                   <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 10 }}>
-                    {isAdminListing ? (
-                      <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--navy)", color: "var(--gold)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🛡️</div>
-                    ) : listing.userPhoto ? (
-                      <div style={{ position: "relative", width: 44, height: 44, borderRadius: "50%", overflow: "hidden" }}><Image src={listing.userPhoto} alt="" fill sizes="44px" style={{ objectFit: "cover" }} /></div>
+                    {listing.userPhoto ? (
+                      <div style={{ position: "relative", width: 44, height: 44, borderRadius: "50%", overflow: "hidden" }}>
+                        <Image src={listing.userPhoto} alt="" fill sizes="44px" style={{ objectFit: "cover" }} />
+                      </div>
                     ) : (
-                      <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--navy)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700 }}>{listing.userName?.[0]?.toUpperCase() ?? "U"}</div>
+                      <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--navy)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700 }}>
+                        {listing.userName?.[0]?.toUpperCase() ?? "U"}
+                      </div>
                     )}
-                    <div><p style={{ margin: 0, fontWeight: 700 }}>{displayName}</p><p style={{ margin: 0, color: "var(--text-muted)", fontSize: 13 }}>+966{listing.phone}</p></div>
+                    <div>
+                      <p style={{ margin: 0, fontWeight: 700 }}>{listing.userName}</p>
+                      <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 13 }}>+966{listing.phone}</p>
+                      {showEmail && (
+                        <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 13 }}>{listing.userEmail}</p>
+                      )}
+                    </div>
                   </div>
                 );
               })()}

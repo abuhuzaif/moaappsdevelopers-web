@@ -41,6 +41,7 @@ function PostListingForm() {
   const [negotiable, setNegotiable] = useState(false);
   const [location, setLocation] = useState("");
   const [phone, setPhone] = useState("");
+  const [showEmail, setShowEmail] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
   const [descriptionColor, setDescriptionColor] = useState("");
@@ -83,6 +84,7 @@ function PostListingForm() {
         setNegotiable(!!data.negotiable);
         setLocation(data.location ?? "");
         setPhone(data.phone ?? "");
+        setShowEmail(!!data.showEmail);
         setExistingImageUrls(data.imageUrls ?? []);
         setDescriptionColor(data.descriptionColor ?? "");
         setDescriptionBold(!!data.descriptionBold);
@@ -203,6 +205,7 @@ function PostListingForm() {
         negotiable,
         location: location.trim(),
         phone: phone.trim(),
+        showEmail,
         imageUrls,
         descriptionColor: descriptionColor || null,
         descriptionBold,
@@ -578,6 +581,24 @@ function PostListingForm() {
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="e.g. 5XXXXXXXX"
               />
+
+              {!adminPosting && (
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontSize: 13.5,
+                    fontWeight: 600,
+                    color: "var(--text-muted)",
+                    margin: "12px 0 4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  <input type="checkbox" checked={showEmail} onChange={(e) => setShowEmail(e.target.checked)} />
+                  Show my email to buyers on this listing
+                </label>
+              )}
 
               {error && <p style={{ color: "#b91c1c", fontSize: 13, marginTop: 8 }}>{error}</p>}
 
