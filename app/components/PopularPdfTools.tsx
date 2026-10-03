@@ -4,7 +4,7 @@ const TOOLS = [
   ["📄", "PDF to Word", "Convert PDF files to editable Word documents.", "/tools/pdf-to-word/"],
   ["🔗", "Merge PDF", "Combine multiple PDF files into one document.", "/tools/merge-pdf/"],
   ["🗜️", "Compress PDF", "Reduce PDF size for easy sharing and upload.", "/tools/compress-pdf/"],
-  ["🖼️", "JPG to PDF", "Convert images into a professional PDF online.", "/tools/jpg-to-pdf/"],
+  ["📐", "PDF to DXF", "Convert vector PDF drawings to DXF format online.", "/tools/pdf-to-dxf/"],
   ["📑", "PDF to JPG", "Convert PDF pages into high-quality JPG images.", "/tools/pdf-to-jpg/"],
   ["✂️", "Split PDF", "Split a PDF and extract only the pages you need.", "/tools/split-pdf/"],
   ["✍️", "Sign PDF", "Add, move and resize your signature on a PDF.", "/tools/sign-pdf/", "NEW"],

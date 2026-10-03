@@ -55,6 +55,7 @@ const GIS_TOOLS = [
   ["📐", "DWG → PDF", "Convert AutoCAD DWG drawings to PDF for sharing and printing", "/tools/dwg-to-pdf/"],
   ["📐", "DWG → SVG", "Convert AutoCAD DWG drawings to scalable SVG graphics", "/tools/dwg-to-svg/"],
   ["📐", "DXF → SVG", "Convert DXF drawings to scalable SVG graphics", "/tools/dxf-to-svg/"],
+  ["🖼️", "JPG to PDF", "Convert images into a professional PDF online.", "/tools/jpg-to-pdf/"],
   ["⭐", "Lat/Lon → UTM", "Convert latitude and longitude to UTM coordinates", "/tools/latlon-to-utm/"],
   ["⭐", "UTM → Lat/Lon", "Convert UTM coordinates back to latitude and longitude", "/tools/utm-to-latlon/"],
 ];
