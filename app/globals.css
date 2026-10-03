@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --navy: #0c1730;
   --navy-deep: #060b16;
   --gold: #e8b84b;
@@ -21,12 +21,12 @@ body {
   margin: 0;
   background: #ffffff;
   color: var(--ink);
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   scroll-behavior: smooth;
 }
 
 h1, h2, h3, .brand, .btn, .listing-title, .stat-value {
-  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: var(--font-plus-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 a {

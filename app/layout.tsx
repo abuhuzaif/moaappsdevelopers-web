@@ -1,6 +1,21 @@
 ﻿import type { Metadata } from "next";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import ToolsBanner from "./_components/ToolsBanner";
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-plus-jakarta",
+  display: "swap",
+});
 
 const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
 
@@ -142,7 +157,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const schema = isKsaConnectSite ? ksaConnectSchema : moaAppsDevelopersSchema;
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${plusJakartaSans.variable}`}>
       <head>
         {/* Preload the homepage hero image (LCP element on myksaconnect.com)
             so the browser fetches it immediately instead of discovering it
@@ -157,12 +172,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           />
         )}
         <meta name="google-site-verification" content="googleeed0f7655921d9e45" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
         <link rel="stylesheet" href="/myksa-tool-colors.css?v=2" />
         <style>{`
           .mk-page .mk-tools-showcase {
