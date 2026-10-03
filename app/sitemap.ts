@@ -1,4 +1,4 @@
-import type { MetadataRoute } from "next";
+﻿import type { MetadataRoute } from "next";
 import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { SEO_POSTS } from "@/lib/seoContent";
@@ -14,7 +14,7 @@ async function getBlogSlugs(): Promise<string[]> {
 
 // Active listing IDs so each classified ad gets its own sitemap entry.
 // Capped at 500 most relevant (active) listings to keep sitemap generation
-// fast — well under Google's per-sitemap limit either way.
+// fast â€” well under Google's per-sitemap limit either way.
 async function getActiveListingIds(): Promise<string[]> {
   try {
     const q = query(collection(db, "listings"), where("status", "==", "active"), limit(500));
@@ -30,8 +30,8 @@ const TOOL_SLUGS = [
   "gaz-square-meter-converter", "square-feet-square-meter-converter", "marla-converter", "acre-hectare-square-meter-converter", "feet-inches-centimeter-converter", "bmi-calculator", "age-calculator", "percentage-calculator", "loan-emi-calculator", "saudi-vat-calculator",
   "end-of-service-calculator", "gosi-calculator", "overtime-calculator", "annual-leave-calculator", "final-settlement-calculator", "vat-calculator", "fuel-cost-calculator",
   "shp-to-kml", "kml-to-shp", "shp-to-geojson", "geojson-to-kml", "csv-to-kml", "kml-to-csv", "dxf-to-kml", "kml-to-dxf", "latlon-to-utm", "utm-to-latlon",
-  // CAD/DWG tools — previously had their own page.tsx files but were missing from the sitemap
-  "dwg-to-pdf", "dwg-to-dxf", "dwg-to-svg", "dxf-to-svg", "cad",
+  // CAD/DWG tools â€” previously had their own page.tsx files but were missing from the sitemap
+  "dwg-to-pdf", "dwg-to-dxf", "dwg-to-svg", "dxf-to-svg", "cad", "pdf-to-dxf",
 ];
 
 const CONVERTER_SLUGS = [

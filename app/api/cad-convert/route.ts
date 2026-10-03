@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -8,6 +8,7 @@ const OPERATIONS: Record<string, { input: string; output: string; extension: str
   "dwg-to-pdf": { input: "dwg", output: "pdf", extension: "pdf", contentType: "application/pdf" },
   "dwg-to-svg": { input: "dwg", output: "svg", extension: "svg", contentType: "image/svg+xml" },
   "dxf-to-svg": { input: "dxf", output: "svg", extension: "svg", contentType: "image/svg+xml" },
+  "pdf-to-dxf": { input: "pdf", output: "dxf", extension: "dxf", contentType: "application/dxf" },
 };
 
 const MAX_FILE_BYTES = 25 * 1024 * 1024;
@@ -151,3 +152,4 @@ export async function POST(request: Request) {
     return errorResponse(message, message.includes("CLOUDCONVERT_API_KEY") ? 503 : 500);
   }
 }
+
