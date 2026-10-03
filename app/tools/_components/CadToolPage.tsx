@@ -1,7 +1,7 @@
 import CadConverterClient from "./CadConverterClient";
 
 type Props = {
-  slug: "dwg-to-dxf" | "dwg-to-pdf" | "dwg-to-svg" | "dxf-to-svg";
+  slug: "dwg-to-dxf" | "dwg-to-pdf" | "dwg-to-svg" | "dxf-to-svg" | "pdf-to-dxf";
   title: string;
   description: string;
   input: string;
@@ -43,6 +43,15 @@ const COPY: Record<Props["slug"], { intro: string; steps: string[]; faqs: Array<
       { q: "Can DXF be converted to SVG?", a: "Yes. DXF is a CAD exchange format and SVG is a web-friendly vector graphics format." },
       { q: "Will layers and dimensions always look identical?", a: "CAD-to-SVG conversion can represent drawing content differently, so review the result for important drawings." },
       { q: "Is the DXF file modified?", a: "No. The tool creates a separate SVG output." },
+    ],
+  },
+  "pdf-to-dxf": {
+    intro: "Convert vector PDF drawings to DXF format online when you need to bring PDF-based plans or drawings into CAD software.",
+    steps: ["Choose a PDF containing vector line drawings.", "Start the PDF to DXF conversion.", "Download the DXF file and verify layers, geometry, text and dimensions in your CAD software."],
+    faqs: [
+      { q: "Does this work with any PDF?", a: "It works best with PDFs that contain vector line drawings, typically exported from CAD or design software. Scanned or image-based PDFs will not convert into usable CAD geometry." },
+      { q: "Will the original PDF be changed?", a: "No. The uploaded PDF is used to create a separate DXF output file." },
+      { q: "Will every PDF convert perfectly?", a: "Conversion quality depends on how the PDF was created. Always verify important drawings after conversion." },
     ],
   },
 };

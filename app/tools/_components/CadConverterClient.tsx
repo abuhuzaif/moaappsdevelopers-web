@@ -7,6 +7,7 @@ const CONFIG: Record<string, { input: string; output: string; accept: string; bu
   "dwg-to-pdf": { input: "DWG", output: "PDF", accept: ".dwg", button: "Convert DWG → PDF", hint: "Create a PDF copy of your DWG drawing for sharing, printing or review." },
   "dwg-to-svg": { input: "DWG", output: "SVG", accept: ".dwg", button: "Convert DWG → SVG", hint: "Convert the drawing to scalable SVG graphics for web and design workflows." },
   "dxf-to-svg": { input: "DXF", output: "SVG", accept: ".dxf", button: "Convert DXF → SVG", hint: "Convert an open DXF drawing to scalable SVG graphics." },
+  "pdf-to-dxf": { input: "PDF", output: "DXF", accept: ".pdf", button: "Convert PDF → DXF", hint: "Vector PDF drawings are converted to DXF format for use in CAD software." },
 };
 
 export default function CadConverterClient({ slug }: { slug: string }) {
