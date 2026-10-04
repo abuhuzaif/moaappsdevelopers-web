@@ -1,5 +1,6 @@
 ﻿import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import ToolsBanner from "./_components/ToolsBanner";
 
@@ -191,6 +192,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ToolsBanner />
         {children}
+        <Analytics />
       </body>
     </html>
   );
