@@ -1,4 +1,4 @@
-﻿import type { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { SEO_POSTS } from "@/lib/seoContent";
@@ -14,7 +14,7 @@ async function getBlogSlugs(): Promise<string[]> {
 
 // Active listing IDs so each classified ad gets its own sitemap entry.
 // Capped at 500 most relevant (active) listings to keep sitemap generation
-// fast â€” well under Google's per-sitemap limit either way.
+// fast — well under Google's per-sitemap limit either way.
 async function getActiveListingIds(): Promise<string[]> {
   try {
     const q = query(collection(db, "listings"), where("status", "==", "active"), limit(500));
@@ -30,13 +30,13 @@ const TOOL_SLUGS = [
   "gaz-square-meter-converter", "square-feet-square-meter-converter", "marla-converter", "acre-hectare-square-meter-converter", "feet-inches-centimeter-converter", "bmi-calculator", "age-calculator", "percentage-calculator", "loan-emi-calculator", "saudi-vat-calculator",
   "end-of-service-calculator", "gosi-calculator", "overtime-calculator", "annual-leave-calculator", "final-settlement-calculator", "vat-calculator", "fuel-cost-calculator",
   "shp-to-kml", "kml-to-shp", "shp-to-geojson", "geojson-to-kml", "csv-to-kml", "kml-to-csv", "dxf-to-kml", "kml-to-dxf", "latlon-to-utm", "utm-to-latlon",
-  // CAD/DWG tools â€” previously had their own page.tsx files but were missing from the sitemap
+  // CAD/DWG tools — previously had their own page.tsx files but were missing from the sitemap
   "dwg-to-pdf", "dwg-to-dxf", "dwg-to-svg", "dxf-to-svg", "cad", "pdf-to-dxf",
 ];
 
 const CONVERTER_SLUGS = [
   "word-to-pdf", "pdf-to-word", "pdf-to-csv", "pdf-to-excel", "pdf-to-text", "pdf-ocr", "pdf-to-html", "pdf-to-markdown",
-  "csv-to-excel", "excel-to-csv", "pdf-to-jpg", "jpg-to-pdf", "ppt-to-pdf", "pdf-to-ppt", "txt-to-pdf",
+  "pdf-to-jpg", "jpg-to-pdf", "ppt-to-pdf", "pdf-to-ppt", "txt-to-pdf",
   "merge-pdf", "split-pdf", "compress-pdf", "rotate-pdf", "extract-pdf-pages", "add-pdf-page-numbers", "watermark-pdf", "protect-pdf", "unlock-pdf",
   "remove-pdf-pages", "reorder-pdf-pages", "extract-images-from-pdf", "sign-pdf", "compare-pdf", "repair-pdf", "images-to-pdf", "pdf-to-images",
   "csv-to-json", "json-to-csv", "xml-to-json", "json-to-xml", "json-formatter",

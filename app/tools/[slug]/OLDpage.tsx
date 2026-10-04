@@ -5,8 +5,6 @@ import ConverterClient from "../_components/ConverterClient";
 import ServerConverterClient from "../_components/ServerConverterClient";
 import AdvancedPdfToolClient from "../_components/AdvancedPdfToolClient";
 import TxtToPdfClient from "../_components/TxtToPdfClient";
-import { TOOL_SEO } from "@/lib/toolSeo";
-import { RelatedTools } from "../_components/ToolSeoContent";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -291,24 +289,6 @@ const GENERIC_COPY = (toolName: string, shortDescription: string): SeoCopy => ({
   ],
 });
 
-// Priority: hand-written SEO_COPY, then the central TOOL_SEO entry, then the generic fallback.
-function getSeo(slug: string, toolName: string, shortDescription: string): SeoCopy {
-  const written = SEO_COPY[slug];
-  if (written) return written;
-  const central = TOOL_SEO[slug];
-  if (central && central.title && central.description) {
-    return {
-      title: central.title,
-      description: central.description,
-      intro: central.intro,
-      howTo: central.howTo,
-      benefits: central.benefits,
-      faqs: central.faqs,
-    };
-  }
-  return GENERIC_COPY(toolName, shortDescription);
-}
-
 export function generateStaticParams() {
   return CONVERTER_DEFINITIONS.map(({ slug }) => ({ slug }));
 }
@@ -317,7 +297,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const tool = CONVERTER_DEFINITIONS.find((item) => item.slug === slug);
   if (!tool) return {};
-  const seo = getSeo(slug, tool.name, tool.shortDescription);
+  const seo = SEO_COPY[slug] ?? GENERIC_COPY(tool.name, tool.shortDescription);
   return {
     title: seo.title,
     description: seo.description,
@@ -340,7 +320,7 @@ export default async function ConverterToolPage({ params }: Props) {
   const interactive = INTERACTIVE_CONVERTER_SLUGS.has(slug);
   const serverSide = SERVER_CONVERTER_SLUGS.has(slug);
   const advancedPdf = ADVANCED_PDF_SLUGS.has(slug);
-  const seo = getSeo(slug, tool.name, tool.shortDescription);
+  const seo = SEO_COPY[slug] ?? GENERIC_COPY(tool.name, tool.shortDescription);
   const siteUrl = "https://www.myksaconnect.com";
   const pageUrl = `${siteUrl}/tools/${tool.slug}/`;
 
@@ -432,8 +412,6 @@ export default async function ConverterToolPage({ params }: Props) {
             ))}
           </div>
         </article>
-
-        <RelatedTools slug={slug} />
 
         <a href="/tools/converters/" style={{ display: "inline-block", marginTop: 24, color: "#005744", fontWeight: 800, textDecoration: "none" }}>← Back to all converters</a>
       </section>

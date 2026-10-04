@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import ToolSeoContent from "./ToolSeoContent";
 
 type Kind =
   | "gaz"
@@ -13,6 +14,20 @@ type Kind =
   | "percentage"
   | "emi"
   | "vat";
+
+// Maps each calculator kind to its page slug (used to load SEO text from lib/toolSeo.ts).
+const KIND_TO_SLUG: Record<Kind, string> = {
+  gaz: "gaz-square-meter-converter",
+  sqm: "square-feet-square-meter-converter",
+  marla: "marla-converter",
+  acre: "acre-hectare-square-meter-converter",
+  length: "feet-inches-centimeter-converter",
+  bmi: "bmi-calculator",
+  age: "age-calculator",
+  percentage: "percentage-calculator",
+  emi: "loan-emi-calculator",
+  vat: "saudi-vat-calculator",
+};
 
 const today = new Date().toISOString().slice(0, 10);
 const n = (v: string) => Number(v) || 0;
@@ -134,6 +149,7 @@ export default function EssentialCalculator({ kind, title, description }: { kind
           {kind === "bmi" && <p className="ec-note">BMI is a general screening measure and is not a medical diagnosis.</p>}
           <div className="ec-actions"><a href="/tools/">← Back to all Saudi Expat Tools</a></div>
         </section>
+        <ToolSeoContent slug={KIND_TO_SLUG[kind]} />
       </div>
     </main>
   );
