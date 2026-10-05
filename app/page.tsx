@@ -23,40 +23,40 @@ const CATEGORIES = ["Housing", "Car", "Household", "Buy & Sell", "Services", "El
 const TRENDING_KEYWORDS = ["Villa", "Apartment", "Toyota", "iPhone", "Sofa Set", "Driver", "Room Rent", "Labour", "Furniture"];
 
 const EXPAT_TOOLS = [
-  ["ðŸ“…", "Iqama Expiry Calculator", "Check your Iqama expiry date", "/tools/iqama-expiry-calculator/"],
-  ["ðŸ”„", "Hijri / Gregorian Converter", "Convert dates instantly", "/tools/hijri-gregorian-converter/"],
-  ["ðŸ’°", "Salary Calculator", "Monthly & yearly salary", "/tools/salary-calculator/"],
-  ["ðŸ’±", "SAR Currency Converter", "SAR to INR, PKR & more", "/tools/sar-currency-converter/"],
-  ["ðŸ ", "Rent Split Calculator", "Split rent with roommates", "/tools/rent-split-calculator/"],
-  ["ðŸ“…", "Days Between Dates", "Calculate the days between two dates", "/tools/days-between-dates/"],
+  ["📅", "Iqama Expiry Calculator", "Check your Iqama expiry date", "/tools/iqama-expiry-calculator/"],
+  ["🔄", "Hijri / Gregorian Converter", "Convert dates instantly", "/tools/hijri-gregorian-converter/"],
+  ["💰", "Salary Calculator", "Monthly & yearly salary", "/tools/salary-calculator/"],
+  ["💱", "SAR Currency Converter", "SAR to INR, PKR & more", "/tools/sar-currency-converter/"],
+  ["🏠", "Rent Split Calculator", "Split rent with roommates", "/tools/rent-split-calculator/"],
+  ["📅", "Days Between Dates", "Calculate the days between two dates", "/tools/days-between-dates/"],
 ] as const;
 
 const RESTAURANT_MENU_FEATURES = [
-  ["ðŸ“±", "QR Digital Menu", "Customers scan and view your menu instantly."],
-  ["ðŸ½ï¸", "Arabic + English", "Show dishes, prices and offers in both languages."],
-  ["ðŸ“", "Location & Contact", "Add map, WhatsApp, call and opening hours."],
+  ["📱", "QR Digital Menu", "Customers scan and view your menu instantly."],
+  ["🍽️", "Arabic + English", "Show dishes, prices and offers in both languages."],
+  ["📍", "Location & Contact", "Add map, WhatsApp, call and opening hours."],
 ] as const;
 
 const CATEGORY_CARDS = [
-  ["âŒ‚", "Housing", "Rent, Sale", "Housing"],
-  ["ðŸš—", "Cars", "Buy & Sell", "Car"],
-  ["â–£", "Electronics", "Mobiles, Laptops", "Electronics"],
-  ["âš’", "Services", "Home, Repair", "Services"],
-  ["â–¤", "Jobs", "Drivers, Labour", "Jobs"],
-  ["â™™", "Community", "Groups, Events", "Community"],
-  ["â€¢â€¢â€¢", "Others", "More Ads", "Classifieds"],
+  ["⌂", "Housing", "Rent, Sale", "Housing"],
+  ["🚗", "Cars", "Buy & Sell", "Car"],
+  ["▣", "Electronics", "Mobiles, Laptops", "Electronics"],
+  ["⚒", "Services", "Home, Repair", "Services"],
+  ["▤", "Jobs", "Drivers, Labour", "Jobs"],
+  ["♙", "Community", "Groups, Events", "Community"],
+  ["•••", "Others", "More Ads", "Classifieds"],
 ] as const;
 
 const CATEGORY_ICONS: Record<string, string> = {
-  Housing: "ðŸ ",
-  Car: "ðŸš—",
-  Household: "ðŸ›‹ï¸",
-  "Buy & Sell": "ðŸ›ï¸",
-  Services: "ðŸ› ï¸",
-  Electronics: "ðŸ’»",
-  Jobs: "ðŸ’¼",
-  Community: "ðŸ‘¥",
-  Classifieds: "ðŸ·ï¸",
+  Housing: "🏠",
+  Car: "🚗",
+  Household: "🛋️",
+  "Buy & Sell": "🛍️",
+  Services: "🛠️",
+  Electronics: "💻",
+  Jobs: "💼",
+  Community: "👥",
+  Classifieds: "🏷️",
 };
 
 type SortMode = "newest" | "price_low" | "price_high";
@@ -85,7 +85,7 @@ export default function KsaConnectPage() {
           })
         );
       } catch {
-        // Non-critical â€” homepage still works without the guides section.
+        // Non-critical — homepage still works without the guides section.
       }
     })();
   }, []);
@@ -133,7 +133,7 @@ export default function KsaConnectPage() {
 
   const featured = listings.filter((l) => Boolean((l as Listing & { featured?: boolean }).featured)).slice(0, 6);
 
-  // ItemList JSON-LD â€” represents the unfiltered "live listings" feed so
+  // ItemList JSON-LD — represents the unfiltered "live listings" feed so
   // Google always sees a consistent list here regardless of what a visitor
   // has filtered/searched for in their own session.
   const listingsSchema = useMemo(() => {
@@ -180,26 +180,26 @@ export default function KsaConnectPage() {
       <section className="mk-hero" aria-label="MYKSA CONNECT homepage hero">
         <div className="mk-hero-bg" aria-hidden="true" />
         <div className="mk-hero-search-mask" aria-hidden="true" />
-        <div className="mk-hero-pin" aria-hidden="true">âœ¦</div>
+        <div className="mk-hero-pin" aria-hidden="true">✦</div>
         <div className="mk-hero-inner">
           <nav className="mk-nav">
             <a href="/ksa-connect" className="mk-logo" aria-label="MYKSA CONNECT home">
-              <span className="mk-logo-mark">âœ¦</span>
+              <span className="mk-logo-mark">✦</span>
               <span className="mk-logo-text"><strong>MYKSA</strong> <b>CONNECT</b><small>BUY. SELL. CONNECT.</small></span>
             </a>
             <div className="mk-nav-links">
-              <a href="#listings">Browse AdsâŒ„</a>
-              <a href="#categories">CategoriesâŒ„</a>
-              <a href="#cities">CitiesâŒ„</a>
-              <a href="/restaurants">ðŸ½ï¸ Digital Menu</a>
+              <a href="#listings">Browse Ads⌄</a>
+              <a href="#categories">Categories⌄</a>
+              <a href="#cities">Cities⌄</a>
+              <a href="/restaurants">🍽️ Digital Menu</a>
               <a href="/ksa-connect/faq">Help &amp; Support</a>
               <a href="#about">About Us</a>
               {user ? (
-                <button className="mk-login" onClick={() => signOutUser()}>â™™ {user.displayName?.split(" ")[0] ?? "Account"}</button>
+                <button className="mk-login" onClick={() => signOutUser()}>♙ {user.displayName?.split(" ")[0] ?? "Account"}</button>
               ) : (
-                <button className="mk-login" onClick={() => signInWithGoogle()}>â™™ Login / Sign Up</button>
+                <button className="mk-login" onClick={() => signInWithGoogle()}>♙ Login / Sign Up</button>
               )}
-              <a href="/ksa-connect/post" className="mk-post">ï¼‹ &nbsp;Post an Ad</a>
+              <a href="/ksa-connect/post" className="mk-post">＋ &nbsp;Post an Ad</a>
             </div>
           </nav>
 
@@ -207,23 +207,23 @@ export default function KsaConnectPage() {
             <h1>Your Connection<br />Across <span>Saudi Arabia</span></h1>
             <p>The most trusted platform for expatriates<br className="mk-desktop" /> to buy, sell, find and connect.</p>
             <div className="mk-hero-actions">
-              <a href="#listings" className="mk-btn mk-btn-green">âŒ• &nbsp;Browse Ads</a>
-              <a href="/ksa-connect/post" className="mk-btn mk-btn-gold">ï¼‹ &nbsp;Post an Ad</a>
+              <a href="#listings" className="mk-btn mk-btn-green">⌕ &nbsp;Browse Ads</a>
+              <a href="/ksa-connect/post" className="mk-btn mk-btn-gold">＋ &nbsp;Post an Ad</a>
             </div>
             <div className="mk-trust-mini">
-              <div><i>â™¢</i><span>Trusted<br />Community</span></div>
-              <div><i>â€¢â€¢â€¢</i><span>Chat<br />Securely</span></div>
-              <div><i>â—</i><span>Local<br />Reach</span></div>
-              <div><i>ÏŸ</i><span>Fast &amp;<br />Easy</span></div>
+              <div><i>♢</i><span>Trusted<br />Community</span></div>
+              <div><i>•••</i><span>Chat<br />Securely</span></div>
+              <div><i>●</i><span>Local<br />Reach</span></div>
+              <div><i>ϟ</i><span>Fast &amp;<br />Easy</span></div>
             </div>
           </div>
         </div>
 
         <div className="mk-search-wrap">
           <div className="mk-search-row">
-            <label className="mk-search-field"><span>ðŸ“</span><select aria-label="Select a city" value={cities.size === 1 ? Array.from(cities)[0] : ""} onChange={(e) => setCities(e.target.value ? new Set([e.target.value]) : new Set())}><option value="">Select a City</option>{CITY_OPTIONS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}</select></label>
-            <label className="mk-search-field"><span>â–¦</span><select aria-label="Select a category" value={categories.size === 1 ? Array.from(categories)[0] : ""} onChange={(e) => setCategories(e.target.value ? new Set([e.target.value]) : new Set())}><option value="">Select a Category</option>{CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}</select></label>
-            <label className="mk-search-field mk-keyword"><span>âŒ•</span><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="What are you looking for?" aria-label="Search listings" /></label>
+            <label className="mk-search-field"><span>📍</span><select aria-label="Select a city" value={cities.size === 1 ? Array.from(cities)[0] : ""} onChange={(e) => setCities(e.target.value ? new Set([e.target.value]) : new Set())}><option value="">Select a City</option>{CITY_OPTIONS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}</select></label>
+            <label className="mk-search-field"><span>▦</span><select aria-label="Select a category" value={categories.size === 1 ? Array.from(categories)[0] : ""} onChange={(e) => setCategories(e.target.value ? new Set([e.target.value]) : new Set())}><option value="">Select a Category</option>{CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}</select></label>
+            <label className="mk-search-field mk-keyword"><span>⌕</span><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="What are you looking for?" aria-label="Search listings" /></label>
             <button className="mk-search-btn" onClick={() => document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" })}>Search Ads</button>
           </div>
           <div className="mk-trending"><strong>Trending Searches:</strong>{TRENDING_KEYWORDS.map((k) => <button key={k} onClick={() => handleTrendingClick(k)}>{k}</button>)}</div>
@@ -232,6 +232,16 @@ export default function KsaConnectPage() {
 
       <main className="mk-main">
         <style>{`
+          /* Keep every homepage block exactly as wide as the content column.
+             These sections declare width: min(1500px, 92vw) in their own CSS, which is wider
+             than the padded .mk-main column and made them stick out on the right. */
+          .mk-main .mk-pdf-popular,
+          .mk-main .mk-restaurant-strip,
+          .mk-main .mk-tools-strip {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+          }
           .mk-tools-showcase {
             position: relative;
             overflow: hidden;
@@ -367,28 +377,28 @@ export default function KsaConnectPage() {
         <section className="mk-tools-strip mk-tools-showcase" aria-labelledby="expat-tools-title">
           <div className="mk-tools-showcase-head">
             <div className="mk-tools-showcase-copy">
-              <div className="mk-tools-badge">ðŸ§° &nbsp; 25+ FREE ESSENTIAL TOOLS</div>
-              <p className="mk-strip-kicker">ðŸ’¼ Professional Tools</p>
+              <div className="mk-tools-badge">🧰 &nbsp; 25+ FREE ESSENTIAL TOOLS</div>
+              <p className="mk-strip-kicker">💼 Professional Tools</p>
               <h2 id="expat-tools-title">Work, Salary &amp; Business Tools</h2>
               <p className="mk-tools-showcase-desc">
-                One place for everyday Saudi expat needs â€” Iqama, salary, currency, HR, travel, rent and professional tools.
+                One place for everyday Saudi expat needs — Iqama, salary, currency, HR, travel, rent and professional tools.
               </p>
               <div className="mk-tools-quick-tags" aria-label="Tool categories">
-                <span>ðŸªª Iqama</span>
-                <span>ðŸ’° Salary</span>
-                <span>ðŸ’± Currency</span>
-                <span>â±ï¸ Work &amp; HR</span>
-                <span>ðŸ—ºï¸ GIS</span>
+                <span>🪪 Iqama</span>
+                <span>💰 Salary</span>
+                <span>💱 Currency</span>
+                <span>⏱️ Work &amp; HR</span>
+                <span>🗺️ GIS</span>
               </div>
             </div>
 
             <a href="/tools/" className="mk-tools-explore-cta">
-              <span className="mk-tools-cta-icon">ðŸ§°</span>
+              <span className="mk-tools-cta-icon">🧰</span>
               <span>
                 <strong>Explore All Tools</strong>
                 <small>25+ useful calculators &amp; tools</small>
               </span>
-              <b aria-hidden="true">â†’</b>
+              <b aria-hidden="true">→</b>
             </a>
           </div>
 
@@ -397,7 +407,7 @@ export default function KsaConnectPage() {
               <a key={href} href={href} className="mk-tool-card">
                 <span className="mk-tool-icon" aria-hidden="true">{icon}</span>
                 <span><strong>{title}</strong><small>{description}</small></span>
-                <b aria-hidden="true">â†’</b>
+                <b aria-hidden="true">→</b>
               </a>
             ))}
           </div>
@@ -405,11 +415,11 @@ export default function KsaConnectPage() {
 
         <section className="mk-restaurant-strip" aria-labelledby="restaurant-menu-title">
           <div className="mk-restaurant-copy">
-            <p className="mk-strip-kicker">ðŸ½ï¸ Restaurant Digital Menus</p>
+            <p className="mk-strip-kicker">🍽️ Restaurant Digital Menus</p>
             <h2 id="restaurant-menu-title">Turn Your Restaurant Menu Into a Digital Experience</h2>
             <p>Create a mobile-friendly menu page with QR access, photos, prices, offers, location and direct WhatsApp/call buttons.</p>
             <div className="mk-restaurant-actions">
-              <a href="/restaurants" className="mk-btn mk-btn-gold">Browse Digital Menus â†’</a>
+              <a href="/restaurants" className="mk-btn mk-btn-gold">Browse Digital Menus →</a>
               <a href="/restaurants/create" className="mk-restaurant-secondary">Create a Menu</a>
             </div>
           </div>
@@ -423,7 +433,7 @@ export default function KsaConnectPage() {
         </section>
 
         <section id="cities" className="mk-section">
-          <div className="mk-section-head"><h2>Browse Ads by City</h2><button onClick={() => { setCities(new Set()); document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" }); }}>View all cities â†’</button></div>
+          <div className="mk-section-head"><h2>Browse Ads by City</h2><button onClick={() => { setCities(new Set()); document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" }); }}>View all cities →</button></div>
           <div className="mk-city-grid">
             {CITY_OPTIONS.map((city, i) => (
               <a
@@ -432,14 +442,14 @@ export default function KsaConnectPage() {
                 className="mk-city-card"
                 style={{ backgroundImage: `linear-gradient(180deg, rgba(2,24,34,.02) 35%, rgba(2,12,20,.9) 100%), url('/images/cities/${city.image}.jpg')` }}
               >
-                <span className="mk-city-number">{i + 1}</span><span className="mk-city-name">â— &nbsp;{city.label}</span>
+                <span className="mk-city-number">{i + 1}</span><span className="mk-city-name">● &nbsp;{city.label}</span>
               </a>
             ))}
           </div>
         </section>
 
         <section id="categories" className="mk-section">
-          <div className="mk-section-head"><h2>Browse by Category</h2><button onClick={clearAll}>View all categories â†’</button></div>
+          <div className="mk-section-head"><h2>Browse by Category</h2><button onClick={clearAll}>View all categories →</button></div>
           <div className="mk-category-grid">
             {CATEGORY_CARDS.map(([icon, title, sub, filter]) => (
               <button key={title} className={`mk-category-card${filter && categories.has(filter) ? " mk-category-card-active" : ""}`} onClick={() => filter && setCategories(new Set([filter]))}>
@@ -451,13 +461,13 @@ export default function KsaConnectPage() {
 
         <section id="about" className="mk-benefits">
           <div className="mk-why"><p>Why Choose</p><h2>MYKSA <span>CONNECT?</span></h2><ul><li>100% Free to Use</li><li>Post Unlimited Ads</li><li>Chat Directly &amp; Securely</li><li>Reach Local Buyers Faster</li><li>Available Across 7 Major Cities</li></ul></div>
-          <div className="mk-map-card"><div className="mk-map-art">âœ¦<br />â˜€</div><div><strong>One Platform.<br />7 Major Cities.</strong><b>Millions of Opportunities.</b></div></div>
-          <div className="mk-app-card"><div><p className="mk-app-kicker">TAKE MYKSA CONNECT</p><h2>With You Anywhere</h2><p>Post, chat and manage your ads on the go.</p><div className="mk-store-row"><a href="https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect" target="_blank" rel="noreferrer">â–¶ Google Play</a><a href="/ksa-connect/faq"> App Store</a></div></div><div className="mk-mini-phone">MYKSA<br /><b>CONNECT</b></div></div>
+          <div className="mk-map-card"><div className="mk-map-art">✦<br />☀</div><div><strong>One Platform.<br />7 Major Cities.</strong><b>Millions of Opportunities.</b></div></div>
+          <div className="mk-app-card"><div><p className="mk-app-kicker">TAKE MYKSA CONNECT</p><h2>With You Anywhere</h2><p>Post, chat and manage your ads on the go.</p><div className="mk-store-row"><a href="https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect" target="_blank" rel="noreferrer">▶ Google Play</a><a href="/ksa-connect/faq"> App Store</a></div></div><div className="mk-mini-phone">MYKSA<br /><b>CONNECT</b></div></div>
         </section>
 
         {featured.length > 0 && (
           <section className="mk-featured">
-            <div className="mk-section-head"><h2>Featured Listings</h2><a href="#listings">View all â†’</a></div>
+            <div className="mk-section-head"><h2>Featured Listings</h2><a href="#listings">View all →</a></div>
             <div className="featured-scroll">
               {featured.map((l) => (
                 <a href={`/ksa-connect/${l.id}`} key={l.id} className="featured-card">
@@ -468,7 +478,7 @@ export default function KsaConnectPage() {
                   ) : (
                     <div className="featured-image featured-image-empty" />
                   )}
-                  <span className="featured-tag">â­ Featured</span>
+                  <span className="featured-tag">⭐ Featured</span>
                   <div className="listing-body">
                     <p className="listing-title">{l.title}</p>
                     <p className="listing-price">{formattedPrice(l)}</p>
@@ -481,31 +491,43 @@ export default function KsaConnectPage() {
 
 
 
-        <section className="mk-listings-area" id="listings">
+        <section
+          className="mk-listings-area"
+          id="listings"
+          style={{
+            background: "#f1f6f3",
+            border: "1px solid #d9e7e1",
+            borderTop: "3px solid #005744",
+            borderRadius: 24,
+            padding: "clamp(14px, 2.2vw, 26px)",
+            boxShadow: "0 16px 38px rgba(0,55,43,.075)",
+            margin: "24px 0 40px",
+          }}
+        >
           <div className="listings-layout">
             <aside className="filters-sidebar">
               <p className="filters-sidebar-title">Filters {hasActiveFilters && <button className="clear-filters" onClick={clearAll}>Clear All</button>}</p>
-              <div className="filter-group"><p className="filter-group-title">City</p>{(citiesExpanded ? CITY_OPTIONS : CITY_OPTIONS.slice(0, 5)).map((c) => <label className={`checkbox-row${cities.has(c.value) ? " checkbox-row-active" : ""}`} key={c.value}><input type="checkbox" checked={cities.has(c.value)} onChange={() => toggle(cities, setCities, c.value)} />{c.label}</label>)}<button className="view-more-toggle" onClick={() => setCitiesExpanded((v) => !v)}>{citiesExpanded ? "View less Ë„" : "View more Ë…"}</button></div>
+              <div className="filter-group"><p className="filter-group-title">City</p>{(citiesExpanded ? CITY_OPTIONS : CITY_OPTIONS.slice(0, 5)).map((c) => <label className={`checkbox-row${cities.has(c.value) ? " checkbox-row-active" : ""}`} key={c.value}><input type="checkbox" checked={cities.has(c.value)} onChange={() => toggle(cities, setCities, c.value)} />{c.label}</label>)}<button className="view-more-toggle" onClick={() => setCitiesExpanded((v) => !v)}>{citiesExpanded ? "View less ˄" : "View more ˅"}</button></div>
               <div className="filter-group"><p className="filter-group-title">Category</p>{CATEGORIES.map((c) => <label className={`checkbox-row${categories.has(c) ? " checkbox-row-active" : ""}`} key={c}><input type="checkbox" checked={categories.has(c)} onChange={() => toggle(categories, setCategories, c)} /><span className="checkbox-icon">{CATEGORY_ICONS[c]}</span>{c}</label>)}</div>
             </aside>
             <div className="listings-main">
-              <div className="listings-topbar"><input className="search-input" type="text" placeholder="Search listings by titleâ€¦" value={search} onChange={(e) => setSearch(e.target.value)} style={{ flex: 1, minWidth: 180 }} /><select className="sort-select" value={sort} onChange={(e) => setSort(e.target.value as SortMode)}><option value="newest">Newest first</option><option value="price_low">Price: Low to High</option><option value="price_high">Price: High to Low</option></select><a href="/ksa-connect/post" className="mk-btn mk-btn-gold listings-post-btn">ï¼‹ Post an Ad</a></div>
+              <div className="listings-topbar"><input className="search-input" type="text" placeholder="Search listings by title…" value={search} onChange={(e) => setSearch(e.target.value)} style={{ flex: 1, minWidth: 180 }} /><select className="sort-select" value={sort} onChange={(e) => setSort(e.target.value as SortMode)}><option value="newest">Newest first</option><option value="price_low">Price: Low to High</option><option value="price_high">Price: High to Low</option></select><a href="/ksa-connect/post" className="mk-btn mk-btn-gold listings-post-btn">＋ Post an Ad</a></div>
               {!loading && !error && (
                 <p className="results-count">
                   Showing {filtered.length} of {listings.length} listing{listings.length === 1 ? "" : "s"}
                   {cities.size === 1 && (
                     <> in <strong>{CITY_OPTIONS.find((c) => c.value === Array.from(cities)[0])?.label}</strong></>
                   )}
-                  {categories.size === 1 && <> Â· {Array.from(categories)[0]}</>}
+                  {categories.size === 1 && <> · {Array.from(categories)[0]}</>}
                 </p>
               )}
-              {loading && <div className="listing-grid">{Array.from({ length: 6 }).map((_, i) => <div className="skeleton-card" key={i}><div className="skeleton skeleton-image" /><div className="skeleton-body"><div className="skeleton skeleton-line" style={{ width: "80%" }} /><div className="skeleton skeleton-line" style={{ width: "50%" }} /><div className="skeleton skeleton-line" style={{ width: "65%", marginBottom: 0 }} /></div></div>)}</div>}
+              {loading && <div className="listing-grid" style={{ margin: "20px 0 0" }}>{Array.from({ length: 6 }).map((_, i) => <div className="skeleton-card" key={i}><div className="skeleton skeleton-image" /><div className="skeleton-body"><div className="skeleton skeleton-line" style={{ width: "80%" }} /><div className="skeleton skeleton-line" style={{ width: "50%" }} /><div className="skeleton skeleton-line" style={{ width: "65%", marginBottom: 0 }} /></div></div>)}</div>}
               {error && <div className="empty-state" style={{ color: "#b91c1c" }}>Couldn&apos;t load listings: {error}<br /><span style={{ fontSize: 12 }}>(Check Firestore security rules and your .env.local Firebase config.)</span></div>}
-              {!loading && !error && filtered.length === 0 && <div className="empty-state"><span className="empty-icon">ðŸ”</span>No listings found. Try a different city, category, or search term.</div>}
+              {!loading && !error && filtered.length === 0 && <div className="empty-state"><span className="empty-icon">🔍</span>No listings found. Try a different city, category, or search term.</div>}
               {!loading && !error && filtered.length > 0 && (
-                <div className="listing-grid">
+                <div className="listing-grid" style={{ margin: "20px 0 0" }}>
                   {filtered.map((l) => (
-                    <div className="listing-card" key={l.id}>
+                    <div className="listing-card" key={l.id} style={{ display: "flex", flexDirection: "column", background: "#ffffff", border: "1.5px solid #9db9ac", boxShadow: "0 4px 14px rgba(0,55,43,.08)" }}>
                       <div style={{ position: "relative" }} className="listing-image">
                         {l.imageUrls?.[0] ? (
                           <Image src={l.imageUrls[0]} alt={l.title} fill sizes="(max-width: 640px) 50vw, 280px" style={{ objectFit: "cover" }} />
@@ -513,14 +535,22 @@ export default function KsaConnectPage() {
                           <div className="listing-image-empty" style={{ width: "100%", height: "100%" }} />
                         )}
                         {l.createdAt && <span className="date-badge">{timeAgo(l.createdAt)}</span>}
-                        <button className="heart-btn" aria-label="Save listing" title="Save listing">ðŸ¤</button>
+                        <button className="heart-btn" aria-label="Save listing" title="Save listing">🤍</button>
                       </div>
-                      <div className="listing-body">
+                      <div className="listing-body" style={{ display: "flex", flexDirection: "column", flex: 1 }}>
                         <p className="listing-category-tag">{l.category}</p>
                         <p className="listing-title">{l.title}</p>
                         <p className="listing-price">{formattedPrice(l)}</p>
-                        <p className="listing-location">{l.city} Â· {l.location}</p>
-                        <a href={`/ksa-connect/${l.id}`} className="view-details-btn">View Details</a>
+                        <p className="listing-location">{l.city} · {l.location}</p>
+                        <div style={{ marginTop: "auto", paddingTop: 12 }}>
+                          <a
+                            href={`/ksa-connect/${l.id}`}
+                            aria-label={`View details: ${l.title}`}
+                            style={{ display: "block", textAlign: "center", padding: "9px 0", borderRadius: 8, background: "#005744", color: "#ffffff", fontSize: 13, fontWeight: 700, textDecoration: "none" }}
+                          >
+                            View Details
+                          </a>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -537,11 +567,11 @@ export default function KsaConnectPage() {
             <div className="mk-section-head">
               <div>
                 <p style={{ color: "#005744", fontWeight: 700, fontSize: 12.5, letterSpacing: 1, textTransform: "uppercase", margin: 0 }}>
-                  ðŸ“– Resources
+                  📖 Resources
                 </p>
                 <h2 style={{ margin: "4px 0 0" }}>Expat Guides</h2>
               </div>
-              <a href="/ksa-connect/blog">View all â†’</a>
+              <a href="/ksa-connect/blog">View all →</a>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20, marginTop: 20 }}>
               {blogPosts.map((post) => (
@@ -565,7 +595,7 @@ export default function KsaConnectPage() {
                     {post.description}
                   </p>
                   <span style={{ display: "inline-block", marginTop: 12, fontSize: 13, fontWeight: 700, color: "#005744" }}>
-                    Read more â†’
+                    Read more →
                   </span>
                 </a>
               ))}
@@ -574,21 +604,21 @@ export default function KsaConnectPage() {
         </section>
       )}
 
-      <section className="mk-final-cta"><div><h2>Ready to Buy, Sell and Connect?</h2><p>Join thousands of expatriates using MYKSA CONNECT every day.</p><a href="/ksa-connect/post" className="mk-btn mk-btn-gold">Post Your Ad Now â†’</a></div></section>
+      <section className="mk-final-cta"><div><h2>Ready to Buy, Sell and Connect?</h2><p>Join thousands of expatriates using MYKSA CONNECT every day.</p><a href="/ksa-connect/post" className="mk-btn mk-btn-gold">Post Your Ad Now →</a></div></section>
       <footer className="footer">
         <div className="container">
           <section className="mk-trust-strip" aria-label="Trust and support info">
-            <div><span>â™™</span><strong>Safe &amp; Secure</strong><small>Your privacy and safety are our priority.</small></div>
-            <div><span>â™¢</span><strong>Verified Users</strong><small>Build trust with verified buyers and sellers.</small></div>
-            <div><span>â—Ž</span><strong>All Across Saudi Arabia</strong><small>7 Major cities. One trusted platform.</small></div>
-            <div><span>â™§</span><strong>24/7 Support</strong><small>We are here to help you anytime.</small></div>
+            <div><span>♙</span><strong>Safe &amp; Secure</strong><small>Your privacy and safety are our priority.</small></div>
+            <div><span>♢</span><strong>Verified Users</strong><small>Build trust with verified buyers and sellers.</small></div>
+            <div><span>◎</span><strong>All Across Saudi Arabia</strong><small>7 Major cities. One trusted platform.</small></div>
+            <div><span>♧</span><strong>24/7 Support</strong><small>We are here to help you anytime.</small></div>
           </section>
         </div>
         <p>
-          <a href="/ksa-connect/blog">Guides</a> Â·{" "}
-          <a href="/ksa-connect/faq">FAQ</a> Â·{" "}
-          <a href="/ksa-connect/privacy">Privacy Policy</a> Â·{" "}
-          <a href="/ksa-connect/safety">Safety &amp; Fraud Prevention</a> Â·{" "}
+          <a href="/ksa-connect/blog">Guides</a> ·{" "}
+          <a href="/ksa-connect/faq">FAQ</a> ·{" "}
+          <a href="/ksa-connect/privacy">Privacy Policy</a> ·{" "}
+          <a href="/ksa-connect/safety">Safety &amp; Fraud Prevention</a> ·{" "}
           <a href="mailto:abuman.moa@gmail.com">Contact</a>
         </p>
       </footer>
