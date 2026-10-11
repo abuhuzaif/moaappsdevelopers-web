@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { Playfair_Display, Noto_Naskh_Arabic, Great_Vibes, Cinzel } from "next/font/google";
+import { Playfair_Display, Noto_Naskh_Arabic, Great_Vibes, Cinzel, Roboto_Condensed, Tajawal } from "next/font/google";
 import type { MenuItem, MenuPrice, MenuRestaurantInfo, MenuSection, OrderType } from "@/lib/restaurant-menu";
 import { AddControl, CartBar, CartProvider, CartSheet, useCartState } from "./cart";
 import "./restaurant-menu.css";
 
-const display = Playfair_Display({ subsets: ["latin"], weight: ["500", "700"], variable: "--rm-font-display" });
+const display = Playfair_Display({ subsets: ["latin"], weight: ["500", "700", "900"], variable: "--rm-font-display" });
 const arabic = Noto_Naskh_Arabic({ subsets: ["arabic"], weight: ["400", "600", "700"], variable: "--rm-font-arabic" });
 const script = Great_Vibes({ subsets: ["latin"], weight: "400", variable: "--rm-font-script" });
 const caps = Cinzel({ subsets: ["latin"], weight: ["400", "600"], variable: "--rm-font-caps" });
+// "classic" style (cream printed menu, e.g. Al Jalsa) — not preloaded, only fetched when used
+const condensed = Roboto_Condensed({ subsets: ["latin"], weight: ["400", "700", "800"], variable: "--rm-font-condensed", preload: false });
+const arabicSans = Tajawal({ subsets: ["arabic"], weight: ["400", "500", "700", "800"], variable: "--rm-font-arabic-sans", preload: false });
 
 type Lang = "en" | "ar";
 type T = { en: string; ar: string };
@@ -26,6 +29,11 @@ const ui = {
     large: { en: "Large", ar: "كبير" },
     breast: { en: "Breast", ar: "صدر" },
     leg: { en: "Leg", ar: "فخذ" },
+    chicken: { en: "Chicken", ar: "دجاج" },
+    paneer: { en: "Paneer", ar: "بانير" },
+    veg: { en: "Veg", ar: "نباتي" },
+    nonveg: { en: "Non-veg", ar: "غير نباتي" },
+    seafood: { en: "Seafood", ar: "بحري" },
   } as Record<string, T>,
   allergen: {
     gluten: { en: "Gluten", ar: "جلوتين" },
@@ -66,6 +74,11 @@ const ui = {
   },
   langSwitch: { en: "عربي", ar: "English" },
   timings: { en: "Timings", ar: "أوقات العمل" },
+  menuAr: { en: "قائمة الطعام", ar: "قائمة الطعام" },
+  followUs: { en: "Follow us on", ar: "تابعونا على" },
+  vatIncluded: { en: "VAT included", ar: "شامل ضريبة القيمة المضافة" },
+  thankYou: { en: "Thank you", ar: "شكراً لكم" },
+  calShort: { en: "CAL", ar: "سعرة" },
 };
 
 const pick = (lang: Lang, en?: string, ar?: string) => (lang === "ar" && ar ? ar : en ?? "");
@@ -256,6 +269,171 @@ function Plaque({ title, id }: { title: string; id?: string }) {
   );
 }
 
+// ── "classic" style (cream printed menu with copper badges) ─────────────
+function formatIntlPhone(digits?: string) {
+  const d = (digits ?? "").replace(/\D/g, "");
+  if (d.startsWith("966") && d.length === 12) return `+966 ${d.slice(3, 5)} ${d.slice(5, 8)} ${d.slice(8)}`;
+  return d ? `+${d}` : "";
+}
+
+function Corners({ src }: { src?: string }) {
+  if (!src) return null;
+  return (
+    <>
+      {(["tl", "tr", "bl", "br"] as const).map((pos) => (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img key={pos} className={`rm-cl-corner rm-cl-corner-${pos}`} src={src} alt="" aria-hidden />
+      ))}
+    </>
+  );
+}
+
+function ClassicBadge({ p, lang }: { p: MenuPrice; lang: Lang }) {
+  const lbl = p.label ? ui.priceLabel[p.label]?.[lang] ?? p.label : "";
+  return (
+    <div className="rm-cl-price">
+      <div className="rm-cl-badge">
+        {lbl && <span className="rm-cl-badge-label">{lbl}</span>}
+        <span className="rm-cl-badge-amount">
+          <Riyal lang={lang} />
+          <span>{p.amount}</span>
+        </span>
+      </div>
+      {p.cal != null && (
+        <span className="rm-cl-cal">
+          {ui.calShort[lang]} {p.cal}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function ClassicDish({ item, lang }: { item: MenuItem; lang: Lang }) {
+  return (
+    <article className="rm-cl-dish" id={`rm-item-${item.id}`}>
+      <div className="rm-cl-dish-text">
+        <h3>
+          {pick(lang, item.name, item.nameAr)}
+          {item.tags?.map((tag) =>
+            ui.tag[tag] ? (
+              <span key={tag} className={`rm-tag rm-tag-${tag}`}>
+                {ui.tag[tag][lang]}
+              </span>
+            ) : null
+          )}
+        </h3>
+        {item.desc && <p>{pick(lang, item.desc, item.descAr)}</p>}
+        {item.allergens && item.allergens.length > 0 && (
+          <p className="rm-allergens">
+            {ui.contains[lang]}: {item.allergens.map((a) => ui.allergen[a]?.[lang] ?? a).join(sep(lang))}
+          </p>
+        )}
+      </div>
+      <div className="rm-cl-prices">
+        {item.prices.map((p, i) => (
+          <div className="rm-cl-price-row" key={i}>
+            <ClassicBadge p={p} lang={lang} />
+            <AddControl item={item} p={p} lang={lang} />
+          </div>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+function ClassicSection({ s, lang, corner }: { s: MenuSection; lang: Lang; corner?: string }) {
+  const photos = s.items.filter((it) => it.imageUrl);
+  const jump = (id: string) =>
+    document.getElementById(`rm-item-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  return (
+    <section className="rm-cat rm-cl-page" id={`rm-cat-${s.id}`} data-cat={s.id} aria-labelledby={`rm-h-${s.id}`}>
+      <Corners src={corner} />
+      <header className="rm-cl-head">
+        <h2 id={`rm-h-${s.id}`} lang="en" dir="ltr">{s.name}</h2>
+        {s.nameAr && <h2 className="rm-cl-head-ar" lang="ar" dir="rtl">{s.nameAr}</h2>}
+      </header>
+      {photos.length > 0 && (
+        <div className="rm-cl-gallery">
+          {photos.map((it) => (
+            <button type="button" key={it.id} className="rm-cl-photo" onClick={() => jump(it.id)}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={it.imageUrl} alt={pick(lang, it.name, it.nameAr)} loading="lazy" width={260} height={260} />
+              {it.nameAr && <span className="rm-cl-photo-ar" lang="ar" dir="rtl">{it.nameAr}</span>}
+              <span className="rm-cl-photo-en" lang="en" dir="ltr">{it.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="rm-cl-list">
+        {s.items.map((it) => (
+          <ClassicDish key={it.id} item={it} lang={lang} />
+        ))}
+      </div>
+      <footer className="rm-cl-page-foot">
+        {s.note && <span className="rm-cl-pill">{pick(lang, s.note, s.noteAr)}</span>}
+        <span className="rm-cl-vat">{ui.vatIncluded[lang]}</span>
+      </footer>
+    </section>
+  );
+}
+
+function ClassicCover({
+  restaurant,
+  lang,
+  thanks = false,
+}: {
+  restaurant: MenuRestaurantInfo;
+  lang: Lang;
+  thanks?: boolean;
+}) {
+  const fr = restaurant.frame ?? {};
+  const phone = formatIntlPhone(restaurant.whatsapp);
+  return (
+    <section className={`rm-cl-page rm-cl-cover${thanks ? " rm-cl-thanks" : ""}`}>
+      <Corners src={fr.corner} />
+      {fr.logoFull ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className="rm-cl-logo" src={fr.logoFull} alt={restaurant.name} />
+      ) : (
+        <p className="rm-cl-name">{restaurant.name}</p>
+      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {fr.flourish && <img className="rm-cl-flourish" src={fr.flourish} alt="" aria-hidden />}
+      {thanks ? (
+        <p className="rm-cl-big" lang={lang}>{ui.thankYou[lang]}</p>
+      ) : (
+        <>
+          <p className="rm-cl-menu-ar" lang="ar" dir="rtl">قائمة الطعام</p>
+          <p className="rm-cl-big" lang="en">MENU</p>
+        </>
+      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {fr.flourish && <img className="rm-cl-flourish rm-cl-flourish-flip" src={fr.flourish} alt="" aria-hidden />}
+      {restaurant.instagram && (
+        <p className="rm-cl-follow">
+          <span>{ui.followUs[lang]}</span>
+          <strong>{restaurant.instagram}</strong>
+        </p>
+      )}
+      {phone && (
+        <a className="rm-cl-phone" href={`https://wa.me/${restaurant.whatsapp?.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" dir="ltr">
+          <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden>
+            <path fill="currentColor" d="M16 3C9 3 3.3 8.6 3.3 15.6c0 2.2.6 4.4 1.7 6.3L3 29l7.3-1.9c1.8 1 3.8 1.5 5.8 1.5 7 0 12.7-5.7 12.7-12.6C28.8 8.6 23 3 16 3zm0 23.1c-1.9 0-3.8-.5-5.4-1.5l-.4-.2-4.3 1.1 1.2-4.2-.3-.4c-1.1-1.7-1.6-3.6-1.6-5.6C5.2 9.8 10 5.1 16 5.1s10.7 4.7 10.7 10.5S21.9 26.1 16 26.1z" />
+          </svg>
+          {phone}
+        </a>
+      )}
+      {(restaurant.address || restaurant.addressAr) && (
+        <p className="rm-cl-address">
+          {restaurant.addressAr && <span lang="ar" dir="rtl">{restaurant.addressAr}</span>}
+          {restaurant.address && <span lang="en" dir="ltr">{restaurant.address}</span>}
+        </p>
+      )}
+      {!thanks && restaurant.hours && <p className="rm-cl-address">{pick(lang, restaurant.hours, restaurant.hoursAr)}</p>}
+    </section>
+  );
+}
+
 export default function RestaurantMenu({
   restaurant,
   sections,
@@ -348,6 +526,7 @@ export default function RestaurantMenu({
   const th = restaurant.theme ?? {};
   const fr = restaurant.frame ?? {};
   const ornate = th.style === "ornate" && !!fr.top;
+  const classic = th.style === "classic";
   const css = (u?: string) => (u ? `url("${u}")` : undefined);
   const style = {
     "--rm-frame-top": css(fr.top),
@@ -372,12 +551,14 @@ export default function RestaurantMenu({
     <div
       ref={rootRef}
       id="menu"
-      className={`rm ${display.variable} ${arabic.variable} ${script.variable} ${caps.variable}${ornate ? " rm-ornate" : ""}${lang === "ar" ? " rm-ar" : ""}`}
+      className={`rm ${display.variable} ${arabic.variable} ${script.variable} ${caps.variable}${classic ? ` ${condensed.variable} ${arabicSans.variable} rm-classic` : ""}${ornate ? " rm-ornate" : ""}${lang === "ar" ? " rm-ar" : ""}`}
       style={style}
       lang={lang}
       dir={lang === "ar" ? "rtl" : "ltr"}
     >
-      {ornate ? (
+      {classic ? (
+        <ClassicCover restaurant={restaurant} lang={lang} />
+      ) : ornate ? (
         <section className="rm-page rm-intro">
           <Plaque title={ui.menu[lang]} />
           <div className="rm-page-body">
@@ -462,6 +643,10 @@ export default function RestaurantMenu({
             const title = pick(lang, s.name, s.nameAr);
             const note = s.note ? <p className="rm-cat-note">{pick(lang, s.note, s.noteAr)}</p> : null;
 
+            if (classic) {
+              return <ClassicSection key={s.id} s={s} lang={lang} corner={fr.corner} />;
+            }
+
             if (ornate) {
               const allPhotos = s.items.every((it) => it.imageUrl);
               return (
@@ -502,6 +687,8 @@ export default function RestaurantMenu({
         )}
       </div>
 
+      {classic && <ClassicCover restaurant={restaurant} lang={lang} thanks />}
+
       {catering &&
         (ornate ? (
           <section className="rm-page rm-catering-page">
@@ -528,7 +715,7 @@ export default function RestaurantMenu({
         ))}
 
       <footer className="rm-foot">
-        {restaurant.footerNotes?.slice(ornate ? 1 : 0).map((n, i) => (
+        {restaurant.footerNotes?.slice(ornate ? 1 : classic ? restaurant.footerNotes.length : 0).map((n, i) => (
           <p key={i} className={i === 0 && !ornate ? "rm-foot-lead" : undefined}>
             {pick(lang, n.en, n.ar)}
           </p>
@@ -566,7 +753,7 @@ export default function RestaurantMenu({
       )}
 
       {wa && !(orderingOn && cart.lines.length > 0) && (
-        <a className="rm-fab" href={waLink(ui.whatsappGreeting[lang])} target="_blank" rel="noreferrer" aria-label={ui.orderWhatsapp[lang]}>
+        <a className={`rm-fab${orderingOn ? " rm-fab-start" : ""}`} href={waLink(ui.whatsappGreeting[lang])} target="_blank" rel="noreferrer" aria-label={ui.orderWhatsapp[lang]}>
           <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden>
             <path
               fill="currentColor"
