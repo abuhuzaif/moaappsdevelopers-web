@@ -13,6 +13,7 @@ interface Restaurant {
   city?: string;
   cuisine?: string;
   isActive?: boolean;
+  hidden?: boolean; // unlisted: reachable by direct link only
 }
 
 const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
@@ -30,7 +31,9 @@ export default async function RestaurantsDirectoryPage() {
 
   const q = query(collection(db, "restaurants"), where("isActive", "==", true));
   const snap = await getDocs(q);
-  const restaurants = snap.docs.map((d) => d.data() as Restaurant);
+  const restaurants = snap.docs
+    .map((d) => d.data() as Restaurant)
+    .filter((r) => !r.hidden);
 
   return (
     <div>

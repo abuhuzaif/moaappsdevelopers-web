@@ -3,34 +3,56 @@ import type { Metadata } from "next";
 import { collection, query, where, limit, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Image from "next/image";
+import RestaurantMenu from "@/components/restaurant-menu/RestaurantMenu";
+import {
+  getMenuSections,
+  parseCategories,
+  type L10n,
+  type MenuRestaurantInfo,
+  type MenuTheme,
+} from "@/lib/restaurant-menu";
 
-// ── Types ────────────────────────────────────────────────
+// Re-fetch from Firestore at most every 5 minutes (price/calorie edits go live within 5 min,
+// and visitors don't each trigger ~70 Firestore reads).
+export const revalidate = 300;
+
+// ── Types ─────────────────────────────────────────────────────
 interface Restaurant {
   slug: string;
   name: string;
+  nameAr?: string;
   tagline?: string;
+  taglineAr?: string;
   description?: string;
   logoUrl?: string;
   coverImageUrl?: string;
   city?: string;
   address?: string;
+  addressAr?: string;
+  hours?: string;
+  hoursAr?: string;
   phone?: string;
   whatsapp?: string;
   cuisine?: string;
   isActive?: boolean;
+  // Unlisted: page works by direct link, but is hidden from /restaurants and search engines.
+  hidden?: boolean;
   // Link to the restaurant's own digital menu (e.g. urbanredchillies.com/menu).
-  // When set, this page shows a "View Full Menu" button + QR code that send
-  // visitors there instead of rendering a menu inline — keeps this page as
-  // a lightweight SEO listing while the restaurant's own site stays the
-  // single source of truth for prices/availability.
+  // When set (and there are no inline menuItems), this page shows a "View Full Menu"
+  // button + QR code that sends visitors there.
   menuUrl?: string;
+  // Inline menu (see lib/restaurant-menu.ts)
+  menuCategories?: unknown;
+  menuTheme?: MenuTheme;
+  menuFooterNotes?: L10n[];
+  cateringText?: L10n;
 }
 
 // This shared codebase also powers moaappsdevelopers.com — restaurant
 // pages should only exist on the myksaconnect.com deployment.
 const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
 
-async function getRestaurant(slug: string): Promise<Restaurant | null> {
+async function getRestaurant(slug: string): Promise<{ id: string; data: Restaurant } | null> {
   const q = query(
     collection(db, "restaurants"),
     where("slug", "==", slug),
@@ -39,10 +61,10 @@ async function getRestaurant(slug: string): Promise<Restaurant | null> {
   );
   const snap = await getDocs(q);
   if (snap.empty) return null;
-  return snap.docs[0].data() as Restaurant;
+  return { id: snap.docs[0].id, data: snap.docs[0].data() as Restaurant };
 }
 
-// ── SEO metadata, generated per-restaurant ─────────────────
+// ── SEO metadata, generated per-restaurant ────────────────────
 export async function generateMetadata({
   params,
 }: {
@@ -50,8 +72,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   if (!isKsaConnectSite) return {};
   const { restaurantSlug } = await params;
-  const restaurant = await getRestaurant(restaurantSlug);
-  if (!restaurant) return { title: "Restaurant Not Found — KSA-Connect" };
+  const found = await getRestaurant(restaurantSlug);
+  if (!found) return { title: "Restaurant Not Found — KSA-Connect" };
+  const restaurant = found.data;
 
   const title = `${restaurant.name} — Digital Menu | KSA-Connect`;
   const description =
@@ -61,6 +84,8 @@ export async function generateMetadata({
   return {
     title,
     description,
+    robots: restaurant.hidden ? { index: false, follow: false } : undefined,
+    alternates: { canonical: `https://www.myksaconnect.com/${restaurant.slug}` },
     openGraph: {
       title,
       description,
@@ -79,9 +104,15 @@ export default async function RestaurantMenuPage({
   if (!isKsaConnectSite) notFound();
 
   const { restaurantSlug } = await params;
-  const restaurant = await getRestaurant(restaurantSlug);
-  if (!restaurant) notFound();
+  const found = await getRestaurant(restaurantSlug);
+  if (!found) notFound();
+  const restaurant = found.data;
 
+  const categories = parseCategories(restaurant.menuCategories);
+  const sections = categories.length ? await getMenuSections(found.id, categories) : [];
+  const hasInlineMenu = sections.length > 0;
+
+  const pageUrl = `https://www.myksaconnect.com/${restaurant.slug}`;
   const restaurantSchema = {
     "@context": "https://schema.org",
     "@type": "Restaurant",
@@ -90,18 +121,35 @@ export default async function RestaurantMenuPage({
     address: restaurant.address,
     telephone: restaurant.phone,
     image: restaurant.coverImageUrl,
-    url: `https://www.myksaconnect.com/${restaurant.slug}`,
-    ...(restaurant.menuUrl ? { hasMenu: restaurant.menuUrl } : {}),
+    url: pageUrl,
+    ...(hasInlineMenu ? { hasMenu: pageUrl } : restaurant.menuUrl ? { hasMenu: restaurant.menuUrl } : {}),
   };
 
-  const qrCodeUrl = restaurant.menuUrl
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=${encodeURIComponent(
-        restaurant.menuUrl
-      )}`
-    : null;
+  const qrCodeUrl =
+    !hasInlineMenu && restaurant.menuUrl
+      ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=${encodeURIComponent(
+          restaurant.menuUrl
+        )}`
+      : null;
+
+  const menuInfo: MenuRestaurantInfo = {
+    name: restaurant.name,
+    nameAr: restaurant.nameAr,
+    tagline: restaurant.tagline,
+    taglineAr: restaurant.taglineAr,
+    address: restaurant.address,
+    addressAr: restaurant.addressAr,
+    hours: restaurant.hours,
+    hoursAr: restaurant.hoursAr,
+    phone: restaurant.phone,
+    whatsapp: restaurant.whatsapp,
+    theme: restaurant.menuTheme,
+    footerNotes: restaurant.menuFooterNotes,
+    cateringText: restaurant.cateringText,
+  };
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", paddingBottom: 60 }}>
+    <div style={{ maxWidth: 900, margin: "0 auto", paddingBottom: hasInlineMenu ? 0 : 60 }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantSchema) }}
@@ -110,7 +158,7 @@ export default async function RestaurantMenuPage({
       {/* ── Cover + Logo ── */}
       <div style={{ position: "relative", width: "100%", height: 220, background: "#0C1730" }}>
         {restaurant.coverImageUrl && (
-          <Image src={restaurant.coverImageUrl} alt={restaurant.name} fill style={{ objectFit: "cover", opacity: 0.85 }} />
+          <Image src={restaurant.coverImageUrl} alt={restaurant.name} fill priority style={{ objectFit: "cover", opacity: 0.85 }} />
         )}
         <div
           style={{
@@ -134,7 +182,7 @@ export default async function RestaurantMenuPage({
       </div>
 
       {/* ── Contact bar ── */}
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", padding: "16px 20px", borderBottom: "1px solid var(--border)" }}>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", padding: "16px 20px", borderBottom: "1px solid var(--border)" }}>
         {restaurant.address && (
           <span style={{ fontSize: 13, color: "var(--text-muted)" }}>📍 {restaurant.address}</span>
         )}
@@ -161,49 +209,55 @@ export default async function RestaurantMenuPage({
         </p>
       )}
 
-      {/* ── Digital Menu: link + QR ── */}
-      <div style={{ padding: "28px 20px" }}>
-        {restaurant.menuUrl ? (
-          <div
-            style={{
-              display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
-              padding: "28px 20px", border: "1px solid var(--border)", borderRadius: 16,
-              textAlign: "center",
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>🍽️ View Full Digital Menu</h2>
-            <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)", maxWidth: 340 }}>
-              Scan the QR code with your phone camera, or tap the button below to open the menu.
-            </p>
-
-            {qrCodeUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={qrCodeUrl}
-                alt={`QR code to ${restaurant.name} digital menu`}
-                width={180}
-                height={180}
-                style={{ borderRadius: 12, border: "1px solid var(--border)" }}
-              />
-            )}
-
-            <a
-              href={restaurant.menuUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="mk-btn mk-btn-gold"
-              style={{ fontSize: 14, padding: "10px 24px", fontWeight: 700 }}
+      {/* ── Digital Menu ── */}
+      {hasInlineMenu ? (
+        <RestaurantMenu restaurant={menuInfo} sections={sections} />
+      ) : (
+        <div style={{ padding: "28px 20px" }}>
+          {restaurant.menuUrl ? (
+            <div
+              style={{
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
+                padding: "28px 20px", border: "1px solid var(--border)", borderRadius: 16,
+                textAlign: "center",
+              }}
             >
-              Open Digital Menu →
-            </a>
-          </div>
-        ) : (
-          <p style={{ color: "var(--text-muted)", textAlign: "center" }}>Menu coming soon.</p>
-        )}
-      </div>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>🍽️ View Full Digital Menu</h2>
+              <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)", maxWidth: 340 }}>
+                Scan the QR code with your phone camera, or tap the button below to open the menu.
+              </p>
+
+              {qrCodeUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={qrCodeUrl}
+                  alt={`QR code to ${restaurant.name} digital menu`}
+                  width={180}
+                  height={180}
+                  style={{ borderRadius: 12, border: "1px solid var(--border)" }}
+                />
+              )}
+
+              <a
+                href={restaurant.menuUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mk-btn mk-btn-gold"
+                style={{ fontSize: 14, padding: "10px 24px", fontWeight: 700 }}
+              >
+                Open Digital Menu →
+              </a>
+            </div>
+          ) : (
+            <p style={{ color: "var(--text-muted)", textAlign: "center" }}>Menu coming soon.</p>
+          )}
+        </div>
+      )}
 
       <div style={{ textAlign: "center", padding: "20px", borderTop: "1px solid var(--border)" }}>
-        <a href="/restaurants" style={{ fontSize: 13, color: "var(--text-muted)" }}>← Browse other restaurants on KSA-Connect</a>
+        <a href="/restaurants" style={{ fontSize: 13, color: "var(--text-muted)" }}>
+          ← All restaurants
+        </a>
       </div>
     </div>
   );

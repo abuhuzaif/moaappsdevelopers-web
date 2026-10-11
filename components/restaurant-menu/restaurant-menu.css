@@ -1,0 +1,311 @@
+/* Inline restaurant menu — everything is scoped under .rm so the KSA-Connect theme is untouched.
+   Colours come from restaurants/{id}.menuTheme (set as CSS variables on .rm); these are the fallbacks. */
+
+.rm {
+  --rm-bg: #14110f;
+  --rm-surface: #1d1916;
+  --rm-text: #f1ebe1;
+  --rm-muted: #a69c8f;
+  --rm-accent: #c9a24a;
+  --rm-accent-soft: #dcc283;
+  --rm-highlight: #b3261e;
+  --rm-line: rgba(201, 162, 74, 0.28);
+  --rm-sticky-top: 0px; /* set this if the site header is sticky */
+
+  --rm-f-display: var(--rm-font-display), Georgia, "Times New Roman", serif;
+  --rm-f-arabic: var(--rm-font-arabic), "Geeza Pro", Tahoma, sans-serif;
+
+  position: relative;
+  background: var(--rm-bg);
+  color: var(--rm-text);
+  padding: 8px 0 96px;
+  line-height: 1.55;
+}
+.rm *,
+.rm *::before,
+.rm *::after { box-sizing: border-box; }
+.rm button { font: inherit; color: inherit; cursor: pointer; }
+.rm :focus-visible { outline: 2px solid var(--rm-accent); outline-offset: 3px; border-radius: 4px; }
+
+.rm.rm-ar,
+.rm.rm-ar .rm-dish-name,
+.rm.rm-ar .rm-cat-head h2,
+.rm.rm-ar .rm-title h2,
+.rm.rm-ar .rm-amount,
+.rm.rm-ar .rm-catering h2 { font-family: var(--rm-f-arabic); }
+.rm.rm-ar { line-height: 1.75; }
+
+/* ── Top ── */
+.rm-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 20px 4px;
+}
+.rm-title h2 {
+  margin: 0;
+  font-family: var(--rm-f-display);
+  font-weight: 500;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: var(--rm-accent-soft);
+}
+.rm-title p { margin: 2px 0 0; color: var(--rm-muted); font-size: 0.95rem; }
+.rm-lang {
+  flex: none;
+  background: transparent;
+  border: 1px solid var(--rm-line);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 0.95rem;
+  color: var(--rm-accent-soft);
+}
+.rm-lang:hover { border-color: var(--rm-accent); }
+.rm-lang[lang="ar"] { font-family: var(--rm-f-arabic); }
+
+/* ── Sticky bar ── */
+.rm-bar {
+  position: sticky;
+  top: var(--rm-sticky-top);
+  z-index: 5;
+  padding: 10px 16px;
+  background: color-mix(in srgb, var(--rm-bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rm-line);
+}
+.rm-search { position: relative; display: flex; align-items: center; }
+.rm-search input {
+  width: 100%;
+  appearance: none;
+  background: var(--rm-surface);
+  border: 1px solid var(--rm-line);
+  border-radius: 999px;
+  color: var(--rm-text);
+  font: inherit;
+  font-size: 16px; /* 16px stops iOS zoom on focus */
+  padding: 9px 18px;
+}
+.rm-search input::placeholder { color: var(--rm-muted); }
+.rm-search input:focus { outline: none; border-color: var(--rm-accent); }
+.rm-search input::-webkit-search-cancel-button { display: none; }
+.rm-clear {
+  position: absolute;
+  inset-inline-end: 6px;
+  background: transparent;
+  border: 0;
+  color: var(--rm-accent-soft);
+  padding: 6px 12px;
+  font-size: 0.9rem;
+}
+.rm-chips {
+  display: flex;
+  gap: 8px;
+  margin: 10px -16px 0;
+  padding: 0 16px 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rm-chips::-webkit-scrollbar { display: none; }
+.rm-chip {
+  flex: none;
+  white-space: nowrap;
+  border: 1px solid var(--rm-line);
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.92rem;
+  color: var(--rm-muted);
+}
+.rm-chip:hover { color: var(--rm-text); }
+.rm-chip.is-active {
+  color: #fff;
+  background: var(--rm-highlight);
+  border-color: var(--rm-accent);
+}
+
+/* ── Categories ── */
+.rm-list { padding: 0 20px; }
+.rm-cat {
+  scroll-margin-top: calc(var(--rm-sticky-top) + 120px);
+  padding-top: 36px;
+}
+.rm-cat-head { text-align: center; margin-bottom: 14px; }
+.rm-cat-head h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--rm-f-display);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 6vw, 1.9rem);
+  color: var(--rm-accent-soft);
+}
+.rm-cat-head h2::before,
+.rm-cat-head h2::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rm-accent));
+  opacity: 0.6;
+}
+.rm-cat-head h2::after { transform: scaleX(-1); }
+.rm-cat-head p { margin: 6px 0 0; color: var(--rm-muted); font-size: 0.95rem; }
+
+/* ── Dish rows ── */
+.rm-dish {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--rm-accent) 14%, transparent);
+}
+.rm-cat .rm-dish:last-child { border-bottom: 0; }
+
+.rm-thumb {
+  flex: none;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--rm-surface);
+  box-shadow: 0 0 0 1px var(--rm-line);
+}
+.rm-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rm-thumb-empty { background: transparent; box-shadow: none; }
+
+.rm-dish-body { flex: 1; min-width: 0; }
+.rm-dish-head { display: flex; align-items: baseline; gap: 8px; }
+.rm-dish-name {
+  margin: 0;
+  font-family: var(--rm-f-display);
+  font-weight: 500;
+  font-size: 1.12rem;
+  line-height: 1.3;
+  color: var(--rm-text);
+}
+.rm.rm-ar .rm-dish-name { font-weight: 600; font-size: 1.08rem; }
+
+.rm-tag {
+  display: inline-block;
+  margin-inline-start: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  vertical-align: 2px;
+  white-space: nowrap;
+}
+.rm-tag-new { background: var(--rm-highlight); color: #fff; }
+.rm-tag-signature { border: 1px solid var(--rm-accent); color: var(--rm-accent-soft); }
+
+.rm-leader {
+  flex: 1;
+  min-width: 16px;
+  border-bottom: 1px dotted color-mix(in srgb, var(--rm-accent) 55%, transparent);
+  transform: translateY(-4px);
+}
+.rm-amount {
+  flex: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--rm-f-display);
+  font-weight: 700;
+  font-size: 1.12rem;
+  color: var(--rm-accent);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.rm-riyal {
+  height: 0.78em;
+  width: auto;
+  display: inline-block;
+  filter: invert(72%) sepia(43%) saturate(470%) hue-rotate(5deg) brightness(92%);
+}
+.rm-riyal-text { font-weight: 600; font-size: 0.7em; color: var(--rm-accent-soft); }
+
+.rm-cal { display: block; text-align: end; font-size: 0.85rem; color: var(--rm-muted); }
+.rm-cal-inline { display: inline; margin-inline-end: 8px; font-size: 0.8rem; }
+
+.rm-desc,
+.rm-includes {
+  margin: 4px 0 0;
+  color: var(--rm-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 60ch;
+}
+.rm-includes { color: color-mix(in srgb, var(--rm-text) 78%, transparent); }
+
+.rm-price-lines { margin-top: 6px; }
+.rm-price-line { display: flex; align-items: baseline; gap: 8px; padding: 2px 0; }
+.rm-price-label { color: var(--rm-text); font-size: 0.98rem; }
+
+.rm-allergens { margin: 6px 0 0; font-size: 0.8rem; color: color-mix(in srgb, var(--rm-muted) 85%, transparent); }
+
+.rm-empty { text-align: center; color: var(--rm-muted); padding: 48px 8px; }
+
+/* ── Catering & footer ── */
+.rm-catering {
+  margin: 48px 20px 0;
+  padding: 26px 22px;
+  text-align: center;
+  border: 1px solid var(--rm-line);
+  border-radius: 18px;
+  background: var(--rm-surface);
+}
+.rm-catering h2 {
+  margin: 0 0 8px;
+  font-family: var(--rm-f-display);
+  font-weight: 500;
+  font-size: 1.45rem;
+  color: var(--rm-accent-soft);
+}
+.rm-catering p { margin: 0 auto 16px; max-width: 48ch; color: var(--rm-muted); }
+.rm-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--rm-accent);
+  color: var(--rm-text);
+  text-decoration: none;
+}
+.rm-btn:hover { background: color-mix(in srgb, var(--rm-accent) 15%, transparent); }
+
+.rm-foot {
+  margin: 36px 20px 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--rm-line);
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--rm-muted);
+}
+.rm-foot p { margin: 4px auto; max-width: 56ch; }
+.rm-foot-lead { color: var(--rm-accent-soft); }
+
+/* ── WhatsApp button ── */
+.rm-fab {
+  position: fixed;
+  z-index: 30;
+  right: 18px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #1f9d55;
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+.rm-fab:hover { background: #22b05f; }
+
+@media (min-width: 640px) {
+  .rm-thumb { width: 100px; height: 100px; }
+  .rm-dish { gap: 20px; padding: 20px 0; }
+  .rm-dish-name { font-size: 1.22rem; }
+  .rm-amount { font-size: 1.22rem; }
+}
