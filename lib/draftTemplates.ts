@@ -178,6 +178,16 @@ export const DRAFT_TEMPLATES: Record<string, Record<string, { title: string; des
       title: "Sports/Fitness item for sale",
       description: "Sports or fitness item in good condition, available for sale.",
     },
+    Restaurants: {
+      title: "Restaurant – view our digital menu",
+      description:
+        "Fresh, delicious food at our restaurant. Browse the full menu with prices online, dine-in and takeaway available, order easily on WhatsApp. Please contact for timings and location.",
+    },
+    "Umrah Packages": {
+      title: "Umrah package available",
+      description:
+        "Umrah package available with transport and hotel stay in Makkah & Madinah. Please contact for dates, prices and package details.",
+    },
     Miscellaneous: {
       title: "Item available",
       description: "Item available, please contact for more details.",

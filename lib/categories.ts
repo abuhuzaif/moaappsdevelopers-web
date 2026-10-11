@@ -81,6 +81,8 @@ export const SUB_CATEGORIES: Record<string, string[]> = {
     "Pets & Animals",
     "Books & Hobbies",
     "Sports & Fitness",
+    "Restaurants",
+    "Umrah Packages",
     "Miscellaneous",
   ],
 };
