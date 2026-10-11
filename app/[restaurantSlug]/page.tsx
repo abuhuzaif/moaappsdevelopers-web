@@ -49,6 +49,7 @@ interface Restaurant {
   menuTheme?: MenuTheme;
   menuFrame?: MenuFrame;
   ordering?: MenuOrdering;
+  instagram?: string;
   menuFooterNotes?: L10n[];
   cateringText?: L10n;
 }
@@ -142,6 +143,7 @@ export default async function RestaurantMenuPage({
     name: restaurant.name,
     slug: restaurant.slug,
     ordering: restaurant.ordering,
+    instagram: restaurant.instagram,
     logoUrl: restaurant.logoUrl,
     frame: restaurant.menuFrame,
     nameAr: restaurant.nameAr,

@@ -43,7 +43,7 @@ export interface MenuSection extends MenuCategory {
 }
 
 export interface MenuTheme {
-  style?: "default" | "ornate"; // "ornate" = printed-menu look (needs frame images)
+  style?: "default" | "ornate" | "classic"; // ornate = dark printed look (Quetta Grill), classic = cream printed look (Al Jalsa)
   bg?: string;
   surface?: string;
   text?: string;
@@ -61,6 +61,9 @@ export interface MenuFrame {
   side?: string; // left border strip (tiles vertically)
   sideR?: string; // right border strip
   divider?: string; // ornament line between pages (PNG)
+  corner?: string; // "classic": corner ornament (PNG, top-left orientation)
+  flourish?: string; // "classic": ornament divider under the logo (PNG)
+  logoFull?: string; // "classic": logo with restaurant name (PNG)
 }
 
 export type OrderType = "dinein" | "takeaway" | "delivery";
@@ -76,6 +79,7 @@ export interface MenuRestaurantInfo {
   name: string;
   slug?: string;
   ordering?: MenuOrdering;
+  instagram?: string; // handle without @
   logoUrl?: string;
   frame?: MenuFrame;
   nameAr?: string;

@@ -64,6 +64,11 @@ const priceLabel: Record<string, T> = {
   large: { en: "Large", ar: "كبير" },
   breast: { en: "Breast", ar: "صدر" },
   leg: { en: "Leg", ar: "فخذ" },
+  chicken: { en: "Chicken", ar: "دجاج" },
+  paneer: { en: "Paneer", ar: "بانير" },
+  veg: { en: "Veg", ar: "نباتي" },
+  nonveg: { en: "Non-veg", ar: "غير نباتي" },
+  seafood: { en: "Seafood", ar: "بحري" },
 };
 const labelText = (l: string | undefined, lang: Lang) => (l ? priceLabel[l]?.[lang] ?? l : "");
 const lineName = (c: CartLine, lang: Lang) => (lang === "ar" && c.nameAr ? c.nameAr : c.name);
