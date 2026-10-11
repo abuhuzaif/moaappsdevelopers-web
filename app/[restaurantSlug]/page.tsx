@@ -4,11 +4,13 @@ import { collection, query, where, limit, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Image from "next/image";
 import RestaurantMenu from "@/components/restaurant-menu/RestaurantMenu";
+import StickyRestaurantBar from "@/components/restaurant-menu/StickyRestaurantBar";
 import {
   getMenuSections,
   parseCategories,
   type L10n,
   type MenuFrame,
+  type MenuOrdering,
   type MenuRestaurantInfo,
   type MenuTheme,
 } from "@/lib/restaurant-menu";
@@ -46,6 +48,7 @@ interface Restaurant {
   menuCategories?: unknown;
   menuTheme?: MenuTheme;
   menuFrame?: MenuFrame;
+  ordering?: MenuOrdering;
   menuFooterNotes?: L10n[];
   cateringText?: L10n;
 }
@@ -137,6 +140,8 @@ export default async function RestaurantMenuPage({
 
   const menuInfo: MenuRestaurantInfo = {
     name: restaurant.name,
+    slug: restaurant.slug,
+    ordering: restaurant.ordering,
     logoUrl: restaurant.logoUrl,
     frame: restaurant.menuFrame,
     nameAr: restaurant.nameAr,
@@ -214,6 +219,13 @@ export default async function RestaurantMenuPage({
           </a>
         )}
       </div>
+
+      <StickyRestaurantBar
+        name={restaurant.name}
+        logoUrl={restaurant.logoUrl}
+        phone={restaurant.phone}
+        whatsapp={restaurant.whatsapp}
+      />
 
       {restaurant.description && (
         <p style={{ padding: "16px 20px 0", color: "var(--text-muted)", fontSize: 14, lineHeight: 1.6 }}>

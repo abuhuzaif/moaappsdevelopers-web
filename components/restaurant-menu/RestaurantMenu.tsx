@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Playfair_Display, Noto_Naskh_Arabic, Great_Vibes, Cinzel } from "next/font/google";
-import type { MenuItem, MenuPrice, MenuRestaurantInfo, MenuSection } from "@/lib/restaurant-menu";
+import type { MenuItem, MenuPrice, MenuRestaurantInfo, MenuSection, OrderType } from "@/lib/restaurant-menu";
+import { AddControl, CartBar, CartProvider, CartSheet, useCartState } from "./cart";
 import "./restaurant-menu.css";
 
 const display = Playfair_Display({ subsets: ["latin"], weight: ["500", "700"], variable: "--rm-font-display" });
@@ -158,6 +159,7 @@ function Dish({ item, lang, reserve }: { item: MenuItem; lang: Lang; reserve: bo
             <>
               <span className="rm-leader" aria-hidden />
               <Amount p={single} lang={lang} />
+              <AddControl item={item} p={single} lang={lang} />
             </>
           )}
         </div>
@@ -176,6 +178,7 @@ function Dish({ item, lang, reserve }: { item: MenuItem; lang: Lang; reserve: bo
                 <span className="rm-leader" aria-hidden />
                 <Cal p={p} lang={lang} inline />
                 <Amount p={p} lang={lang} />
+                <AddControl item={item} p={p} lang={lang} />
               </div>
             ))}
           </div>
@@ -215,7 +218,10 @@ function Card({ item, lang }: { item: MenuItem; lang: Lang }) {
       {item.desc && <p className="rm-card-desc">{pick(lang, item.desc, item.descAr)}</p>}
       {single ? (
         <div className="rm-card-price">
-          <Amount p={single} lang={lang} />
+          <div className="rm-card-price-line">
+            <Amount p={single} lang={lang} />
+            <AddControl item={item} p={single} lang={lang} />
+          </div>
           <Cal p={single} lang={lang} />
         </div>
       ) : (
@@ -224,6 +230,7 @@ function Card({ item, lang }: { item: MenuItem; lang: Lang }) {
             <div key={i} className="rm-card-price-line">
               <span className="rm-price-label">{label(p.label)}</span>
               <Amount p={p} lang={lang} />
+              <AddControl item={item} p={p} lang={lang} />
               <Cal p={p} lang={lang} inline />
             </div>
           ))}
@@ -263,6 +270,14 @@ export default function RestaurantMenu({
   const rootRef = useRef<HTMLDivElement>(null);
 
   const wa = restaurant.whatsapp?.replace(/[^0-9]/g, "");
+
+  // ── WhatsApp ordering ──
+  const orderingOn = !!restaurant.ordering?.enabled && !!wa;
+  const orderTypes: OrderType[] = restaurant.ordering?.types?.length ? restaurant.ordering.types : ["dinein", "takeaway"];
+  const cart = useCartState(restaurant.slug ?? restaurant.name, sections, orderingOn);
+  const [cartOpen, setCartOpen] = useState(false);
+  const itemsById = useMemo(() => new Map(sections.flatMap((s) => s.items).map((i) => [i.id, i])), [sections]);
+  const RiyalAmount = ({ amount }: { amount: number }) => <Amount p={{ amount }} lang={lang} />;
   const waLink = (text: string) => (wa ? `https://wa.me/${wa}?text=${encodeURIComponent(text)}` : undefined);
 
   useEffect(() => {
@@ -353,6 +368,7 @@ export default function RestaurantMenu({
   const catering = restaurant.cateringText ? pick(lang, restaurant.cateringText.en, restaurant.cateringText.ar) : "";
 
   return (
+    <CartProvider value={cart.api}>
     <div
       ref={rootRef}
       id="menu"
@@ -528,7 +544,28 @@ export default function RestaurantMenu({
         <img className="rm-frame-bottom" src={fr.bottom} alt="" />
       )}
 
-      {wa && (
+      {orderingOn && (
+        <>
+          <CartBar lines={cart.lines} lang={lang} onOpen={() => setCartOpen(true)} RiyalAmount={RiyalAmount} />
+          <CartSheet
+            open={cartOpen}
+            onClose={() => setCartOpen(false)}
+            lines={cart.lines}
+            lang={lang}
+            types={orderTypes}
+            restaurantName={restaurant.name}
+            whatsapp={wa!}
+            add={cart.add}
+            dec={cart.dec}
+            removeLine={cart.removeLine}
+            clear={cart.clear}
+            itemsById={itemsById}
+            RiyalAmount={RiyalAmount}
+          />
+        </>
+      )}
+
+      {wa && !(orderingOn && cart.lines.length > 0) && (
         <a className="rm-fab" href={waLink(ui.whatsappGreeting[lang])} target="_blank" rel="noreferrer" aria-label={ui.orderWhatsapp[lang]}>
           <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden>
             <path
@@ -539,5 +576,6 @@ export default function RestaurantMenu({
         </a>
       )}
     </div>
+    </CartProvider>
   );
 }

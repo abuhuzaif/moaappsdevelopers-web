@@ -10,7 +10,7 @@
   --rm-accent-soft: #dcc283;
   --rm-highlight: #b3261e;
   --rm-line: rgba(201, 162, 74, 0.28);
-  --rm-sticky-top: 0px; /* set this if the site header is sticky */
+  --rm-sticky-top: var(--rm-header-h, 0px); /* height of the slim restaurant bar when it is showing */
 
   --rm-f-display: var(--rm-font-display), Georgia, "Times New Roman", serif;
   --rm-f-arabic: var(--rm-font-arabic), "Geeza Pro", Tahoma, sans-serif;
@@ -68,6 +68,7 @@
 .rm-bar {
   position: sticky;
   top: var(--rm-sticky-top);
+  transition: top 0.2s ease;
   z-index: 5;
   padding: 10px 16px;
   background: color-mix(in srgb, var(--rm-bg) 92%, transparent);
@@ -508,4 +509,274 @@
 @media (min-width: 640px) {
   .rm-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .rm-ornate .rm-thumb { width: 110px; height: 110px; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   WhatsApp ordering — add buttons, cart bar, order sheet
+   ══════════════════════════════════════════════════════════════ */
+.rm-add {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin-inline-start: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--rm-accent);
+  background: var(--rm-highlight);
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 1;
+  display: inline-grid;
+  place-items: center;
+  align-self: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.rm-add:hover { filter: brightness(1.12); }
+.rm-add:active { transform: scale(0.94); }
+
+.rm-stepper {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-inline-start: 8px;
+  align-self: center;
+  border: 1px solid var(--rm-accent);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  font-family: inherit;
+}
+.rm-stepper button {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--rm-accent-soft);
+  font-size: 1.15rem;
+  line-height: 1;
+}
+.rm-stepper button:disabled { opacity: 0.4; }
+.rm-stepper > span { min-width: 18px; text-align: center; font-weight: 700; color: var(--rm-text); }
+
+.rm-card-price-line .rm-add,
+.rm-card-price-line .rm-stepper { margin-inline-start: 4px; }
+
+/* bottom bar */
+.rm-cartbar {
+  position: fixed;
+  z-index: 40;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  width: min(calc(100% - 24px), 560px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--rm-accent);
+  border-radius: 16px;
+  background: var(--rm-highlight);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+  text-align: start;
+}
+.rm-cartbar-count {
+  flex: none;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  font-weight: 700;
+}
+.rm-cartbar-text { flex: 1; font-weight: 600; }
+.rm-cartbar-total .rm-amount { color: #fff; font-size: 1.15rem; text-shadow: none; }
+
+/* sheet */
+.rm-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.rm-sheet {
+  width: min(100%, 560px);
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 18px 18px calc(env(safe-area-inset-bottom, 0px) + 18px);
+  border-radius: 20px 20px 0 0;
+  border: 1px solid var(--rm-line);
+  border-bottom: 0;
+  background: var(--rm-surface);
+  color: var(--rm-text);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.45);
+}
+.rm-ornate .rm-sheet { background: #1c1b1f; }
+.rm-sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.rm-sheet-head h2 { margin: 0; font-family: var(--rm-f-display); font-weight: 500; font-size: 1.5rem; color: var(--rm-accent-soft); }
+.rm.rm-ar .rm-sheet-head h2 { font-family: var(--rm-f-arabic); }
+.rm-sheet-close { border: 1px solid var(--rm-line); background: transparent; border-radius: 999px; padding: 6px 14px; color: var(--rm-muted); }
+
+.rm-lines { list-style: none; margin: 0; padding: 0; }
+.rm-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--rm-accent) 16%, transparent);
+}
+.rm-line-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.rm-line-name { font-weight: 600; }
+.rm-line-label { font-size: 0.85rem; color: var(--rm-muted); }
+.rm-line-remove { align-self: flex-start; border: 0; background: none; padding: 2px 0; font-size: 0.8rem; color: var(--rm-muted); text-decoration: underline; }
+.rm-line .rm-stepper { margin: 0; }
+.rm-line-total { flex: none; min-width: 64px; text-align: end; }
+.rm-line-total .rm-amount { font-size: 1rem; }
+
+.rm-sheet-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 14px 0 6px;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.rm-sheet-total .rm-amount { font-size: 1.35rem; }
+
+.rm-types { border: 0; margin: 10px 0 4px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.rm-types legend { width: 100%; margin-bottom: 6px; font-size: 0.9rem; color: var(--rm-muted); }
+.rm-types label {
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+  padding: 10px 12px;
+  border: 1px solid var(--rm-line);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.rm-types label.is-on { border-color: var(--rm-accent); background: color-mix(in srgb, var(--rm-highlight) 70%, transparent); color: #fff; }
+.rm-types input { position: absolute; opacity: 0; pointer-events: none; }
+
+.rm-field { display: block; margin-top: 12px; }
+.rm-field span { display: block; margin-bottom: 4px; font-size: 0.9rem; color: var(--rm-muted); }
+.rm-field input,
+.rm-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--rm-line);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--rm-text);
+  font: inherit;
+  font-size: 16px;
+  resize: vertical;
+}
+.rm-field input:focus,
+.rm-field textarea:focus { outline: none; border-color: var(--rm-accent); }
+
+.rm-error { margin: 10px 0 0; color: #ff8a80; font-size: 0.9rem; }
+.rm-send {
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 14px;
+  background: #1f9d55;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.rm-send:hover { background: #22b05f; }
+.rm-send:disabled { opacity: 0.5; }
+.rm-sheet-note { margin: 8px 0 0; text-align: center; font-size: 0.82rem; color: var(--rm-muted); }
+.rm-btn-ghost { border: 1px solid var(--rm-line); background: transparent; color: var(--rm-text); border-radius: 12px; padding: 10px 14px; }
+.rm-btn-solid { border: 0; background: var(--rm-highlight); color: #fff; border-radius: 12px; padding: 10px 14px; font-weight: 600; }
+.rm-more { width: 100%; margin-top: 10px; }
+.rm-sent { padding: 10px 0 6px; text-align: center; }
+.rm-sent p { margin: 6px 0 14px; font-size: 1.05rem; }
+.rm-sent-actions { display: flex; flex-direction: column; gap: 10px; }
+
+/* ══════════════════════════════════════════════════════════════
+   Slim restaurant bar (appears when the cover banner scrolls away)
+   ══════════════════════════════════════════════════════════════ */
+.rm-topbar {
+  position: fixed;
+  z-index: 35;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: rgba(16, 14, 16, 0.96);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(201, 162, 74, 0.45);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  transform: translateY(-110%);
+  visibility: hidden;
+  transition: transform 0.22s ease, visibility 0s linear 0.22s;
+}
+.rm-topbar.is-on {
+  transform: translateY(0);
+  visibility: visible;
+  transition: transform 0.22s ease;
+}
+.rm-topbar-inner {
+  max-width: 900px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rm-topbar-logo {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 2px solid #e8b84b;
+  background: #fff;
+}
+.rm-topbar-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1rem;
+}
+.rm-topbar-phone {
+  flex: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 162, 74, 0.6);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.rm-topbar-wa {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #1f9d55;
+  color: #fff;
+}
+@media (max-width: 340px) {
+  .rm-topbar-name { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rm-topbar, .rm-topbar.is-on, .rm-bar { transition: none; }
 }

@@ -63,9 +63,19 @@ export interface MenuFrame {
   divider?: string; // ornament line between pages (PNG)
 }
 
+export type OrderType = "dinein" | "takeaway" | "delivery";
+
+/** WhatsApp ordering (cart → WhatsApp message). Off unless enabled. */
+export interface MenuOrdering {
+  enabled?: boolean;
+  types?: OrderType[]; // order of buttons; first is the default
+}
+
 /** Restaurant info the menu component needs (plain, serialisable). */
 export interface MenuRestaurantInfo {
   name: string;
+  slug?: string;
+  ordering?: MenuOrdering;
   logoUrl?: string;
   frame?: MenuFrame;
   nameAr?: string;
