@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import PopularPdfTools from "@/app/components/PopularPdfTools";
+import RestaurantSpotlight from "@/app/components/RestaurantSpotlight";
 import { collection, getDocs, limit, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { db, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
@@ -29,12 +30,6 @@ const EXPAT_TOOLS = [
   ["💱", "SAR Currency Converter", "SAR to INR, PKR & more", "/tools/sar-currency-converter/"],
   ["🏠", "Rent Split Calculator", "Split rent with roommates", "/tools/rent-split-calculator/"],
   ["📅", "Days Between Dates", "Calculate the days between two dates", "/tools/days-between-dates/"],
-] as const;
-
-const RESTAURANT_MENU_FEATURES = [
-  ["📱", "QR Digital Menu", "Customers scan and view your menu instantly."],
-  ["🍽️", "Arabic + English", "Show dishes, prices and offers in both languages."],
-  ["📍", "Location & Contact", "Add map, WhatsApp, call and opening hours."],
 ] as const;
 
 const CATEGORY_CARDS = [
@@ -413,24 +408,7 @@ export default function KsaConnectPage() {
           </div>
         </section>
 
-        <section className="mk-restaurant-strip" aria-labelledby="restaurant-menu-title">
-          <div className="mk-restaurant-copy">
-            <p className="mk-strip-kicker">🍽️ Restaurant Digital Menus</p>
-            <h2 id="restaurant-menu-title">Turn Your Restaurant Menu Into a Digital Experience</h2>
-            <p>Create a mobile-friendly menu page with QR access, photos, prices, offers, location and direct WhatsApp/call buttons.</p>
-            <div className="mk-restaurant-actions">
-              <a href="/restaurants" className="mk-btn mk-btn-gold">Browse Digital Menus →</a>
-              <a href="/restaurants/create" className="mk-restaurant-secondary">Create a Menu</a>
-            </div>
-          </div>
-          <div className="mk-restaurant-features">
-            {RESTAURANT_MENU_FEATURES.map(([icon, title, description]) => (
-              <div className="mk-restaurant-feature" key={title}>
-                <span>{icon}</span><div><strong>{title}</strong><small>{description}</small></div>
-              </div>
-            ))}
-          </div>
-        </section>
+        <RestaurantSpotlight />
 
         <section id="cities" className="mk-section">
           <div className="mk-section-head"><h2>Browse Ads by City</h2><button onClick={() => { setCities(new Set()); document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" }); }}>View all cities →</button></div>
@@ -507,7 +485,7 @@ export default function KsaConnectPage() {
           <div className="listings-layout">
             <aside className="filters-sidebar">
               <p className="filters-sidebar-title">Filters {hasActiveFilters && <button className="clear-filters" onClick={clearAll}>Clear All</button>}</p>
-              <div className="filter-group"><p className="filter-group-title">City</p>{(citiesExpanded ? CITY_OPTIONS : CITY_OPTIONS.slice(0, 5)).map((c) => <label className={`checkbox-row${cities.has(c.value) ? " checkbox-row-active" : ""}`} key={c.value}><input type="checkbox" checked={cities.has(c.value)} onChange={() => toggle(cities, setCities, c.value)} />{c.label}</label>)}<button className="view-more-toggle" onClick={() => setCitiesExpanded((v) => !v)}>{citiesExpanded ? "View less ˄" : "View more ˅"}</button></div>
+              <div className="filter-group"><p className="filter-group-title">City</p>{(citiesExpanded ? CITY_OPTIONS : CITY_OPTIONS.slice(0,5)).map((c) => <label className={`checkbox-row${cities.has(c.value) ? " checkbox-row-active" : ""}`} key={c.value}><input type="checkbox" checked={cities.has(c.value)} onChange={() => toggle(cities, setCities, c.value)} />{c.label}</label>)}<button className="view-more-toggle" onClick={() => setCitiesExpanded((v) => !v)}>{citiesExpanded ? "View less ˄" : "View more ˅"}</button></div>
               <div className="filter-group"><p className="filter-group-title">Category</p>{CATEGORIES.map((c) => <label className={`checkbox-row${categories.has(c) ? " checkbox-row-active" : ""}`} key={c}><input type="checkbox" checked={categories.has(c)} onChange={() => toggle(categories, setCategories, c)} /><span className="checkbox-icon">{CATEGORY_ICONS[c]}</span>{c}</label>)}</div>
             </aside>
             <div className="listings-main">
@@ -625,4 +603,3 @@ export default function KsaConnectPage() {
     </div>
   );
 }
-
