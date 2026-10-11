@@ -18,6 +18,9 @@ interface Restaurant {
 
 const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
 
+// Drafts (isActive: false) also show on localhost and Vercel preview deployments, never on production.
+const showDrafts = process.env.VERCEL_ENV !== "production";
+
 export const metadata: Metadata = isKsaConnectSite
   ? {
       title: "Digital Menus — Restaurants in Saudi Arabia | KSA-Connect",
@@ -29,7 +32,9 @@ export const metadata: Metadata = isKsaConnectSite
 export default async function RestaurantsDirectoryPage() {
   if (!isKsaConnectSite) notFound();
 
-  const q = query(collection(db, "restaurants"), where("isActive", "==", true));
+  const q = showDrafts
+    ? query(collection(db, "restaurants"))
+    : query(collection(db, "restaurants"), where("isActive", "==", true));
   const snap = await getDocs(q);
   const restaurants = snap.docs
     .map((d) => d.data() as Restaurant)
@@ -43,7 +48,7 @@ export default async function RestaurantsDirectoryPage() {
           __html: `
             .rd-hero-band {
               width: 100%;
-              background: linear-gradient(135deg, #04160f 0%, #0a2a1f 100%);
+              background: linear-gradient(135deg, #07122a 0%, #0d1f45 100%);
             }
             .rd-hero-wrap {
               max-width: 1400px;
@@ -62,7 +67,10 @@ export default async function RestaurantsDirectoryPage() {
               height: auto;
               display: block;
             }
+            .rd-hero-link { display: block; }
+            .rd-hero-link:focus-visible { outline: 3px solid #f6b91f; outline-offset: 3px; }
             .rd-grid-wrap {
+              scroll-margin-top: 16px;
               max-width: 1100px;
               margin: 0 auto;
               padding: 36px 20px 60px;
@@ -185,19 +193,23 @@ export default async function RestaurantsDirectoryPage() {
             >
               Restaurants on KSA-Connect — Digital Menus in Saudi Arabia
             </h1>
-            <Image
-              src="/restaurants-hero-banner.png"
-              alt="Restaurants on KSA-Connect — browse digital menus, compare prices, and order online"
-              width={1774}
-              height={886}
-              priority
-              style={{ width: "100%", height: "auto" }}
-            />
+            {/* whole banner is clickable — its "Explore Restaurants" button scrolls to the list */}
+            <a href="#restaurants" aria-label="Explore restaurants" className="rd-hero-link">
+              <Image
+                src="/restaurants-hero-banner-v2.webp"
+                alt="KSA Connect Digital Menus — discover restaurants across Saudi Arabia: browse menus, food items, locations, offers and online orders"
+                width={1949}
+                height={807}
+                priority
+                sizes="(max-width: 1400px) 100vw, 1400px"
+                style={{ width: "100%", height: "auto" }}
+              />
+            </a>
           </div>
         </div>
       </div>
 
-      <div className="rd-grid-wrap">
+      <div className="rd-grid-wrap" id="restaurants">
         {restaurants.length === 0 && (
           <p className="rd-empty">No restaurants listed yet — check back soon!</p>
         )}
@@ -209,7 +221,7 @@ export default async function RestaurantsDirectoryPage() {
                 {r.coverImageUrl && (
                   <Image src={r.coverImageUrl} alt={r.name} fill style={{ objectFit: "cover" }} />
                 )}
-                <span className="rd-view-menu">View Menu →</span>
+                <span className="rd-view-menu">{r.isActive === false ? "Preview" : "View Menu →"}</span>
                 {r.logoUrl && (
                   <div className="rd-card-logo">
                     <Image src={r.logoUrl} alt="" fill style={{ objectFit: "cover" }} />
