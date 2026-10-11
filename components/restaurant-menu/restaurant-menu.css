@@ -75,7 +75,8 @@
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--rm-line);
 }
-.rm-search { position: relative; display: flex; align-items: center; }
+.rm-search-row { display: flex; align-items: center; gap: 8px; }
+.rm-search { position: relative; display: flex; align-items: center; flex: 1; min-width: 0; }
 .rm-search input {
   width: 100%;
   appearance: none;
@@ -219,10 +220,13 @@
   font-variant-numeric: lining-nums tabular-nums;
 }
 .rm-riyal {
-  height: 0.78em;
-  width: auto;
   display: inline-block;
-  filter: invert(72%) sepia(43%) saturate(470%) hue-rotate(5deg) brightness(92%);
+  width: 0.82em;
+  height: 0.82em;
+  background-color: currentColor;
+  -webkit-mask: url("/riyal.png") center / contain no-repeat;
+  mask: url("/riyal.png") center / contain no-repeat;
+  align-self: center;
 }
 .rm-riyal-text { font-weight: 600; font-size: 0.7em; color: var(--rm-accent-soft); }
 
@@ -308,4 +312,200 @@
   .rm-dish { gap: 20px; padding: 20px 0; }
   .rm-dish-name { font-size: 1.22rem; }
   .rm-amount { font-size: 1.22rem; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   ORNATE style — looks like the restaurant's printed menu.
+   Frame images come from restaurants/{id}.menuFrame (cut from their PDF).
+   ══════════════════════════════════════════════════════════════ */
+.rm.rm-ornate {
+  --rm-text: #ffffff;
+  --rm-muted: #d9d2c7;
+  --rm-f-script: var(--rm-font-script), "Snell Roundhand", cursive;
+  --rm-f-caps: var(--rm-font-caps), "Trajan Pro", Georgia, serif;
+  --rm-side: 5.63%; /* border strip width, same scale as the header band */
+  padding: 0 0 96px;
+  background: radial-gradient(ellipse 120% 70% at 50% 25%, #2b2a2f 0%, #18171b 55%, #111014 100%);
+}
+.rm-ornate .rm-list { padding: 0; }
+
+/* one "page" per category: plaque band on top, ornate strips down both sides */
+.rm-page {
+  position: relative;
+  background:
+    var(--rm-frame-side) left top / var(--rm-side) auto repeat-y,
+    var(--rm-frame-side-r) right top / var(--rm-side) auto repeat-y;
+}
+.rm-ornate .rm-cat { padding-top: 0; scroll-margin-top: calc(var(--rm-sticky-top) + 110px); }
+
+.rm-plaque {
+  position: relative;
+  aspect-ratio: 1400 / 364;
+  background: var(--rm-frame-top) center top / 100% 100% no-repeat, #18171b;
+  container-type: inline-size;
+}
+.rm-plaque h2 {
+  position: absolute;
+  left: 29%;
+  right: 29%;
+  top: 27%;
+  bottom: 26%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: var(--rm-f-display);
+  font-weight: 400;
+  font-size: clamp(15px, 5.6cqw, 48px);
+  line-height: 1.02;
+  color: #fffaf2;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.55), 0 0 3px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+}
+.rm-plaque h2 span { display: inline-block; transform: scaleY(1.12); }
+.rm.rm-ornate.rm-ar .rm-plaque h2 { font-family: var(--rm-f-arabic); font-weight: 700; font-size: clamp(15px, 5cqw, 42px); }
+.rm.rm-ornate.rm-ar .rm-plaque h2 span { transform: none; }
+
+.rm-page-body { padding: 4px calc(var(--rm-side) + 4%) 6px; }
+.rm-divider { display: block; width: 78%; height: auto; margin: 10px auto 0; }
+.rm-page-end { padding-bottom: 16px; margin-top: 4px; }
+
+.rm-ornate .rm-cat-note {
+  margin: 0 0 4px;
+  text-align: center;
+  font-family: var(--rm-f-caps);
+  font-size: 0.8rem;
+  color: var(--rm-muted);
+}
+
+/* ── Intro page (like the cover of the printed menu) ── */
+.rm-intro .rm-page-body { text-align: center; padding-bottom: 4px; }
+.rm-intro-logo {
+  display: block;
+  width: min(56%, 300px);
+  height: auto;
+  margin: 4px auto 0;
+  -webkit-mask-image: radial-gradient(circle, #000 60%, transparent 70%);
+  mask-image: radial-gradient(circle, #000 60%, transparent 70%);
+}
+.rm-intro-name {
+  margin: -4px 0 0;
+  font-family: var(--rm-f-script);
+  font-size: clamp(3rem, 15vw, 5.2rem);
+  line-height: 1.1;
+  color: #fff;
+  text-shadow: 0 0 22px rgba(255, 255, 255, 0.35), 0 2px 2px rgba(0, 0, 0, 0.6);
+}
+.rm-intro-name-ar { margin: 0; font-family: var(--rm-f-arabic); font-size: 1.3rem; color: #fff; }
+.rm-intro-tagline {
+  margin: 0;
+  text-align: end;
+  padding-inline-end: 4%;
+  font-family: var(--rm-f-caps);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  color: #fff;
+}
+.rm-intro-story,
+.rm-intro-hours p {
+  margin: 6px 0 0;
+  font-family: var(--rm-f-caps);
+  font-size: clamp(0.8rem, 3.5vw, 1.05rem);
+  letter-spacing: 0.03em;
+  color: #fff;
+}
+.rm-intro-hours { margin-top: 14px; }
+.rm-intro-hours p { margin: 2px 0 0; }
+.rm-intro-hours p:last-child { font-weight: 600; font-size: clamp(0.95rem, 4vw, 1.2rem); }
+.rm-intro-band {
+  margin: 18px 0 0;
+  padding: 10px 14%;
+  text-align: center;
+  background: #120a0b;
+  border-top: 1px solid #7d2a25;
+  border-bottom: 1px solid #7d2a25;
+  font-family: var(--rm-f-caps);
+  font-size: clamp(0.72rem, 3.2vw, 0.95rem);
+  line-height: 1.45;
+  color: #fff;
+}
+
+/* ── Photo grid (categories where every dish has a photo) ── */
+.rm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 12px;
+  padding-top: 6px;
+}
+.rm-card { text-align: center; }
+.rm-card-plate {
+  width: 92%;
+  aspect-ratio: 1;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+}
+.rm-card-plate img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rm-card-name {
+  margin: 0;
+  font-family: var(--rm-f-display);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.75);
+}
+.rm-card-name .rm-tag { margin: 4px 0 0; display: table; margin-inline: auto; text-transform: none; }
+.rm-card-desc { margin: 4px 0 0; font-family: var(--rm-f-caps); font-size: 0.7rem; line-height: 1.4; color: var(--rm-muted); }
+.rm-card-price { margin-top: 4px; }
+.rm-card-price .rm-amount { font-size: 1.55rem; }
+.rm-card-price .rm-cal { text-align: center; }
+.rm-card-prices { margin-top: 4px; }
+.rm-card-price-line { display: flex; justify-content: center; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.rm-card-price-line .rm-amount { font-size: 1.2rem; }
+.rm-card .rm-allergens { margin-top: 4px; }
+
+/* ── List rows in ornate style ── */
+.rm-ornate .rm-dish { border-bottom-color: rgba(201, 162, 74, 0.18); }
+.rm-ornate .rm-thumb { width: 92px; height: 92px; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6); }
+.rm-ornate .rm-thumb-empty { box-shadow: none; }
+.rm-ornate .rm-dish-name {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 1.02rem;
+  color: #fff;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.75);
+}
+.rm-ornate .rm-desc,
+.rm-ornate .rm-includes { font-family: var(--rm-f-caps); font-size: 0.74rem; line-height: 1.45; color: var(--rm-muted); }
+.rm-ornate .rm-amount { color: #fff; font-size: 1.3rem; text-shadow: 0 2px 3px rgba(0, 0, 0, 0.75); }
+.rm-ornate .rm-price-label { font-family: var(--rm-f-caps); font-size: 0.85rem; }
+
+.rm-ornate .rm-catering-page .rm-page-body { text-align: center; padding-bottom: 22px; }
+.rm-catering-text { margin: 4px auto 16px; max-width: 46ch; font-family: var(--rm-f-caps); font-size: 0.85rem; line-height: 1.6; color: #fff; }
+.rm-ornate .rm-foot { border-top: 0; margin-top: 18px; }
+.rm-frame-bottom { display: block; width: 100%; height: auto; margin-top: 18px; }
+
+/* Arabic in ornate: Latin display/caps fonts don't cover Arabic */
+.rm.rm-ornate.rm-ar .rm-card-name,
+.rm.rm-ornate.rm-ar .rm-dish-name { text-transform: none; font-family: var(--rm-f-arabic); }
+.rm.rm-ornate.rm-ar .rm-card-desc,
+.rm.rm-ornate.rm-ar .rm-desc,
+.rm.rm-ornate.rm-ar .rm-includes,
+.rm.rm-ornate.rm-ar .rm-intro-story,
+.rm.rm-ornate.rm-ar .rm-intro-hours p,
+.rm.rm-ornate.rm-ar .rm-intro-tagline,
+.rm.rm-ornate.rm-ar .rm-intro-band,
+.rm.rm-ornate.rm-ar .rm-cat-note,
+.rm.rm-ornate.rm-ar .rm-price-label,
+.rm.rm-ornate.rm-ar .rm-catering-text { font-family: var(--rm-f-arabic); letter-spacing: 0; }
+
+@media (min-width: 640px) {
+  .rm-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .rm-ornate .rm-thumb { width: 110px; height: 110px; }
 }

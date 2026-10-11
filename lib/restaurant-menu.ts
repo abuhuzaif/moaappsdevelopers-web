@@ -43,6 +43,7 @@ export interface MenuSection extends MenuCategory {
 }
 
 export interface MenuTheme {
+  style?: "default" | "ornate"; // "ornate" = printed-menu look (needs frame images)
   bg?: string;
   surface?: string;
   text?: string;
@@ -53,9 +54,20 @@ export interface MenuTheme {
   line?: string;
 }
 
+/** Images cut from the restaurant's printed menu, used by the "ornate" style. */
+export interface MenuFrame {
+  top?: string; // header band with blank plaque (category title is drawn on it)
+  bottom?: string; // closing band (logo emblem)
+  side?: string; // left border strip (tiles vertically)
+  sideR?: string; // right border strip
+  divider?: string; // ornament line between pages (PNG)
+}
+
 /** Restaurant info the menu component needs (plain, serialisable). */
 export interface MenuRestaurantInfo {
   name: string;
+  logoUrl?: string;
+  frame?: MenuFrame;
   nameAr?: string;
   tagline?: string;
   taglineAr?: string;

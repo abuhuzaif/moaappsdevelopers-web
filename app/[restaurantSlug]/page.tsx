@@ -8,6 +8,7 @@ import {
   getMenuSections,
   parseCategories,
   type L10n,
+  type MenuFrame,
   type MenuRestaurantInfo,
   type MenuTheme,
 } from "@/lib/restaurant-menu";
@@ -44,6 +45,7 @@ interface Restaurant {
   // Inline menu (see lib/restaurant-menu.ts)
   menuCategories?: unknown;
   menuTheme?: MenuTheme;
+  menuFrame?: MenuFrame;
   menuFooterNotes?: L10n[];
   cateringText?: L10n;
 }
@@ -52,13 +54,14 @@ interface Restaurant {
 // pages should only exist on the myksaconnect.com deployment.
 const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
 
+// Drafts (isActive: false) are visible on localhost and Vercel preview deployments only,
+// so a restaurant can be shown to the customer before it goes live on myksaconnect.com.
+const showDrafts = process.env.VERCEL_ENV !== "production";
+
 async function getRestaurant(slug: string): Promise<{ id: string; data: Restaurant } | null> {
-  const q = query(
-    collection(db, "restaurants"),
-    where("slug", "==", slug),
-    where("isActive", "==", true),
-    limit(1)
-  );
+  const q = showDrafts
+    ? query(collection(db, "restaurants"), where("slug", "==", slug), limit(1))
+    : query(collection(db, "restaurants"), where("slug", "==", slug), where("isActive", "==", true), limit(1));
   const snap = await getDocs(q);
   if (snap.empty) return null;
   return { id: snap.docs[0].id, data: snap.docs[0].data() as Restaurant };
@@ -84,7 +87,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    robots: restaurant.hidden ? { index: false, follow: false } : undefined,
+    robots: restaurant.hidden || restaurant.isActive === false ? { index: false, follow: false } : undefined,
     alternates: { canonical: `https://www.myksaconnect.com/${restaurant.slug}` },
     openGraph: {
       title,
@@ -134,6 +137,8 @@ export default async function RestaurantMenuPage({
 
   const menuInfo: MenuRestaurantInfo = {
     name: restaurant.name,
+    logoUrl: restaurant.logoUrl,
+    frame: restaurant.menuFrame,
     nameAr: restaurant.nameAr,
     tagline: restaurant.tagline,
     taglineAr: restaurant.taglineAr,
@@ -173,7 +178,14 @@ export default async function RestaurantMenuPage({
             </div>
           )}
           <div>
-            <h1 style={{ color: "#fff", fontSize: 24, fontWeight: 800, margin: 0 }}>{restaurant.name}</h1>
+            <h1 style={{ color: "#fff", fontSize: 24, fontWeight: 800, margin: 0 }}>
+              {restaurant.name}
+              {restaurant.isActive === false && (
+                <span style={{ marginLeft: 10, fontSize: 11, fontWeight: 700, verticalAlign: "middle", background: "#f6b91f", color: "#0C1730", padding: "3px 8px", borderRadius: 999 }}>
+                  PREVIEW
+                </span>
+              )}
+            </h1>
             {restaurant.tagline && (
               <p style={{ color: "#E8B84B", fontSize: 13, margin: "2px 0 0" }}>{restaurant.tagline}</p>
             )}
@@ -188,7 +200,7 @@ export default async function RestaurantMenuPage({
         )}
         {restaurant.phone && (
           <a href={`tel:${restaurant.phone}`} className="mk-btn" style={{ fontSize: 13, padding: "6px 14px" }}>
-            📞 Call
+            📞 <span dir="ltr">{restaurant.phone}</span>
           </a>
         )}
         {restaurant.whatsapp && (

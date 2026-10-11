@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { Playfair_Display, Noto_Naskh_Arabic } from "next/font/google";
+import { Playfair_Display, Noto_Naskh_Arabic, Great_Vibes, Cinzel } from "next/font/google";
 import type { MenuItem, MenuPrice, MenuRestaurantInfo, MenuSection } from "@/lib/restaurant-menu";
 import "./restaurant-menu.css";
 
 const display = Playfair_Display({ subsets: ["latin"], weight: ["500", "700"], variable: "--rm-font-display" });
 const arabic = Noto_Naskh_Arabic({ subsets: ["arabic"], weight: ["400", "600", "700"], variable: "--rm-font-arabic" });
+const script = Great_Vibes({ subsets: ["latin"], weight: "400", variable: "--rm-font-script" });
+const caps = Cinzel({ subsets: ["latin"], weight: ["400", "600"], variable: "--rm-font-caps" });
 
 type Lang = "en" | "ar";
 type T = { en: string; ar: string };
@@ -62,6 +64,7 @@ const ui = {
     ar: "قد تحتوي الأطباق على مسببات حساسية. يرجى سؤال الموظفين عن المكونات.",
   },
   langSwitch: { en: "عربي", ar: "English" },
+  timings: { en: "Timings", ar: "أوقات العمل" },
 };
 
 const pick = (lang: Lang, en?: string, ar?: string) => (lang === "ar" && ar ? ar : en ?? "");
@@ -76,7 +79,7 @@ function normalize(s: string) {
     .replace(/[\u064B-\u0652]/g, "");
 }
 
-// ── Riyal sign: official SVG at /public/riyal.svg, else "SAR" / "ر.س" ──
+// ── Riyal sign: /public/riyal.png (white symbol), else "SAR" / "ر.س" ──
 let riyalProbe: Promise<boolean> | null = null;
 function useRiyalSvg() {
   const [ok, setOk] = useState(false);
@@ -85,7 +88,7 @@ function useRiyalSvg() {
       const img = new Image();
       img.onload = () => resolve(img.naturalWidth > 0);
       img.onerror = () => resolve(false);
-      img.src = "/riyal.svg";
+      img.src = "/riyal.png";
     });
     let alive = true;
     riyalProbe.then((v) => alive && setOk(v));
@@ -99,8 +102,8 @@ function useRiyalSvg() {
 function Riyal({ lang }: { lang: Lang }) {
   const ok = useRiyalSvg();
   if (!ok) return <span className="rm-riyal-text">{lang === "ar" ? "ر.س" : "SAR"}</span>;
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img className="rm-riyal" src="/riyal.svg" alt={lang === "ar" ? "ريال" : "SAR"} />;
+  // drawn with a CSS mask so it takes the price colour
+  return <span className="rm-riyal" role="img" aria-label={lang === "ar" ? "ريال" : "SAR"} />;
 }
 
 function Amount({ p, lang }: { p: MenuPrice; lang: Lang }) {
@@ -188,6 +191,64 @@ function Dish({ item, lang, reserve }: { item: MenuItem; lang: Lang; reserve: bo
   );
 }
 
+function Card({ item, lang }: { item: MenuItem; lang: Lang }) {
+  const label = (l?: string) => (l ? ui.priceLabel[l]?.[lang] ?? l : "");
+  const single = item.prices.length === 1 && !item.prices[0].label ? item.prices[0] : null;
+  return (
+    <article className="rm-card">
+      {item.imageUrl && (
+        <div className="rm-card-plate">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={item.imageUrl} alt={pick(lang, item.name, item.nameAr)} loading="lazy" width={280} height={280} />
+        </div>
+      )}
+      <h3 className="rm-card-name">
+        {pick(lang, item.name, item.nameAr)}
+        {item.tags?.map((tag) =>
+          ui.tag[tag] ? (
+            <span key={tag} className={`rm-tag rm-tag-${tag}`}>
+              {ui.tag[tag][lang]}
+            </span>
+          ) : null
+        )}
+      </h3>
+      {item.desc && <p className="rm-card-desc">{pick(lang, item.desc, item.descAr)}</p>}
+      {single ? (
+        <div className="rm-card-price">
+          <Amount p={single} lang={lang} />
+          <Cal p={single} lang={lang} />
+        </div>
+      ) : (
+        <div className="rm-card-prices">
+          {item.prices.map((p, i) => (
+            <div key={i} className="rm-card-price-line">
+              <span className="rm-price-label">{label(p.label)}</span>
+              <Amount p={p} lang={lang} />
+              <Cal p={p} lang={lang} inline />
+            </div>
+          ))}
+        </div>
+      )}
+      {item.allergens && item.allergens.length > 0 && (
+        <p className="rm-allergens">
+          {ui.contains[lang]}: {item.allergens.map((a) => ui.allergen[a]?.[lang] ?? a).join(sep(lang))}
+        </p>
+      )}
+    </article>
+  );
+}
+
+/* Leather plaque header cut from the printed menu; the title is real text on top of it. */
+function Plaque({ title, id }: { title: string; id?: string }) {
+  return (
+    <header className="rm-plaque">
+      <h2 id={id}>
+        <span>{title}</span>
+      </h2>
+    </header>
+  );
+}
+
 export default function RestaurantMenu({
   restaurant,
   sections,
@@ -270,7 +331,14 @@ export default function RestaurantMenu({
   };
 
   const th = restaurant.theme ?? {};
+  const fr = restaurant.frame ?? {};
+  const ornate = th.style === "ornate" && !!fr.top;
+  const css = (u?: string) => (u ? `url("${u}")` : undefined);
   const style = {
+    "--rm-frame-top": css(fr.top),
+    "--rm-frame-bottom": css(fr.bottom),
+    "--rm-frame-side": css(fr.side),
+    "--rm-frame-side-r": css(fr.sideR ?? fr.side),
     "--rm-bg": th.bg,
     "--rm-surface": th.surface,
     "--rm-text": th.text,
@@ -288,30 +356,68 @@ export default function RestaurantMenu({
     <div
       ref={rootRef}
       id="menu"
-      className={`rm ${display.variable} ${arabic.variable}${lang === "ar" ? " rm-ar" : ""}`}
+      className={`rm ${display.variable} ${arabic.variable} ${script.variable} ${caps.variable}${ornate ? " rm-ornate" : ""}${lang === "ar" ? " rm-ar" : ""}`}
       style={style}
       lang={lang}
       dir={lang === "ar" ? "rtl" : "ltr"}
     >
-      <div className="rm-top">
-        <div className="rm-title">
-          <h2>{ui.menu[lang]}</h2>
-          {lang === "ar" && restaurant.nameAr && <p>{restaurant.nameAr}</p>}
-          {hours && <p className="rm-hours">{hours}</p>}
+      {ornate ? (
+        <section className="rm-page rm-intro">
+          <Plaque title={ui.menu[lang]} />
+          <div className="rm-page-body">
+            {restaurant.logoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="rm-intro-logo" src={restaurant.logoUrl} alt="" width={400} height={400} />
+            )}
+            <p className="rm-intro-name" lang="en" dir="ltr">
+              {restaurant.name}
+            </p>
+            {lang === "ar" && restaurant.nameAr && <p className="rm-intro-name-ar">{restaurant.nameAr}</p>}
+            {(restaurant.tagline || restaurant.taglineAr) && (
+              <p className="rm-intro-tagline">{pick(lang, restaurant.tagline, restaurant.taglineAr)}</p>
+            )}
+            {fr.divider && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="rm-divider" src={fr.divider} alt="" />
+            )}
+            {restaurant.footerNotes?.[0] && (
+              <p className="rm-intro-story">{pick(lang, restaurant.footerNotes[0].en, restaurant.footerNotes[0].ar)}</p>
+            )}
+            {(restaurant.address || restaurant.addressAr) && (
+              <p className="rm-intro-story">{pick(lang, restaurant.address, restaurant.addressAr)}</p>
+            )}
+            {hours && (
+              <div className="rm-intro-hours">
+                <p>{ui.timings[lang]}</p>
+                <p>{hours}</p>
+              </div>
+            )}
+          </div>
+          <p className="rm-intro-band">{ui.dailyIntake[lang]}</p>
+        </section>
+      ) : (
+        <div className="rm-top">
+          <div className="rm-title">
+            <h2>{ui.menu[lang]}</h2>
+            {lang === "ar" && restaurant.nameAr && <p>{restaurant.nameAr}</p>}
+            {hours && <p className="rm-hours">{hours}</p>}
+          </div>
         </div>
-        <button type="button" className="rm-lang" onClick={switchLang} lang={lang === "en" ? "ar" : "en"}>
-          {ui.langSwitch[lang]}
-        </button>
-      </div>
+      )}
 
       <nav className="rm-bar" aria-label={lang === "ar" ? "أقسام القائمة" : "Menu sections"}>
-        <div className="rm-search">
-          <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={ui.search[lang]} aria-label={ui.search[lang]} />
-          {q && (
-            <button type="button" className="rm-clear" onClick={() => setQ("")}>
-              {ui.clear[lang]}
-            </button>
-          )}
+        <div className="rm-search-row">
+          <div className="rm-search">
+            <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={ui.search[lang]} aria-label={ui.search[lang]} />
+            {q && (
+              <button type="button" className="rm-clear" onClick={() => setQ("")}>
+                {ui.clear[lang]}
+              </button>
+            )}
+          </div>
+          <button type="button" className="rm-lang" onClick={switchLang} lang={lang === "en" ? "ar" : "en"}>
+            {ui.langSwitch[lang]}
+          </button>
         </div>
         {!q && (
           <div className="rm-chips" ref={chipsRef}>
@@ -337,11 +443,39 @@ export default function RestaurantMenu({
         ) : (
           filtered.map((s) => {
             const reserve = s.items.some((it) => it.imageUrl);
+            const title = pick(lang, s.name, s.nameAr);
+            const note = s.note ? <p className="rm-cat-note">{pick(lang, s.note, s.noteAr)}</p> : null;
+
+            if (ornate) {
+              const allPhotos = s.items.every((it) => it.imageUrl);
+              return (
+                <section key={s.id} className="rm-cat rm-page" id={`rm-cat-${s.id}`} data-cat={s.id} aria-labelledby={`rm-h-${s.id}`}>
+                  <Plaque title={title} id={`rm-h-${s.id}`} />
+                  <div className="rm-page-body">
+                    {note}
+                    {allPhotos ? (
+                      <div className="rm-grid">
+                        {s.items.map((it) => (
+                          <Card key={it.id} item={it} lang={lang} />
+                        ))}
+                      </div>
+                    ) : (
+                      s.items.map((it) => <Dish key={it.id} item={it} lang={lang} reserve={reserve} />)
+                    )}
+                  </div>
+                  {fr.divider && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img className="rm-divider rm-page-end" src={fr.divider} alt="" />
+                  )}
+                </section>
+              );
+            }
+
             return (
               <section key={s.id} className="rm-cat" id={`rm-cat-${s.id}`} data-cat={s.id} aria-labelledby={`rm-h-${s.id}`}>
                 <header className="rm-cat-head">
-                  <h2 id={`rm-h-${s.id}`}>{pick(lang, s.name, s.nameAr)}</h2>
-                  {s.note && <p>{pick(lang, s.note, s.noteAr)}</p>}
+                  <h2 id={`rm-h-${s.id}`}>{title}</h2>
+                  {note}
                 </header>
                 {s.items.map((it) => (
                   <Dish key={it.id} item={it} lang={lang} reserve={reserve} />
@@ -352,29 +486,47 @@ export default function RestaurantMenu({
         )}
       </div>
 
-      {catering && (
-        <section className="rm-catering">
-          <h2>{ui.cateringTitle[lang]}</h2>
-          <p>{catering}</p>
-          {wa && (
-            <a className="rm-btn" href={waLink(ui.cateringGreeting[lang])} target="_blank" rel="noreferrer">
-              {ui.cateringCta[lang]}
-            </a>
-          )}
-        </section>
-      )}
+      {catering &&
+        (ornate ? (
+          <section className="rm-page rm-catering-page">
+            <Plaque title={ui.cateringTitle[lang]} />
+            <div className="rm-page-body">
+              <p className="rm-catering-text">{catering}</p>
+              {wa && (
+                <a className="rm-btn" href={waLink(ui.cateringGreeting[lang])} target="_blank" rel="noreferrer">
+                  {ui.cateringCta[lang]}
+                </a>
+              )}
+            </div>
+          </section>
+        ) : (
+          <section className="rm-catering">
+            <h2>{ui.cateringTitle[lang]}</h2>
+            <p>{catering}</p>
+            {wa && (
+              <a className="rm-btn" href={waLink(ui.cateringGreeting[lang])} target="_blank" rel="noreferrer">
+                {ui.cateringCta[lang]}
+              </a>
+            )}
+          </section>
+        ))}
 
       <footer className="rm-foot">
-        {restaurant.footerNotes?.map((n, i) => (
-          <p key={i} className={i === 0 ? "rm-foot-lead" : undefined}>
+        {restaurant.footerNotes?.slice(ornate ? 1 : 0).map((n, i) => (
+          <p key={i} className={i === 0 && !ornate ? "rm-foot-lead" : undefined}>
             {pick(lang, n.en, n.ar)}
           </p>
         ))}
-        {(restaurant.address || restaurant.addressAr) && <p>{pick(lang, restaurant.address, restaurant.addressAr)}</p>}
+        {!ornate && (restaurant.address || restaurant.addressAr) && <p>{pick(lang, restaurant.address, restaurant.addressAr)}</p>}
         <p>{ui.vat[lang]}</p>
-        <p>{ui.dailyIntake[lang]}</p>
+        {!ornate && <p>{ui.dailyIntake[lang]}</p>}
         <p>{ui.allergyNote[lang]}</p>
       </footer>
+
+      {ornate && fr.bottom && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className="rm-frame-bottom" src={fr.bottom} alt="" />
+      )}
 
       {wa && (
         <a className="rm-fab" href={waLink(ui.whatsappGreeting[lang])} target="_blank" rel="noreferrer" aria-label={ui.orderWhatsapp[lang]}>
