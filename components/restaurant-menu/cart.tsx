@@ -41,6 +41,10 @@ const t = {
   remove: { en: "Remove", ar: "حذف" },
   needTable: { en: "Please enter your table number.", ar: "يرجى إدخال رقم الطاولة." },
   needName: { en: "Please enter your name for takeaway.", ar: "يرجى إدخال اسمك للطلب السفري." },
+  mobile: { en: "Mobile number", ar: "رقم الجوال" },
+  mobileOptional: { en: "Mobile number (optional)", ar: "رقم الجوال (اختياري)" },
+  needMobile: { en: "Please enter your mobile number for takeaway.", ar: "يرجى إدخال رقم جوالك للطلب السفري." },
+  badMobile: { en: "Please enter a valid Saudi mobile number, e.g. 05XXXXXXXX.", ar: "يرجى إدخال رقم جوال سعودي صحيح، مثل 05XXXXXXXX." },
   sentTitle: { en: "Did your order go through on WhatsApp?", ar: "هل تم إرسال طلبك عبر واتساب؟" },
   sentYes: { en: "Yes, clear my order", ar: "نعم، امسح الطلب" },
   sentNo: { en: "No, keep it", ar: "لا، احتفظ به" },
@@ -160,39 +164,113 @@ export function AddControl({ item, p, lang }: { item: MenuItem; p: MenuPrice; la
   );
 }
 
-// ── WhatsApp message ────────────────────────────────────────
+// ── WhatsApp message (receipt style) ────────────────────────
+/** 05XXXXXXXX from "+966 5x…", "9665x…", "05x…" or "5x…"; null if not a Saudi mobile. */
+export function normalizeSaudiMobile(raw: string): string | null {
+  let d = raw.replace(/\D/g, "");
+  if (d.startsWith("00966")) d = d.slice(5);
+  else if (d.startsWith("966")) d = d.slice(3);
+  if (d.startsWith("0")) d = d.slice(1);
+  return /^5\d{8}$/.test(d) ? `0${d}` : null;
+}
+
+const money = (n: number) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+function wrapText(text: string, width: number): string[] {
+  const out: string[] = [];
+  let line = "";
+  for (const word of text.split(/\s+/)) {
+    if (!word) continue;
+    if (!line) line = word;
+    else if ((line + " " + word).length <= width) line += " " + word;
+    else {
+      out.push(line);
+      line = word;
+    }
+    while (line.length > width) {
+      out.push(line.slice(0, width));
+      line = line.slice(width);
+    }
+  }
+  if (line) out.push(line);
+  return out.length ? out : [""];
+}
+
+function orderCode(restaurantName: string) {
+  const initials =
+    restaurantName
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((w) => w[0]!.toUpperCase())
+      .join("")
+      .replace(/[^A-Z]/g, "")
+      .slice(0, 3) || "ORD";
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2, "0");
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const rnd = String(Math.floor(1000 + Math.random() * 9000));
+  return `${initials}-${dd}${mm}-${rnd}`;
+}
+
 function buildMessage(opts: {
   restaurantName: string;
   lines: CartLine[];
   type: OrderType;
   table: string;
   name: string;
+  mobile: string;
   note: string;
   pageUrl: string;
 }) {
-  const { restaurantName, lines, type, table, name, note, pageUrl } = opts;
+  const { restaurantName, lines, type, table, name, mobile, note, pageUrl } = opts;
   const total = lines.reduce((s, l) => s + l.price * l.qty, 0);
-  const typeText = type === "dinein" ? `Dine-in · Table ${table}` : type === "takeaway" ? "Takeaway" : "Delivery";
-  const rows = lines.map((l) => {
+  const count = lines.reduce((s, l) => s + l.qty, 0);
+  const when = new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Riyadh",
+  }).format(new Date());
+  const typeText =
+    type === "dinein" ? `🍽️ Dine-in · Table ${table}` : type === "takeaway" ? "🥡 Takeaway" : "🛵 Delivery";
+
+  // Receipt body in a WhatsApp monospace block, 30 columns wide (fits phone screens).
+  const W = 30;
+  const NAME_W = 17;
+  const AMT_W = W - 4 - NAME_W; // "99x " + name + amount
+  const rule = "-".repeat(W);
+  const body: string[] = [`QTY ITEM${"SAR".padStart(W - 8)}`, rule];
+  for (const l of lines) {
     const label = l.label ? ` (${labelText(l.label, "en")})` : "";
-    const ar = l.nameAr ? ` / ${l.nameAr}` : "";
-    return `${l.qty} × ${l.name}${label}${ar} — SAR ${l.price * l.qty}`;
-  });
-  return [
-    `🧾 *New order – ${restaurantName}*`,
-    typeText,
-    name ? `Name: ${name}` : "",
-    "",
-    ...rows,
-    "",
-    `*Total: SAR ${total}*`,
-    note ? `Note: ${note}` : "",
-    "",
-    pageUrl,
-  ]
-    .filter((x, i, a) => !(x === "" && a[i - 1] === ""))
-    .join("\n")
-    .trim();
+    const nameLines = wrapText(`${l.name}${label}`, NAME_W);
+    const qty = `${String(l.qty).padStart(2)}x `;
+    body.push(`${qty}${nameLines[0].padEnd(NAME_W)}${money(l.price * l.qty).padStart(AMT_W)}`);
+    for (const extra of nameLines.slice(1)) body.push(`    ${extra}`);
+    if (l.qty > 1) body.push(`    @ ${money(l.price)} each`);
+  }
+  body.push(rule);
+  body.push(`Items${String(count).padStart(W - 5)}`);
+  body.push(`TOTAL (SAR)${money(total).padStart(W - 11)}`);
+
+  const head = [
+    `🧾 *${restaurantName.toUpperCase()} — ORDER*`,
+    "━━━━━━━━━━━━━━━━━━",
+    `*Order:* ${orderCode(restaurantName)}`,
+    `*Date:* ${when}`,
+    `*Type:* ${typeText}`,
+    ...(name ? [`*Name:* ${name}`] : []),
+    ...(mobile ? [`*Mobile:* ${mobile}`] : []),
+  ];
+  const parts = [
+    head.join("\n"),
+    ["```", ...body, "```"].join("\n"),
+    ...(note ? [`📝 *Note:* ${note}`] : []),
+    ["_Prices include 15% VAT. Please confirm this order._", "_Ordered via MYKSA CONNECT_", pageUrl].join("\n"),
+  ];
+  return parts.join("\n\n");
 }
 
 // ── Bottom bar ──────────────────────────────────────────────
@@ -254,6 +332,7 @@ export function CartSheet({
   const [type, setType] = useState<OrderType>(types[0] ?? "dinein");
   const [table, setTable] = useState("");
   const [name, setName] = useState("");
+  const [mobile, setMobile] = useState("");
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
@@ -268,6 +347,8 @@ export function CartSheet({
       }
       const saved = localStorage.getItem("rm-customer-name");
       if (saved) setName(saved);
+      const savedMobile = localStorage.getItem("rm-customer-mobile");
+      if (savedMobile) setMobile(savedMobile);
     } catch {}
   }, [types]);
 
@@ -296,9 +377,13 @@ export function CartSheet({
   const send = () => {
     if (type === "dinein" && !table.trim()) return setError(t.needTable[lang]);
     if (type === "takeaway" && !name.trim()) return setError(t.needName[lang]);
+    if (type === "takeaway" && !mobile.trim()) return setError(t.needMobile[lang]);
+    const cleanMobile = mobile.trim() ? normalizeSaudiMobile(mobile) : "";
+    if (cleanMobile === null) return setError(t.badMobile[lang]);
     setError("");
     try {
       if (name.trim()) localStorage.setItem("rm-customer-name", name.trim());
+      if (cleanMobile) localStorage.setItem("rm-customer-mobile", cleanMobile);
     } catch {}
     const msg = buildMessage({
       restaurantName,
@@ -306,6 +391,7 @@ export function CartSheet({
       type,
       table: table.trim(),
       name: name.trim(),
+      mobile: cleanMobile,
       note: note.trim(),
       pageUrl: window.location.origin + window.location.pathname,
     });
@@ -405,6 +491,18 @@ export function CartSheet({
             <label className="rm-field">
               <span>{type === "takeaway" ? t.name[lang] : t.nameOptional[lang]}</span>
               <input value={name} onChange={(e) => setName(e.target.value.slice(0, 60))} autoComplete="name" />
+            </label>
+            <label className="rm-field">
+              <span>{type === "takeaway" ? t.mobile[lang] : t.mobileOptional[lang]}</span>
+              <input
+                type="tel"
+                inputMode="tel"
+                dir="ltr"
+                placeholder="05XXXXXXXX"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value.replace(/[^0-9+\s]/g, "").slice(0, 16))}
+                autoComplete="tel"
+              />
             </label>
             <label className="rm-field">
               <span>{t.note[lang]}</span>
