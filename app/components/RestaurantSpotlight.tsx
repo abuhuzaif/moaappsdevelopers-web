@@ -75,7 +75,7 @@ export default function RestaurantSpotlight() {
   const rowB = photos.slice(half).length ? photos.slice(half) : photos;
 
   return (
-    <section className="rs" aria-labelledby="rs-title">
+    <section className="rs" aria-labelledby="rs-title" style={{ width: "100%", maxWidth: "100%", alignSelf: "stretch" }} data-rs-version="3">
       <style>{CSS}</style>
 
       <div className="rs-copy">
@@ -143,8 +143,15 @@ const CSS = `
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
   gap: clamp(14px, 2.5vw, 30px);
-  max-width: 1040px;
-  margin: 22px auto;
+  /* fill the content column edge-to-edge, like the tools and city sections
+     (the homepage column centres its children, so stretch explicitly) */
+  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
+  align-self: stretch;
+  justify-self: stretch;
+  box-sizing: border-box;
+  margin: 22px 0;
   padding: clamp(18px, 2.4vw, 26px) clamp(18px, 2.8vw, 32px);
   border-radius: 22px;
   color: #fff;
