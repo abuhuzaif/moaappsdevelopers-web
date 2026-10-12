@@ -179,7 +179,8 @@ export default function KsaConnectPage() {
         <div className="mk-hero-inner">
           <nav className="mk-nav">
             <a href="/ksa-connect" className="mk-logo" aria-label="MYKSA CONNECT home">
-              <span className="mk-logo-mark">✦</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/ksa-logo.png" alt="" width={46} height={46} className="mk-logo-img" />
               <span className="mk-logo-text"><strong>MYKSA</strong> <b>CONNECT</b><small>BUY. SELL. CONNECT.</small></span>
             </a>
             <div className="mk-nav-links">
@@ -227,6 +228,17 @@ export default function KsaConnectPage() {
 
       <main className="mk-main">
         <style>{`
+          /* New KC logo in the header (replaces the old ✦ mark) */
+          .mk-logo-img {
+            width: 46px;
+            height: 46px;
+            flex: none;
+            border-radius: 50%;
+            filter: drop-shadow(0 4px 12px rgba(246,185,31,.35));
+          }
+          @media (max-width: 760px) {
+            .mk-logo-img { width: 38px; height: 38px; }
+          }
           /* Keep every homepage block exactly as wide as the content column.
              These sections declare width: min(1500px, 92vw) in their own CSS, which is wider
              than the padded .mk-main column and made them stick out on the right. */
