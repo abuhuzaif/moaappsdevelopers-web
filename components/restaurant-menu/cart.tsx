@@ -400,7 +400,11 @@ export function CartSheet({
       note: note.trim(),
       pageUrl: window.location.origin + window.location.pathname,
     });
-    window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+    const waUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`;
+    // Inside the KSA-Connect app (WebView) new tabs don't exist — navigate instead,
+    // the app catches wa.me links and opens WhatsApp.
+    if (/KSAConnectApp/i.test(navigator.userAgent)) window.location.href = waUrl;
+    else window.open(waUrl, "_blank", "noopener");
     setSent(true);
   };
 
