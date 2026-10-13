@@ -99,7 +99,7 @@ export default function ListingDetailClient() {
       <nav className="nav container">
         <a href="/" className="brand">
           <div className="brand-badge">{IS_KSA_CONNECT_SITE ? "K" : "M"}</div>
-          {IS_KSA_CONNECT_SITE ? "KSA-Connect" : "MOA Apps Developer's"}
+          {IS_KSA_CONNECT_SITE ? "MYKSA-Connect" : "MOA Apps Developer's"}
         </a>
       </nav>
 
@@ -201,13 +201,52 @@ export default function ListingDetailClient() {
                 );
               })()}
 
-              <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
-                <a href={`tel:+966${listing.phone}`} className="btn btn-outline">Call</a>
-                <a href={`https://wa.me/966${listing.phone.replace(/[^0-9]/g, "")}`} target="_blank" className="btn btn-gold">WhatsApp</a>
+              <div style={{ display: "flex", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
+                <a
+                  href={`tel:+966${listing.phone}`}
+                  style={{
+                    flex: "1 1 140px", textAlign: "center", padding: "12px 18px", borderRadius: 12,
+                    border: "2px solid #005744", color: "#005744", background: "#fff",
+                    fontWeight: 800, fontSize: 15, textDecoration: "none",
+                  }}
+                >
+                  📞 Call
+                </a>
+                <a
+                  href={`https://wa.me/966${listing.phone.replace(/[^0-9]/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    flex: "1 1 140px", textAlign: "center", padding: "12px 18px", borderRadius: 12,
+                    background: "#25D366", color: "#fff", border: "2px solid #25D366",
+                    fontWeight: 800, fontSize: 15, textDecoration: "none",
+                  }}
+                >
+                  💬 WhatsApp
+                </a>
               </div>
+              {/* Safety notice — shown at the end of every listing (same as the app) */}
+              <div
+                role="note"
+                style={{
+                  marginTop: 24,
+                  padding: "14px 16px",
+                  borderRadius: 12,
+                  background: "#FEF2F2",
+                  border: "1.5px solid #DC2626",
+                  color: "#DC2626",
+                }}
+              >
+                <p style={{ margin: "0 0 6px", fontWeight: 900, fontSize: 16 }}>⚠️ Be Aware</p>
+                <p style={{ margin: 0, fontWeight: 700, fontSize: 14, lineHeight: 1.5 }}>
+                  MYKSA CONNECT provides free listings and is not responsible for fraud or disputes.
+                  Please verify all details before paying or finalizing any deal.
+                </p>
+              </div>
+
               <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 16 }}>
                 For in-app chat and more features,{" "}
-                <a href="https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect" target="_blank" style={{ textDecoration: "underline" }}>get the KSA-Connect app</a>.
+                <a href="https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect" target="_blank" style={{ textDecoration: "underline" }}>get the MYKSA-Connect app</a>.
               </p>
             </div>
           </div>
