@@ -133,7 +133,17 @@ export default function ListingDetailClient() {
         {error && <div className="empty-state">{error}</div>}
 
         {listing && (
-          <div>
+          <div
+            style={{
+              // Black frame with a gold line outside and a thin gold line inside (MYKSA Connect colours)
+              border: "4px solid #0b0b0b",
+              boxShadow: "0 0 0 3px #d4a017, inset 0 0 0 2px #d4a017, 0 12px 30px rgba(0,0,0,0.12)",
+              borderRadius: 16,
+              padding: "clamp(12px, 3vw, 22px)",
+              background: "#fff",
+              margin: "6px 3px 0",
+            }}
+          >
             {listing.imageUrls?.length > 0 ? (
               <div>
                 <div style={{ position: "relative", width: "100%", height: 420, background: "#e5e7eb", borderRadius: 14, overflow: "hidden" }}>
@@ -153,7 +163,17 @@ export default function ListingDetailClient() {
               <div style={{ width: "100%", height: 300, background: "#e5e7eb", borderRadius: 14 }} />
             )}
 
-            <div style={{ marginTop: 20 }}>
+            <div
+              style={{
+                marginTop: 20,
+                // Faint MYKSA Connect logo behind the ad details (text stays fully readable)
+                backgroundImage:
+                  "linear-gradient(rgba(255,255,255,0.93), rgba(255,255,255,0.93)), url(/ksa-logo.png)",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center 120px",
+                backgroundSize: "100% 100%, min(70%, 360px)",
+              }}
+            >
               <span className="pill">{listing.category} · {listing.subCategory}</span>
               {listing.createdAt && <span style={{ marginLeft: 10, fontSize: 12, color: "var(--text-muted)" }}>Posted {timeAgo(listing.createdAt)}</span>}
               {!!listing.views && <span style={{ marginLeft: 10, fontSize: 12, color: "var(--text-muted)" }}>👁️ {listing.views} {listing.views === 1 ? "view" : "views"}</span>}
