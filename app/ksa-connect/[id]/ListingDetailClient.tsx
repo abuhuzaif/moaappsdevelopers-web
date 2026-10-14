@@ -136,8 +136,8 @@ export default function ListingDetailClient() {
           <div
             style={{
               // Black frame with a gold line outside and a thin gold line inside (MYKSA Connect colours)
-              border: "4px solid #0b0b0b",
-              boxShadow: "0 0 0 3px #d4a017, inset 0 0 0 2px #d4a017, 0 12px 30px rgba(0,0,0,0.12)",
+              border: "2px solid #0b0b0b",
+              boxShadow: "0 0 0 1.5px #d4a017, inset 0 0 0 1px #d4a017, 0 12px 30px rgba(0,0,0,0.10)",
               borderRadius: 16,
               padding: "clamp(12px, 3vw, 22px)",
               background: "#fff",
