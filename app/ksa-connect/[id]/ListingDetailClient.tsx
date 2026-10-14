@@ -262,11 +262,10 @@ export default function ListingDetailClient() {
                     }}
                   >
                     <p style={{ margin: "0 0 10px", fontWeight: 800, fontSize: 16, color: "#0b3d2e" }}>
-                      {isOwner ? `🎉 Your ad is live in ${liveCount} places!` : "📢 This ad is also shared on"}
+                      {isOwner ? `🎉 Your ad is live in ${liveCount} places!` : `📢 This ad is live in ${liveCount} places`}
                     </p>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 8 }}>
                       {places
-                        .filter((p) => isOwner || p.href)
                         .map((p) => {
                           const inner = (
                             <>
@@ -290,7 +289,7 @@ export default function ListingDetailClient() {
                           );
                         })}
                     </div>
-                    {isOwner && (
+                    {(
                       <a
                         href={`https://wa.me/?text=${shareText}`}
                         target="_blank"
@@ -300,7 +299,7 @@ export default function ListingDetailClient() {
                           background: "#0c1730", color: "#fff", fontWeight: 800, fontSize: 14, textDecoration: "none",
                         }}
                       >
-                        📤 Share your ad on WhatsApp
+                        📤 {isOwner ? "Share your ad on WhatsApp" : "Share this ad on WhatsApp"}
                       </a>
                     )}
                   </div>
