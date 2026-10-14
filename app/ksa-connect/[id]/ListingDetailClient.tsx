@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { doc, getDoc, deleteDoc, updateDoc, increment } from "firebase/firestore";
+import { doc, deleteDoc, updateDoc, increment, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Listing, formattedPrice } from "@/lib/types";
 import { timeAgo } from "@/lib/timeago";
@@ -24,28 +24,37 @@ export default function ListingDetailClient() {
   const [activeImage, setActiveImage] = useState(0);
   const [deleting, setDeleting] = useState(false);
 
+  // Live listener: the page updates by itself when Make.com writes back the
+  // Facebook / Instagram post links (the "live in N places" box).
   useEffect(() => {
     if (!id) return;
-    (async () => {
-      try {
-        const snap = await getDoc(doc(db, "listings", id));
+    let counted = false;
+    const unsub = onSnapshot(
+      doc(db, "listings", id),
+      (snap) => {
         if (!snap.exists()) {
+          setListing(null);
           setError("This listing doesn't exist or has been removed.");
         } else {
+          setError(null);
           setListing({ id: snap.id, ...snap.data() } as Listing);
-
-          const key = `viewed_${id}`;
-          if (!sessionStorage.getItem(key)) {
-            sessionStorage.setItem(key, "1");
-            updateDoc(doc(db, "listings", id), { views: increment(1) }).catch(() => {});
+          if (!counted) {
+            counted = true;
+            const key = `viewed_${id}`;
+            if (!sessionStorage.getItem(key)) {
+              sessionStorage.setItem(key, "1");
+              updateDoc(doc(db, "listings", id), { views: increment(1) }).catch(() => {});
+            }
           }
         }
-      } catch (err: any) {
+        setLoading(false);
+      },
+      (err) => {
         setError(err.message ?? "Couldn't load this listing.");
-      } finally {
         setLoading(false);
       }
-    })();
+    );
+    return unsub;
   }, [id]);
 
   const canManage = !!user && !!listing && (user.uid === listing.userId || isAdmin(user));
@@ -225,6 +234,79 @@ export default function ListingDetailClient() {
                   💬 WhatsApp
                 </a>
               </div>
+              {/* Where this ad is live (website, app, Facebook, Instagram) */}
+              {(() => {
+                const fbPostId: string | undefined = (listing as any).fbPostId;
+                const igUrl: string | undefined = (listing as any).igPermalink;
+                const fbUrl = fbPostId
+                  ? fbPostId.includes("_")
+                    ? `https://www.facebook.com/${fbPostId.split("_")[0]}/posts/${fbPostId.split("_")[1]}`
+                    : `https://www.facebook.com/${fbPostId}`
+                  : undefined;
+                const isOwner = !!user && user.uid === listing.userId;
+                const places = [
+                  { icon: "🌐", name: "MYKSA Connect website", href: undefined as string | undefined, done: true },
+                  { icon: "📱", name: "MYKSA-Connect app", href: "https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect", done: true },
+                  { icon: "📘", name: "Facebook", href: fbUrl, done: !!fbUrl },
+                  { icon: "📸", name: "Instagram", href: igUrl ?? (fbUrl ? "https://www.instagram.com/myksaconnect" : undefined), done: !!igUrl || !!fbUrl },
+                ];
+                const liveCount = places.filter((p) => p.done).length;
+                const shareText = encodeURIComponent(`${listing.title}\nhttps://www.myksaconnect.com/ksa-connect/${listing.id}`);
+
+                return (
+                  <div
+                    style={{
+                      marginTop: 24, padding: "16px", borderRadius: 14,
+                      background: "linear-gradient(135deg, #f1f7f4, #fffaf0)",
+                      border: "1.5px solid #cfe3da",
+                    }}
+                  >
+                    <p style={{ margin: "0 0 10px", fontWeight: 800, fontSize: 16, color: "#0b3d2e" }}>
+                      {isOwner ? `🎉 Your ad is live in ${liveCount} places!` : "📢 This ad is also shared on"}
+                    </p>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 8 }}>
+                      {places
+                        .filter((p) => isOwner || p.href)
+                        .map((p) => {
+                          const inner = (
+                            <>
+                              <span style={{ fontSize: 18 }}>{p.icon}</span>
+                              <span style={{ flex: 1, minWidth: 0 }}>
+                                <strong style={{ display: "block", fontSize: 13.5, color: "#0c1730" }}>{p.name}</strong>
+                                <small style={{ fontSize: 12, color: p.done ? "#15803d" : "#b45309" }}>
+                                  {p.done ? (p.href ? "✓ Live · View →" : "✓ Live") : "⏳ Posting…"}
+                                </small>
+                              </span>
+                            </>
+                          );
+                          const box = {
+                            display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
+                            borderRadius: 10, background: "#fff", border: "1px solid #e2ece7", textDecoration: "none",
+                          } as const;
+                          return p.href ? (
+                            <a key={p.name} href={p.href} target="_blank" rel="noopener noreferrer" style={box}>{inner}</a>
+                          ) : (
+                            <div key={p.name} style={box}>{inner}</div>
+                          );
+                        })}
+                    </div>
+                    {isOwner && (
+                      <a
+                        href={`https://wa.me/?text=${shareText}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "block", marginTop: 12, textAlign: "center", padding: "10px 14px", borderRadius: 10,
+                          background: "#0c1730", color: "#fff", fontWeight: 800, fontSize: 14, textDecoration: "none",
+                        }}
+                      >
+                        📤 Share your ad on WhatsApp
+                      </a>
+                    )}
+                  </div>
+                );
+              })()}
+
               {/* Safety notice — shown at the end of every listing (same as the app) */}
               <div
                 role="note"
