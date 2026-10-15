@@ -9,6 +9,7 @@ import { Listing, formattedPrice } from "@/lib/types";
 import { timeAgo } from "@/lib/timeago";
 import { useAuth } from "@/lib/useAuth";
 import { ADMIN_EMAILS, isAdmin } from "@/lib/admin";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 
 const IS_KSA_CONNECT_SITE = process.env.NEXT_PUBLIC_SITE_MODE === "ksaconnect";
 
@@ -297,6 +298,7 @@ export default function ListingDetailClient() {
               <div style={{ display: "flex", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
                 <a
                   href={`tel:+966${listing.phone}`}
+                  onClick={() => trackAnalyticsEvent("phone_click", { listing_id: listing.id, listing_category: listing.category, listing_city: listing.city })}
                   style={{
                     flex: "1 1 140px", textAlign: "center", padding: "12px 18px", borderRadius: 12,
                     border: "2px solid #005744", color: "#005744", background: "#fff",
@@ -307,6 +309,7 @@ export default function ListingDetailClient() {
                 </a>
                 <a
                   href={`https://wa.me/966${listing.phone.replace(/[^0-9]/g, "")}`}
+                  onClick={() => trackAnalyticsEvent("whatsapp_click", { listing_id: listing.id, listing_category: listing.category, listing_city: listing.city })}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
