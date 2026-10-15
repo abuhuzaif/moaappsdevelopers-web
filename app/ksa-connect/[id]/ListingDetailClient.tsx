@@ -12,6 +12,69 @@ import { ADMIN_EMAILS, isAdmin } from "@/lib/admin";
 
 const IS_KSA_CONNECT_SITE = process.env.NEXT_PUBLIC_SITE_MODE === "ksaconnect";
 
+// Brand logos for the "live in N places" box
+function BrandIcon({ name }: { name: "web" | "app" | "facebook" | "instagram" | "youtube" | "tiktok" }) {
+  const size = 28;
+  if (name === "web") {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src="/ksa-logo.png" alt="" width={size} height={size} style={{ borderRadius: "50%", flex: "none" }} />;
+  }
+  if (name === "app") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" style={{ flex: "none" }}>
+        <rect width="24" height="24" rx="6" fill="#3DDC84" />
+        <path
+          fill="#fff"
+          d="M7.2 10.2h9.6v5.6c0 .5-.4.9-.9.9h-.7v2c0 .5-.4.9-.9.9s-.9-.4-.9-.9v-2h-1.6v2c0 .5-.4.9-.9.9s-.9-.4-.9-.9v-2h-.7c-.5 0-.9-.4-.9-.9v-5.6zm-1.4 0c.5 0 .9.4.9.9v3.6c0 .5-.4.9-.9.9s-.9-.4-.9-.9v-3.6c0-.5.4-.9.9-.9zm12.4 0c.5 0 .9.4.9.9v3.6c0 .5-.4.9-.9.9s-.9-.4-.9-.9v-3.6c0-.5.4-.9.9-.9zM14.6 5.5l.8-1.4c.1-.1 0-.3-.1-.4-.1-.1-.3 0-.4.1l-.8 1.4c-.6-.3-1.3-.4-2.1-.4s-1.5.1-2.1.4l-.8-1.4c-.1-.1-.3-.2-.4-.1-.1.1-.2.3-.1.4l.8 1.4c-1.4.7-2.3 2-2.3 3.6h9.8c0-1.6-.9-2.9-2.3-3.6zM10 7.8a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm4 0a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1z"
+        />
+      </svg>
+    );
+  }
+  if (name === "youtube") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" style={{ flex: "none" }}>
+        <rect width="24" height="24" rx="6" fill="#FF0000" />
+        <path fill="#fff" d="M10 8.3v7.4l6.2-3.7z" />
+      </svg>
+    );
+  }
+  if (name === "tiktok") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" style={{ flex: "none" }}>
+        <rect width="24" height="24" rx="6" fill="#000" />
+        <path fill="#25F4EE" transform="translate(-0.6 -0.4)" d="M15.6 6.6a3 3 0 0 1-.8-2h-2.2v9a1.9 1.9 0 1 1-1.9-1.9l.6.1V9.5l-.6-.1a4.2 4.2 0 1 0 4.2 4.2V9.1a5.2 5.2 0 0 0 3 1V7.9a3 3 0 0 1-2.3-1.3z" />
+        <path fill="#FE2C55" transform="translate(0.6 0.4)" d="M15.6 6.6a3 3 0 0 1-.8-2h-2.2v9a1.9 1.9 0 1 1-1.9-1.9l.6.1V9.5l-.6-.1a4.2 4.2 0 1 0 4.2 4.2V9.1a5.2 5.2 0 0 0 3 1V7.9a3 3 0 0 1-2.3-1.3z" />
+        <path fill="#fff" d="M15.6 6.6a3 3 0 0 1-.8-2h-2.2v9a1.9 1.9 0 1 1-1.9-1.9l.6.1V9.5l-.6-.1a4.2 4.2 0 1 0 4.2 4.2V9.1a5.2 5.2 0 0 0 3 1V7.9a3 3 0 0 1-2.3-1.3z" />
+      </svg>
+    );
+  }
+  if (name === "facebook") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" style={{ flex: "none" }}>
+        <circle cx="12" cy="12" r="12" fill="#1877F2" />
+        <path fill="#fff" d="M13.4 19v-6h2l.3-2.4h-2.3V9.1c0-.7.2-1.2 1.2-1.2h1.2V5.8c-.2 0-1-.1-1.8-.1-1.8 0-3 1.1-3 3.1v1.8h-2V13h2v6h2.4z" />
+      </svg>
+    );
+  }
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" style={{ flex: "none" }}>
+      <defs>
+        <radialGradient id="igGrad" cx="30%" cy="107%" r="150%">
+          <stop offset="0%" stopColor="#fdf497" />
+          <stop offset="5%" stopColor="#fdf497" />
+          <stop offset="45%" stopColor="#fd5949" />
+          <stop offset="60%" stopColor="#d6249f" />
+          <stop offset="90%" stopColor="#285AEB" />
+        </radialGradient>
+      </defs>
+      <rect width="24" height="24" rx="6" fill="url(#igGrad)" />
+      <rect x="5.5" y="5.5" width="13" height="13" rx="4" fill="none" stroke="#fff" strokeWidth="1.7" />
+      <circle cx="12" cy="12" r="3.1" fill="none" stroke="#fff" strokeWidth="1.7" />
+      <circle cx="16" cy="8" r="1" fill="#fff" />
+    </svg>
+  );
+}
+
 export default function ListingDetailClient() {
   const params = useParams();
   const router = useRouter();
@@ -265,10 +328,13 @@ export default function ListingDetailClient() {
                   : undefined;
                 const isOwner = !!user && user.uid === listing.userId;
                 const places = [
-                  { icon: "🌐", name: "MYKSA Connect website", href: undefined as string | undefined, done: true },
-                  { icon: "📱", name: "MYKSA-Connect app", href: "https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect", done: true },
-                  { icon: "📘", name: "Facebook", href: fbUrl, done: !!fbUrl },
-                  { icon: "📸", name: "Instagram", href: igUrl ?? (fbUrl ? "https://www.instagram.com/myksaconnect" : undefined), done: !!igUrl || !!fbUrl },
+                  { icon: "web" as const, name: "MYKSA Connect website", href: undefined as string | undefined, done: true },
+                  { icon: "app" as const, name: "MYKSA-Connect app", href: "https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect", done: true },
+                  { icon: "facebook" as const, name: "Facebook", href: fbUrl, done: !!fbUrl },
+                  { icon: "instagram" as const, name: "Instagram", href: igUrl ?? (fbUrl ? "https://www.instagram.com/myksaconnect" : undefined), done: !!igUrl || !!fbUrl },
+                  // Our channels — follow cards (ads are not auto-posted here, so they don't count as "live")
+                  { icon: "youtube" as const, name: "YouTube", href: "https://www.youtube.com/@MYKSACONNECT" as string | undefined, done: false, follow: true },
+                  { icon: "tiktok" as const, name: "TikTok", href: "https://www.tiktok.com/@moa70391" as string | undefined, done: false, follow: true },
                 ];
                 const liveCount = places.filter((p) => p.done).length;
                 const shareText = encodeURIComponent(`${listing.title}\nhttps://www.myksaconnect.com/ksa-connect/${listing.id}`);
@@ -289,11 +355,11 @@ export default function ListingDetailClient() {
                         .map((p) => {
                           const inner = (
                             <>
-                              <span style={{ fontSize: 18 }}>{p.icon}</span>
+                              <BrandIcon name={p.icon} />
                               <span style={{ flex: 1, minWidth: 0 }}>
                                 <strong style={{ display: "block", fontSize: 13.5, color: "#0c1730" }}>{p.name}</strong>
-                                <small style={{ fontSize: 12, color: p.done ? "#15803d" : "#b45309" }}>
-                                  {p.done ? (p.href ? "✓ Live · View →" : "✓ Live") : "⏳ Posting…"}
+                                <small style={{ fontSize: 12, color: "follow" in p ? "#1d4ed8" : p.done ? "#15803d" : "#b45309" }}>
+                                  {"follow" in p ? "Follow us →" : p.done ? (p.href ? "✓ Live · View →" : "✓ Live") : "⏳ Posting…"}
                                 </small>
                               </span>
                             </>

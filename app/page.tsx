@@ -56,6 +56,66 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 type SortMode = "newest" | "price_low" | "price_high";
 
+// MYKSA Connect social pages — shown in the footer and sent to Google (Organization sameAs)
+const SOCIAL_LINKS = [
+  {
+    name: "Facebook",
+    href: "https://www.facebook.com/profile.php?id=61594787978208",
+    color: "#1877F2",
+    path: "M13.5 21v-7.5h2.5l.4-3h-2.9V8.6c0-.9.3-1.5 1.5-1.5h1.5V4.4c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2.4H8.1v3h2.5V21h2.9z",
+  },
+  {
+    name: "Instagram",
+    href: "https://www.instagram.com/myksaconnect",
+    color: "#E4405F",
+    path: "M12 7.3A4.7 4.7 0 1 0 12 16.7 4.7 4.7 0 0 0 12 7.3zm0 7.7a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm6-7.9a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0zM12 4.6c2.4 0 2.7 0 3.6.1 2.4.1 3.6 1.3 3.7 3.7.1.9.1 1.2.1 3.6s0 2.7-.1 3.6c-.1 2.4-1.3 3.6-3.7 3.7-.9.1-1.2.1-3.6.1s-2.7 0-3.6-.1c-2.4-.1-3.6-1.3-3.7-3.7-.1-.9-.1-1.2-.1-3.6s0-2.7.1-3.6c.1-2.4 1.3-3.6 3.7-3.7.9-.1 1.2-.1 3.6-.1zM12 3c-2.4 0-2.7 0-3.7.1-3.3.1-5 1.9-5.2 5.2C3 9.3 3 9.6 3 12s0 2.7.1 3.7c.1 3.3 1.9 5 5.2 5.2 1 .1 1.3.1 3.7.1s2.7 0 3.7-.1c3.3-.1 5-1.9 5.2-5.2.1-1 .1-1.3.1-3.7s0-2.7-.1-3.7c-.1-3.3-1.9-5-5.2-5.2C14.7 3 14.4 3 12 3z",
+  },
+  {
+    name: "YouTube",
+    href: "https://www.youtube.com/@MYKSACONNECT",
+    color: "#FF0000",
+    path: "M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8c1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3L10 15z",
+  },
+  {
+    name: "TikTok",
+    href: "https://www.tiktok.com/@moa70391",
+    color: "#000000",
+    path: "M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.7a5.7 5.7 0 1 0 4.9 5.7V9.1a7.3 7.3 0 0 0 4.3 1.4V7.4a4.3 4.3 0 0 1-3.2-1.6z",
+  },
+] as const;
+
+const ORGANIZATION_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "MYKSA Connect",
+  url: "https://www.myksaconnect.com",
+  logo: "https://www.myksaconnect.com/ksa-logo.png",
+  sameAs: SOCIAL_LINKS.map((s) => s.href),
+};
+
+function SocialIcons({ size = 40 }: { size?: number }) {
+  return (
+    <div className="mk-social" aria-label="MYKSA Connect on social media">
+      {SOCIAL_LINKS.map((s) => (
+        <a
+          key={s.name}
+          href={s.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`MYKSA Connect on ${s.name}`}
+          title={s.name}
+          className="mk-social-btn"
+          style={{ width: size, height: size, "--brand": s.color } as import("react").CSSProperties}
+        >
+          <svg viewBox="0 0 24 24" width={size * 0.5} height={size * 0.5} aria-hidden="true">
+            <path fill="currentColor" d={s.path} />
+          </svg>
+        </a>
+      ))}
+    </div>
+  );
+}
+
 export default function KsaConnectPage() {
   const { user } = useAuth();
   const [listings, setListings] = useState<Listing[]>([]);
@@ -165,6 +225,7 @@ export default function KsaConnectPage() {
 
   return (
     <div className="mk-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_SCHEMA) }} />
       {listingsSchema && (
         <script
           type="application/ld+json"
@@ -228,6 +289,21 @@ export default function KsaConnectPage() {
 
       <main className="mk-main">
         <style>{`
+          /* Social icons (final CTA + footer) */
+          .mk-social { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+          .mk-social-btn {
+            display: grid; place-items: center; border-radius: 50%;
+            color: #fff; background: rgba(255,255,255,.08);
+            border: 1px solid rgba(246,185,31,.55);
+            transition: background .18s ease, transform .18s ease, border-color .18s ease;
+          }
+          .mk-social-btn:hover { background: var(--brand); border-color: var(--brand); transform: translateY(-2px); }
+          .mk-follow { margin-top: 22px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+          .mk-follow p { margin: 0; font-size: 14px; color: rgba(255,255,255,.85); }
+          .mk-footer-social { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 18px 0 6px; }
+          .mk-footer-social strong { font-size: 13px; letter-spacing: .6px; text-transform: uppercase; color: #005744; }
+          .mk-footer-social .mk-social-btn { color: #0c1730; background: #fff; border-color: #d9e7e1; }
+          .mk-footer-social .mk-social-btn:hover { color: #fff; }
           /* New KC logo in the header (replaces the old ✦ mark) */
           .mk-logo-img {
             width: 46px;
@@ -594,7 +670,7 @@ export default function KsaConnectPage() {
         </section>
       )}
 
-      <section className="mk-final-cta"><div><h2>Ready to Buy, Sell and Connect?</h2><p>Join thousands of expatriates using MYKSA CONNECT every day.</p><a href="/ksa-connect/post" className="mk-btn mk-btn-gold">Post Your Ad Now →</a></div></section>
+      <section className="mk-final-cta"><div><h2>Ready to Buy, Sell and Connect?</h2><p>Join thousands of expatriates using MYKSA CONNECT every day.</p><a href="/ksa-connect/post" className="mk-btn mk-btn-gold">Post Your Ad Now →</a><div className="mk-follow"><p>Follow MYKSA Connect for new ads every day</p><SocialIcons size={42} /></div></div></section>
       <footer className="footer">
         <div className="container">
           <section className="mk-trust-strip" aria-label="Trust and support info">
@@ -603,6 +679,10 @@ export default function KsaConnectPage() {
             <div><span>◎</span><strong>All Across Saudi Arabia</strong><small>7 Major cities. One trusted platform.</small></div>
             <div><span>♧</span><strong>24/7 Support</strong><small>We are here to help you anytime.</small></div>
           </section>
+        </div>
+        <div className="mk-footer-social">
+          <strong>Follow us</strong>
+          <SocialIcons size={38} />
         </div>
         <p>
           <a href="/ksa-connect/blog">Guides</a> ·{" "}
