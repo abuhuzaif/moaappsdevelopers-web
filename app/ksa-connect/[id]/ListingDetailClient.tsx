@@ -239,7 +239,8 @@ export default function ListingDetailClient() {
             >
               <span className="pill">{listing.category} · {listing.subCategory}</span>
               {listing.createdAt && <span style={{ marginLeft: 10, fontSize: 12, color: "var(--text-muted)" }}>Posted {timeAgo(listing.createdAt)}</span>}
-              {!!listing.views && <span style={{ marginLeft: 10, fontSize: 12, color: "var(--text-muted)" }}>👁️ {listing.views} {listing.views === 1 ? "view" : "views"}</span>}
+              {/* View count: admins only for now */}
+              {isAdmin(user) && !!listing.views && <span style={{ marginLeft: 10, fontSize: 12, color: "var(--text-muted)" }}>👁️ {listing.views} {listing.views === 1 ? "view" : "views"}</span>}
               <h1 style={{ fontSize: 24, margin: "12px 0 4px" }}>{listing.title}</h1>
               <p style={{ color: "var(--navy)", fontWeight: 800, fontSize: 22, margin: "0 0 8px" }}>{formattedPrice(listing)}</p>
               <p style={{ color: "var(--text-muted)", fontSize: 14 }}>📍 {listing.city} · {listing.location}</p>
