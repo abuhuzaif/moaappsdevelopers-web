@@ -1,4 +1,6 @@
-﻿import type { Metadata } from "next";
+
+import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
@@ -19,6 +21,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
+const GA_MEASUREMENT_ID = "G-R9E3J40KXD";
 
 export const metadata: Metadata = isKsaConnectSite
   ? {
@@ -138,7 +141,11 @@ const moaAppsDevelopersSchema = {
       description:
         "MOA Apps Developer's is an independent app and web development studio focused on building smart, reliable digital tools — from community marketplaces to Islamic content apps — designed, built, and maintained end-to-end using Flutter, Firebase, and Next.js.",
       email: "abuman.moa@gmail.com",
-      knowsAbout: ["Mobile App Development", "Website Development", "Digital Marketing"],
+      knowsAbout: [
+        "Mobile App Development",
+        "Website Development",
+        "Digital Marketing",
+      ],
       sameAs: ["https://www.myksaconnect.com"],
     },
     {
@@ -154,15 +161,22 @@ const moaAppsDevelopersSchema = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const schema = isKsaConnectSite ? ksaConnectSchema : moaAppsDevelopersSchema;
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const schema = isKsaConnectSite
+    ? ksaConnectSchema
+    : moaAppsDevelopersSchema;
 
   return (
-    <html lang="en" className={`${inter.variable} ${plusJakartaSans.variable}`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${plusJakartaSans.variable}`}
+    >
       <head>
-        {/* Preload the homepage hero image (LCP element on myksaconnect.com)
-            so the browser fetches it immediately instead of discovering it
-            only after parsing globals.css's background-image rule. */}
+        {/* Preload the homepage hero image for MYKSA CONNECT */}
         {isKsaConnectSite && (
           <link
             rel="preload"
@@ -172,8 +186,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             fetchpriority="high"
           />
         )}
-        <meta name="google-site-verification" content="googleeed0f7655921d9e45" />
+
+        <meta
+          name="google-site-verification"
+          content="googleeed0f7655921d9e45"
+        />
+
         <link rel="stylesheet" href="/myksa-tool-colors.css?v=2" />
+
         <style>{`
           .mk-page .mk-tools-showcase {
             display: none !important;
@@ -187,8 +207,33 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             display: none !important;
           }
         `}</style>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(schema),
+          }}
+        />
+
+        {/* Google Analytics 4 — MYKSA CONNECT only */}
+        {isKsaConnectSite && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){window.dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_MEASUREMENT_ID}');
+              `}
+            </Script>
+          </>
+        )}
       </head>
+
       <body>
         <ToolsBanner />
         {children}
