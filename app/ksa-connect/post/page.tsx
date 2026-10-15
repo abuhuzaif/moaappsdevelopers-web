@@ -8,6 +8,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
 import { isAdmin } from "@/lib/admin";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 import { CITIES, CATEGORIES, SUB_CATEGORIES } from "@/lib/categories";
 import { DRAFT_TEMPLATES } from "@/lib/draftTemplates";
 
@@ -225,7 +226,7 @@ function PostListingForm() {
         const expiresAt = Timestamp.fromDate(
           new Date(Date.now() + LISTING_LIFESPAN_DAYS * 24 * 60 * 60 * 1000)
         );
-        await addDoc(collection(db, "listings"), {
+        const createdListing = await addDoc(collection(db, "listings"), {
           ...commonFields,
           userId: user.uid,
           userName: adminPosting ? ADMIN_PUBLIC_NAME : user.displayName ?? "User",
@@ -237,6 +238,11 @@ function PostListingForm() {
           status: "active",
           latitude: null,
           longitude: null,
+        });
+        trackAnalyticsEvent("post_ad_success", {
+          listing_id: createdListing.id,
+          listing_category: category,
+          listing_city: city,
         });
       }
 
