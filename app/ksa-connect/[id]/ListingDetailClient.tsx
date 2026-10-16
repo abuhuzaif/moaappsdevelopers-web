@@ -83,6 +83,8 @@ export default function ListingDetailClient() {
 
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState(0);
   const [deleting, setDeleting] = useState(false);
@@ -244,6 +246,61 @@ export default function ListingDetailClient() {
               <h1 style={{ fontSize: 24, margin: "12px 0 4px" }}>{listing.title}</h1>
               <p style={{ color: "var(--navy)", fontWeight: 800, fontSize: 22, margin: "0 0 8px" }}>{formattedPrice(listing)}</p>
               <p style={{ color: "var(--text-muted)", fontSize: 14 }}>📍 {listing.city} · {listing.location}</p>
+
+              {/* Share this ad */}
+              {(() => {
+                const url = `https://www.myksaconnect.com/ksa-connect/${listing.id}`;
+                const text = `${listing.title} — ${formattedPrice(listing)} · ${listing.city}`;
+                const btn = {
+                  display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 999,
+                  border: "1px solid #d4a017", background: "#fff", color: "#0c1730", fontWeight: 700, fontSize: 13,
+                  cursor: "pointer", textDecoration: "none",
+                } as const;
+                const onShare = async () => {
+                  if (typeof navigator !== "undefined" && navigator.share) {
+                    try {
+                      await navigator.share({ title: listing.title, text, url });
+                      return;
+                    } catch {
+                      /* user cancelled — fall back to the menu */
+                    }
+                  }
+                  setShareOpen((v) => !v);
+                };
+                const copy = async () => {
+                  try {
+                    await navigator.clipboard.writeText(url);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1800);
+                  } catch {}
+                };
+                return (
+                  <div style={{ margin: "4px 0 6px" }}>
+                    <button type="button" onClick={onShare} style={{ ...btn, background: "#0c1730", color: "#fff", border: "1px solid #0c1730" }}>
+                      📤 Share this ad
+                    </button>
+                    {shareOpen && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
+                        <a href={`https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`} target="_blank" rel="noopener noreferrer" style={btn}>
+                          💬 WhatsApp
+                        </a>
+                        <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" style={btn}>
+                          📘 Facebook
+                        </a>
+                        <a href={`https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" style={btn}>
+                          ✖️ X
+                        </a>
+                        <a href={`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`} target="_blank" rel="noopener noreferrer" style={btn}>
+                          ✈️ Telegram
+                        </a>
+                        <button type="button" onClick={copy} style={btn}>
+                          {copied ? "✅ Copied" : "🔗 Copy link"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               {listing.description && (
                 <>
