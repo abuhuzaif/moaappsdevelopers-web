@@ -8,6 +8,7 @@ import { collection, getDocs, limit, onSnapshot, orderBy, query, where } from "f
 import { db, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
 import { Listing, formattedPrice } from "@/lib/types";
+import { REGIONS, citySlug } from "@/lib/categories";
 import { timeAgo } from "@/lib/timeago";
 
 const CITY_OPTIONS = [
@@ -218,6 +219,30 @@ export default function KsaConnectPage() {
     setter(next);
   };
 
+  // City / region filter helpers (search dropdown + sidebar)
+  const regionSelected = REGIONS.find(
+    (r) => cities.size === r.cities.length && r.cities.every((c) => cities.has(c))
+  );
+  const cityFilterValue = regionSelected
+    ? `region:${regionSelected.key}`
+    : cities.size === 1
+    ? Array.from(cities)[0]
+    : "";
+  const onCitySelect = (v: string) => {
+    if (!v) return setCities(new Set());
+    if (v.startsWith("region:")) {
+      const r = REGIONS.find((x) => x.key === v.slice(7));
+      return setCities(new Set(r?.cities ?? []));
+    }
+    setCities(new Set([v]));
+  };
+  const toggleRegion = (regionCities: string[]) => {
+    const allOn = regionCities.every((c) => cities.has(c));
+    const next = new Set(cities);
+    regionCities.forEach((c) => (allOn ? next.delete(c) : next.add(c)));
+    setCities(next);
+  };
+
   const handleTrendingClick = (keyword: string) => {
     setSearch(keyword);
     document.getElementById("listings")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -278,7 +303,7 @@ export default function KsaConnectPage() {
 
         <div className="mk-search-wrap">
           <div className="mk-search-row">
-            <label className="mk-search-field"><span>📍</span><select aria-label="Select a city" value={cities.size === 1 ? Array.from(cities)[0] : ""} onChange={(e) => setCities(e.target.value ? new Set([e.target.value]) : new Set())}><option value="">Select a City</option>{CITY_OPTIONS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}</select></label>
+            <label className="mk-search-field"><span>📍</span><select aria-label="Select a city or region" value={cityFilterValue} onChange={(e) => onCitySelect(e.target.value)}><option value="">All Cities</option>{REGIONS.map((r) => <optgroup key={r.key} label={`${r.emoji} ${r.label} Region`}><option value={`region:${r.key}`}>All {r.label} Region</option>{r.cities.map((c) => <option key={c} value={c}>{c}</option>)}</optgroup>)}</select></label>
             <label className="mk-search-field"><span>▦</span><select aria-label="Select a category" value={categories.size === 1 ? Array.from(categories)[0] : ""} onChange={(e) => setCategories(e.target.value ? new Set([e.target.value]) : new Set())}><option value="">Select a Category</option>{CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}</select></label>
             <label className="mk-search-field mk-keyword"><span>⌕</span><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="What are you looking for?" aria-label="Search listings" /></label>
             <button className="mk-search-btn" onClick={() => document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" })}>Search Ads</button>
@@ -521,7 +546,7 @@ export default function KsaConnectPage() {
             {CITY_OPTIONS.map((city, i) => (
               <a
                 key={city.value}
-                href={`/ksa-connect/city/${city.value.toLowerCase()}`}
+                href={`/ksa-connect/city/${citySlug(city.value)}`}
                 className="mk-city-card"
                 style={{ backgroundImage: `linear-gradient(180deg, rgba(2,24,34,.02) 35%, rgba(2,12,20,.9) 100%), url('/images/cities/${city.image}.jpg')` }}
               >
@@ -590,7 +615,29 @@ export default function KsaConnectPage() {
           <div className="listings-layout">
             <aside className="filters-sidebar">
               <p className="filters-sidebar-title">Filters {hasActiveFilters && <button className="clear-filters" onClick={clearAll}>Clear All</button>}</p>
-              <div className="filter-group"><p className="filter-group-title">City</p>{(citiesExpanded ? CITY_OPTIONS : CITY_OPTIONS.slice(0,5)).map((c) => <label className={`checkbox-row${cities.has(c.value) ? " checkbox-row-active" : ""}`} key={c.value}><input type="checkbox" checked={cities.has(c.value)} onChange={() => toggle(cities, setCities, c.value)} />{c.label}</label>)}<button className="view-more-toggle" onClick={() => setCitiesExpanded((v) => !v)}>{citiesExpanded ? "View less ˄" : "View more ˅"}</button></div>
+              <div className="filter-group">
+                <p className="filter-group-title">City</p>
+                {(citiesExpanded ? REGIONS : REGIONS.slice(0, 2)).map((r) => {
+                  const allOn = r.cities.every((c) => cities.has(c));
+                  return (
+                    <div key={r.key} style={{ marginBottom: 6 }}>
+                      <label className={`checkbox-row${allOn ? " checkbox-row-active" : ""}`} style={{ fontWeight: 800 }}>
+                        <input type="checkbox" checked={allOn} onChange={() => toggleRegion(r.cities)} />
+                        {r.emoji} {r.label}
+                      </label>
+                      <div style={{ paddingLeft: 18 }}>
+                        {r.cities.map((c) => (
+                          <label className={`checkbox-row${cities.has(c) ? " checkbox-row-active" : ""}`} key={c}>
+                            <input type="checkbox" checked={cities.has(c)} onChange={() => toggle(cities, setCities, c)} />
+                            {c}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+                <button className="view-more-toggle" onClick={() => setCitiesExpanded((v) => !v)}>{citiesExpanded ? "View less ˄" : "All regions ˅"}</button>
+              </div>
               <div className="filter-group"><p className="filter-group-title">Category</p>{CATEGORIES.map((c) => <label className={`checkbox-row${categories.has(c) ? " checkbox-row-active" : ""}`} key={c}><input type="checkbox" checked={categories.has(c)} onChange={() => toggle(categories, setCategories, c)} /><span className="checkbox-icon">{CATEGORY_ICONS[c]}</span>{c}</label>)}</div>
             </aside>
             <div className="listings-main">
@@ -598,8 +645,9 @@ export default function KsaConnectPage() {
               {!loading && !error && (
                 <p className="results-count">
                   Showing {filtered.length} of {listings.length} listing{listings.length === 1 ? "" : "s"}
-                  {cities.size === 1 && (
-                    <> in <strong>{CITY_OPTIONS.find((c) => c.value === Array.from(cities)[0])?.label}</strong></>
+                  {regionSelected && <> in <strong>{regionSelected.label} Region</strong></>}
+                  {!regionSelected && cities.size === 1 && (
+                    <> in <strong>{Array.from(cities)[0]}</strong></>
                   )}
                   {categories.size === 1 && <> · {Array.from(categories)[0]}</>}
                 </p>

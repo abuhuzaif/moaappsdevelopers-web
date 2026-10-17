@@ -1,4 +1,28 @@
-export const CITIES = ["Riyadh", "Jeddah", "Dammam", "Khobar", "Jubail", "Yanbu", "Madinah"];
+// ── Cities grouped by region ─────────────────────────────────
+// Ads store just the city name, so adding a city here makes it available
+// everywhere (post form, filters, city pages). Keep spellings identical in
+// the Flutter app (lib/theme/city_manager.dart).
+export type Region = { key: string; label: string; labelAr: string; emoji: string; cities: string[] };
+
+export const REGIONS: Region[] = [
+  { key: "Central", label: "Central", labelAr: "الوسطى", emoji: "🏙️", cities: ["Riyadh", "Al Kharj", "Buraydah"] },
+  { key: "Eastern", label: "Eastern", labelAr: "الشرقية", emoji: "🌊", cities: ["Dammam", "Khobar", "Jubail", "Dhahran", "Al Ahsa"] },
+  { key: "Western", label: "Western", labelAr: "الغربية", emoji: "🕋", cities: ["Jeddah", "Makkah", "Madinah", "Yanbu", "Taif"] },
+  { key: "Southern", label: "Southern", labelAr: "الجنوبية", emoji: "⛰️", cities: ["Abha", "Khamis Mushait", "Jazan", "Najran"] },
+  { key: "Northern", label: "Northern", labelAr: "الشمالية", emoji: "🏜️", cities: ["Tabuk", "Hail"] },
+];
+
+export const CITIES: string[] = REGIONS.flatMap((r) => r.cities);
+
+export function regionOfCity(city: string | null | undefined): Region | undefined {
+  if (!city) return undefined;
+  return REGIONS.find((r) => r.cities.includes(city));
+}
+
+/** URL slug for a city: "Al Kharj" → "al-kharj", "Riyadh" → "riyadh". */
+export function citySlug(city: string): string {
+  return city.toLowerCase().replace(/\s+/g, "-");
+}
 
 export const CATEGORIES = [
   { key: "Housing", label: "Housing", emoji: "🏠" },

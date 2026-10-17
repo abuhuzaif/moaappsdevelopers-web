@@ -8,7 +8,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
 import { isAdmin } from "@/lib/admin";
-import { CITIES, CATEGORIES, SUB_CATEGORIES } from "@/lib/categories";
+import { CITIES, CATEGORIES, SUB_CATEGORIES, REGIONS } from "@/lib/categories";
 import { DRAFT_TEMPLATES } from "@/lib/draftTemplates";
 
 const MAX_PHOTOS = 3;
@@ -368,11 +368,20 @@ function PostListingForm() {
               </div>
 
               <label style={fieldLabel}>City *</label>
-              <div style={chipRow}>
-                {CITIES.map((c) => (
-                  <button type="button" key={c} style={chip(city === c)} onClick={() => setCity(c)}>
-                    {c}
-                  </button>
+              <div style={{ display: "grid", gap: 8 }}>
+                {REGIONS.map((r) => (
+                  <div key={r.key}>
+                    <div style={{ fontSize: 11.5, fontWeight: 800, color: "#5d6a68", letterSpacing: 0.4, margin: "2px 0 4px" }}>
+                      {r.emoji} {r.label.toUpperCase()}
+                    </div>
+                    <div style={chipRow}>
+                      {r.cities.map((c) => (
+                        <button type="button" key={c} style={chip(city === c)} onClick={() => setCity(c)}>
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
 

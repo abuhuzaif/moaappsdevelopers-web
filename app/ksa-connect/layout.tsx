@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "KSA-Connect — Housing, Cars & Classifieds in Saudi Arabia",
+  title: "MYKSA Connect — Housing, Cars & Classifieds in Saudi Arabia",
   description:
-    "Browse live classifieds across Riyadh, Jeddah, Dammam, Khobar, Jubail, Yanbu, and Madinah. Housing, cars, household items, services, and more.",
+    "Browse live classifieds across Saudi Arabia — Riyadh, Jeddah, Makkah, Madinah, Dammam, Khobar, Jubail, Al Ahsa, Taif, Abha, Tabuk and more. Housing, cars, household items, services, and more.",
   alternates: {
     canonical: "https://www.myksaconnect.com/ksa-connect",
   },
   openGraph: {
-    title: "KSA-Connect — Housing, Cars & Classifieds in Saudi Arabia",
+    title: "MYKSA Connect — Housing, Cars & Classifieds in Saudi Arabia",
     description:
-      "Browse live classifieds across 7 Saudi cities. Housing, cars, household items, services, and more.",
+      "Browse live classifieds across every region of Saudi Arabia. Housing, cars, household items, services, and more.",
     type: "website",
   },
 };
