@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
@@ -455,6 +455,22 @@ export default function KsaConnectPage() {
             }
           }
         `}</style>
+        <a
+          href="/ksa-connect/rental-scam-warning"
+          style={{
+            display: "flex", alignItems: "center", gap: 12, margin: "18px 0 6px", padding: "12px 16px",
+            borderRadius: 14, background: "#fef2f2", border: "1.5px solid #dc2626", color: "#991b1b",
+            textDecoration: "none", width: "100%", boxSizing: "border-box",
+          }}
+        >
+          <span style={{ fontSize: 22 }} aria-hidden="true">⚠️</span>
+          <span style={{ flex: 1, minWidth: 0 }}>
+            <strong style={{ display: "block", fontSize: 14.5 }}>Warning: Fake apartment rental scams in Saudi Arabia</strong>
+            <small style={{ fontSize: 12.5, color: "#7f1d1d" }}>Never pay rent or a deposit before verifying the owner, FAL licence and Ejar contract.</small>
+          </span>
+          <b style={{ whiteSpace: "nowrap", fontSize: 13 }}>Read more →</b>
+        </a>
+
         <PopularPdfTools />
 
         <section className="mk-tools-strip mk-tools-showcase" aria-labelledby="expat-tools-title">

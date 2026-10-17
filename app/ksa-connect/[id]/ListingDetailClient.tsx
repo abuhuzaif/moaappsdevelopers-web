@@ -467,6 +467,14 @@ export default function ListingDetailClient() {
                   MYKSA CONNECT provides free listings and is not responsible for fraud or disputes.
                   Please verify all details before paying or finalizing any deal.
                 </p>
+                {listing.category === "Housing" && (
+                  <a
+                    href="/ksa-connect/rental-scam-warning"
+                    style={{ display: "inline-block", marginTop: 10, fontWeight: 800, fontSize: 13.5, color: "#991b1b", textDecoration: "underline" }}
+                  >
+                    🏠 Renting? Read our warning about fake apartment rental scams →
+                  </a>
+                )}
               </div>
 
               <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 16 }}>
