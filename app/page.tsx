@@ -8,7 +8,7 @@ import { collection, getDocs, limit, onSnapshot, orderBy, query, where } from "f
 import { db, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
 import { Listing, formattedPrice } from "@/lib/types";
-import { REGIONS, citySlug } from "@/lib/categories";
+import { REGIONS } from "@/lib/categories";
 import { timeAgo } from "@/lib/timeago";
 
 const CITY_OPTIONS = [
@@ -33,14 +33,19 @@ const EXPAT_TOOLS = [
   ["📅", "Days Between Dates", "Calculate the days between two dates", "/tools/days-between-dates/"],
 ] as const;
 
+// Keep only the nine actual top-level categories from the Post a Listing form.
+// Subcategories such as Mobiles, Furniture, Driver/Labour and Umrah Packages remain
+// available through their parent category and are not duplicated as homepage cards.
 const CATEGORY_CARDS = [
-  ["⌂", "Housing", "Rent, Sale", "Housing"],
-  ["🚗", "Cars", "Buy & Sell", "Car"],
-  ["▣", "Electronics", "Mobiles, Laptops", "Electronics"],
-  ["⚒", "Services", "Home, Repair", "Services"],
-  ["▤", "Jobs", "Drivers, Labour", "Jobs"],
-  ["♙", "Community", "Groups, Events", "Community"],
-  ["•••", "Others", "More Ads", "Classifieds"],
+  { icon: "⌂", title: "Housing", subtitle: "Rent & sale", category: "Housing" },
+  { icon: "🚗", title: "Cars", subtitle: "Buy & sell", category: "Car" },
+  { icon: "🛋️", title: "Household", subtitle: "Furniture & kitchen", category: "Household" },
+  { icon: "🛍️", title: "Buy & Sell", subtitle: "Everyday items", category: "Buy & Sell" },
+  { icon: "💻", title: "Electronics", subtitle: "Mobiles & devices", category: "Electronics" },
+  { icon: "🛠️", title: "Services", subtitle: "Repairs & support", category: "Services" },
+  { icon: "💼", title: "Jobs", subtitle: "Drivers & labour", category: "Jobs" },
+  { icon: "👥", title: "Community", subtitle: "Groups & events", category: "Community" },
+  { icon: "🏷️", title: "Classifieds", subtitle: "More opportunities", category: "Classifieds" },
 ] as const;
 
 const CATEGORY_ICONS: Record<string, string> = {
@@ -53,6 +58,19 @@ const CATEGORY_ICONS: Record<string, string> = {
   Jobs: "💼",
   Community: "👥",
   Classifieds: "🏷️",
+};
+
+// Matching color palette for all nine category cards, including Community and Classifieds.
+const CATEGORY_CARD_STYLES: Record<string, { bg: string; border: string; iconBg: string; accent: string }> = {
+  Housing: { bg: "#DDF8EC", border: "#22C55E", iconBg: "#A7EBCB", accent: "#087A4B" },
+  Car: { bg: "#FFE8D5", border: "#F97316", iconBg: "#FFD0AA", accent: "#C2410C" },
+  Household: { bg: "#DFEBFF", border: "#3B82F6", iconBg: "#B7D1FF", accent: "#1D4ED8" },
+  "Buy & Sell": { bg: "#FFE2ED", border: "#EC4899", iconBg: "#FFC1D9", accent: "#BE185D" },
+  Electronics: { bg: "#EBDDFF", border: "#8B5CF6", iconBg: "#D2B8FF", accent: "#6D28D9" },
+  Services: { bg: "#D8F7E8", border: "#10B981", iconBg: "#A7E8C9", accent: "#047857" },
+  Jobs: { bg: "#FFF1C4", border: "#EAB308", iconBg: "#FFDF78", accent: "#A16207" },
+  Community: { bg: "#D9F7EF", border: "#14B8A6", iconBg: "#A6EBDD", accent: "#0F766E" },
+  Classifieds: { bg: "#FFF0C9", border: "#F59E0B", iconBg: "#FFDB83", accent: "#92400E" },
 };
 
 type SortMode = "newest" | "price_low" | "price_high";
@@ -124,9 +142,11 @@ export default function KsaConnectPage() {
   const [error, setError] = useState<string | null>(null);
   const [cities, setCities] = useState<Set<string>>(new Set());
   const [categories, setCategories] = useState<Set<string>>(new Set());
+  const [selectedSubcategories, setSelectedSubcategories] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortMode>("newest");
   const [citiesExpanded, setCitiesExpanded] = useState(false);
+  const [showAllCities, setShowAllCities] = useState(false);
   const [blogPosts, setBlogPosts] = useState<{ slug: string; title: string; description: string }[]>([]);
 
   useEffect(() => {
@@ -168,15 +188,25 @@ export default function KsaConnectPage() {
     );
   }, []);
 
-  const hasActiveFilters = cities.size > 0 || categories.size > 0 || search.trim().length > 0;
+  const hasActiveFilters = cities.size > 0 || categories.size > 0 || selectedSubcategories.size > 0 || search.trim().length > 0;
+
+  // Live ad count per city (for the city cards)
+  const cityCounts = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const l of listings) if (l.city) m[l.city] = (m[l.city] ?? 0) + 1;
+    return m;
+  }, [listings]);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     const data = listings.filter((l) => {
       const cityMatch = cities.size === 0 || cities.has(l.city);
       const categoryMatch = categories.size === 0 || categories.has(l.category);
+      const rawListing = l as Listing & { subcategory?: string; subCategory?: string; sub_category?: string };
+      const listingSubcategory = String(rawListing.subcategory ?? rawListing.subCategory ?? rawListing.sub_category ?? "").trim().toLowerCase();
+      const subcategoryMatch = selectedSubcategories.size === 0 || Array.from(selectedSubcategories).some((value) => value.toLowerCase() === listingSubcategory);
       const text = `${l.title ?? ""} ${l.description ?? ""} ${l.city ?? ""} ${l.location ?? ""}`.toLowerCase();
-      return cityMatch && categoryMatch && (!term || text.includes(term));
+      return cityMatch && categoryMatch && subcategoryMatch && (!term || text.includes(term));
     });
 
     return [...data].sort((a, b) => {
@@ -185,7 +215,7 @@ export default function KsaConnectPage() {
       const bp = Number(b.price ?? 0);
       return sort === "price_low" ? ap - bp : bp - ap;
     });
-  }, [listings, cities, categories, search, sort]);
+  }, [listings, cities, categories, selectedSubcategories, search, sort]);
 
   const featured = listings.filter((l) => Boolean((l as Listing & { featured?: boolean }).featured)).slice(0, 6);
 
@@ -210,6 +240,7 @@ export default function KsaConnectPage() {
   const clearAll = () => {
     setCities(new Set());
     setCategories(new Set());
+    setSelectedSubcategories(new Set());
     setSearch("");
   };
 
@@ -304,7 +335,7 @@ export default function KsaConnectPage() {
         <div className="mk-search-wrap">
           <div className="mk-search-row">
             <label className="mk-search-field"><span>📍</span><select aria-label="Select a city or region" value={cityFilterValue} onChange={(e) => onCitySelect(e.target.value)}><option value="">All Cities</option>{REGIONS.map((r) => <optgroup key={r.key} label={`${r.emoji} ${r.label} Region`}><option value={`region:${r.key}`}>All {r.label} Region</option>{r.cities.map((c) => <option key={c} value={c}>{c}</option>)}</optgroup>)}</select></label>
-            <label className="mk-search-field"><span>▦</span><select aria-label="Select a category" value={categories.size === 1 ? Array.from(categories)[0] : ""} onChange={(e) => setCategories(e.target.value ? new Set([e.target.value]) : new Set())}><option value="">Select a Category</option>{CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}</select></label>
+            <label className="mk-search-field"><span>▦</span><select aria-label="Select a category" value={categories.size === 1 ? Array.from(categories)[0] : ""} onChange={(e) => { setCategories(e.target.value ? new Set([e.target.value]) : new Set()); setSelectedSubcategories(new Set()); }}><option value="">Select a Category</option>{CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}</select></label>
             <label className="mk-search-field mk-keyword"><span>⌕</span><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="What are you looking for?" aria-label="Search listings" /></label>
             <button className="mk-search-btn" onClick={() => document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" })}>Search Ads</button>
           </div>
@@ -324,6 +355,108 @@ export default function KsaConnectPage() {
           }
           .mk-social-btn:hover { background: var(--brand); border-color: var(--brand); transform: translateY(-2px); }
           .mk-follow { margin-top: 22px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+          /* Clean, compact selector for the 12 additional cities. The main 7 photo cards stay unchanged. */
+          .mk-extra-cities-panel {
+            margin-top: 12px;
+            padding: 12px 14px;
+            border: 1px solid #dce8e3;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #ffffff 0%, #f7faf8 100%);
+          }
+          .mk-extra-cities-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+            color: #53635e;
+            font-size: 12px;
+          }
+          .mk-extra-city-pills {
+            display: grid;
+            grid-template-columns: repeat(13, minmax(0, 1fr));
+            align-items: stretch;
+            gap: 8px;
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 3px 1px 7px;
+            scrollbar-width: thin;
+            -webkit-overflow-scrolling: touch;
+          }
+          /* Colorful, high-contrast chips for the 12 additional cities only. */
+          .mk-extra-city-pills .mk-all-regions-pill,
+          .mk-extra-city-pills .mk-all-regions-pill[aria-pressed="true"] {
+            border: 1px solid #004b3c;
+            background: linear-gradient(135deg, #006b53, #004638);
+            color: #fff;
+            box-shadow: 0 2px 5px rgba(0,75,60,.16);
+          }
+          .mk-extra-city-pills button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            width: 100%;
+            min-width: 0;
+            min-height: 44px;
+            box-sizing: border-box;
+            border: 1px solid #c9d8d3;
+            border-radius: 10px;
+            padding: 7px 5px;
+            background: #eef8ff;
+            color: #153b58;
+            font-size: 11.5px;
+            font-weight: 800;
+            line-height: 1.2;
+            text-align: center;
+            white-space: normal;
+            cursor: pointer;
+            text-shadow: none;
+            transition: border-color .15s ease, background .15s ease, transform .15s ease, box-shadow .15s ease;
+          }
+          .mk-extra-city-pills button:nth-child(2) { background: #e5f4ff; border-color: #7dbce8; color: #124b76; }
+          .mk-extra-city-pills button:nth-child(3) { background: #e5f8ed; border-color: #79c99b; color: #145b38; }
+          .mk-extra-city-pills button:nth-child(4) { background: #fff1d9; border-color: #e8bb63; color: #754600; }
+          .mk-extra-city-pills button:nth-child(5) { background: #f0eaff; border-color: #b4a0f0; color: #49328b; }
+          .mk-extra-city-pills button:nth-child(6) { background: #ffe9ef; border-color: #e99bb3; color: #8c2448; }
+          .mk-extra-city-pills button:nth-child(7) { background: #e2f8f7; border-color: #72c9c4; color: #075b58; }
+          .mk-extra-city-pills button:nth-child(8) { background: #fff0e5; border-color: #e8ad83; color: #7b3a16; }
+          .mk-extra-city-pills button:nth-child(9) { background: #eaf0ff; border-color: #9bb2f3; color: #243f8b; }
+          .mk-extra-city-pills button:nth-child(10) { background: #f1f7df; border-color: #bfd278; color: #455b12; }
+          .mk-extra-city-pills button:nth-child(11) { background: #ffe9df; border-color: #e9a28a; color: #812f19; }
+          .mk-extra-city-pills button:nth-child(12) { background: #e7f3ff; border-color: #8ab9e8; color: #164d7b; }
+          .mk-extra-city-pills button:nth-child(13) { background: #fce9f7; border-color: #e1a1d2; color: #7b2868; }
+          .mk-extra-city-pills button:hover {
+            filter: saturate(1.15) brightness(.98);
+            border-color: #005744;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(12,35,29,.12);
+          }
+          .mk-extra-city-pills button[aria-pressed="true"] {
+            border: 2px solid #b78300;
+            background: #fff0b8;
+            color: #4b3500;
+            box-shadow: 0 0 0 2px rgba(246,185,31,.22), 0 3px 8px rgba(12,35,29,.10);
+          }
+          .mk-extra-city-pills button span:first-child { font-size: 12px; }
+          .mk-extra-city-pills small {
+            color: inherit;
+            opacity: .82;
+            font-size: 10px;
+            font-weight: 800;
+          }
+          @media (max-width: 900px) {
+            .mk-extra-city-pills {
+              grid-template-columns: repeat(13, minmax(78px, 1fr));
+            }
+          }
+          @media (max-width: 640px) {
+            .mk-extra-cities-panel { padding: 10px; }
+            .mk-extra-cities-heading { align-items: flex-start; flex-direction: column; gap: 3px; }
+            .mk-extra-city-pills { gap: 6px; }
+            .mk-extra-city-pills button { min-height: 42px; padding: 7px 5px; }
+          }
           .mk-follow p { margin: 0; font-size: 14px; color: rgba(255,255,255,.85); }
           .mk-footer-social { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 18px 0 6px; }
           .mk-footer-social strong { font-size: 13px; letter-spacing: .6px; text-transform: uppercase; color: #005744; }
@@ -349,6 +482,50 @@ export default function KsaConnectPage() {
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
+          }
+          /* Compact the PDF & Expat Tools cards without changing their destinations. */
+          .mk-main .mk-pdf-popular {
+            padding: 18px 20px !important;
+          }
+          .mk-main .mk-pdf-popular h2 {
+            font-size: clamp(20px, 2vw, 25px) !important;
+            line-height: 1.2 !important;
+            margin-bottom: 4px !important;
+          }
+          .mk-main .mk-pdf-popular [class*="grid"] {
+            gap: 9px 10px !important;
+          }
+          .mk-main .mk-pdf-popular a {
+            min-height: 54px !important;
+            padding: 8px 10px !important;
+            gap: 9px !important;
+            border-radius: 12px !important;
+          }
+          .mk-main .mk-pdf-popular a > span:first-child {
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            border-radius: 9px !important;
+            font-size: 15px !important;
+          }
+          .mk-main .mk-pdf-popular a strong {
+            font-size: 11.5px !important;
+            line-height: 1.2 !important;
+          }
+          .mk-main .mk-pdf-popular a small {
+            font-size: 9.5px !important;
+            line-height: 1.25 !important;
+            margin-top: 2px !important;
+          }
+          .mk-main .mk-pdf-popular a > b,
+          .mk-main .mk-pdf-popular a > svg:last-child {
+            font-size: 16px !important;
+            width: 15px !important;
+            min-width: 15px !important;
+          }
+          @media (max-width: 760px) {
+            .mk-main .mk-pdf-popular { padding: 14px !important; }
+            .mk-main .mk-pdf-popular a { min-height: 52px !important; padding: 7px 8px !important; }
           }
           .mk-tools-showcase {
             position: relative;
@@ -541,35 +718,156 @@ export default function KsaConnectPage() {
         <RestaurantSpotlight />
 
         <section id="cities" className="mk-section">
-          <div className="mk-section-head"><h2>Browse Ads by City</h2><button onClick={() => { setCities(new Set()); document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" }); }}>View all cities →</button></div>
-          <div className="mk-city-grid">
-            {CITY_OPTIONS.map((city, i) => (
-              <a
-                key={city.value}
-                href={`/ksa-connect/city/${citySlug(city.value)}`}
-                className="mk-city-card"
-                style={{ backgroundImage: `linear-gradient(180deg, rgba(2,24,34,.02) 35%, rgba(2,12,20,.9) 100%), url('/images/cities/${city.image}.jpg')` }}
-              >
-                <span className="mk-city-number">{i + 1}</span><span className="mk-city-name">● &nbsp;{city.label}</span>
-              </a>
-            ))}
+          <div className="mk-section-head">
+            <h2>Browse Ads by City</h2>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <button type="button" onClick={() => setShowAllCities((v) => !v)} aria-expanded={showAllCities}>
+                {showAllCities ? "Show main cities ↑" : "View all cities →"}
+              </button>
+              <button type="button" onClick={() => { setCities(new Set()); document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" }); }}>
+                View all ads →
+              </button>
+            </div>
           </div>
+
+          {/* Keep the seven main city photo cards visible, matching the live homepage. */}
+          <div className="mk-city-grid">
+            {CITY_OPTIONS.map((city, index) => {
+              const count = cityCounts[city.value] ?? cityCounts[city.label] ?? 0;
+              const countText = count > 0 ? `${count} ad${count === 1 ? "" : "s"}` : "Be the first to post →";
+              const selected = cities.has(city.value) || (city.value === "Madinah" && cities.has("Madina"));
+              return (
+                <button
+                  key={city.value}
+                  type="button"
+                  className="mk-city-card"
+                  aria-pressed={selected}
+                  onClick={() => {
+                    setCities(new Set([city.value]));
+                    document.getElementById("listings")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                  style={{
+                    backgroundImage: `linear-gradient(180deg, rgba(2,24,34,.02) 35%, rgba(2,12,20,.9) 100%), url('/images/cities/${city.image}.jpg')`,
+                    border: selected ? "2px solid #f6b91f" : undefined,
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                >
+                  <span aria-hidden="true" style={{ position: "absolute", top: 8, left: 8, width: 23, height: 23, display: "grid", placeItems: "center", borderRadius: "50%", background: "#005744", color: "#fff", fontSize: 12, fontWeight: 800 }}>{index + 1}</span>
+                  <span className="mk-city-name">
+                    ● &nbsp;{city.label}
+                    <small style={{ display: "block", fontSize: 12, fontWeight: 600, opacity: 0.9, marginTop: 2 }}>{countText}</small>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {showAllCities && (
+            <div className="mk-extra-cities-panel" aria-label="Additional Saudi cities">
+              <div className="mk-extra-cities-heading">
+                <strong style={{ color: "#0c1730", fontSize: 13 }}>Explore 12 more cities</strong>
+                <span>Select a city to view its ads. Choose All Regions to show listings from every city.</span>
+              </div>
+              <div className="mk-extra-city-pills" aria-label="All regions and additional cities">
+                <button
+                  type="button"
+                  className="mk-all-regions-pill"
+                  aria-pressed={cities.size === 0}
+                  title="Show listings from all cities"
+                  onClick={() => {
+                    setCities(new Set());
+                    document.getElementById("listings")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                >
+                  🇸🇦 <span>All Regions</span>
+                </button>
+                {(() => {
+                  const mainCityValues = new Set(CITY_OPTIONS.map((city) => city.value));
+                  const extraCities = REGIONS.flatMap((region) => region.cities
+                    .filter((city) => !mainCityValues.has(city) && !CITY_OPTIONS.some((main) => main.label === city))
+                    .map((city) => ({ city, region })));
+
+                  return extraCities.map(({ city, region }) => {
+                    const count = cityCounts[city] ?? 0;
+                    const selected = cities.has(city);
+                    return (
+                      <button
+                        key={city}
+                        type="button"
+                        aria-pressed={selected}
+                        title={`View ${city} listings`}
+                        onClick={() => {
+                          setCities(new Set([city]));
+                          document.getElementById("listings")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }}
+                      >
+                        <span aria-hidden="true">{region.emoji}</span>
+                        <span>{city}</span>
+                        {count > 0 && <small>{count}</small>}
+                      </button>
+                    );
+                  });
+                })()}
+              </div>
+            </div>
+          )}
         </section>
 
         <section id="categories" className="mk-section">
           <div className="mk-section-head"><h2>Browse by Category</h2><button onClick={clearAll}>View all categories →</button></div>
-          <div className="mk-category-grid">
-            {CATEGORY_CARDS.map(([icon, title, sub, filter]) => (
-              <button key={title} className={`mk-category-card${filter && categories.has(filter) ? " mk-category-card-active" : ""}`} onClick={() => filter && setCategories(new Set([filter]))}>
-                <span className="mk-category-icon">{icon}</span><strong>{title}</strong><small>{sub}</small>
-              </button>
-            ))}
+          <div
+            className="mk-category-grid mk-category-grid-scroll"
+            aria-label="Browse listing categories"
+            style={{ display: "flex", gap: "8px", overflowX: "auto", overflowY: "hidden", paddingBottom: "8px", scrollSnapType: "x proximity", WebkitOverflowScrolling: "touch" }}
+          >
+            {CATEGORY_CARDS.map((card) => {
+              const selected = categories.has(card.category) && (
+                "subcategories" in card
+                  ? card.subcategories.some((sub) => selectedSubcategories.has(sub))
+                  : selectedSubcategories.size === 0
+              );
+              return (
+                <button
+                  key={card.title}
+                  type="button"
+                  aria-pressed={selected}
+                  title={`Browse ${card.title} listings`}
+                  className={`mk-category-card${selected ? " mk-category-card-active" : ""}`}
+                  style={{
+                    flex: "1 0 0",
+                    minWidth: "100px",
+                    width: "auto",
+                    height: "92px",
+                    boxSizing: "border-box",
+                    scrollSnapAlign: "start",
+                    background: CATEGORY_CARD_STYLES[card.category].bg,
+                    borderColor: CATEGORY_CARD_STYLES[card.category].border,
+                    borderTop: `4px solid ${CATEGORY_CARD_STYLES[card.category].border}`,
+                    color: CATEGORY_CARD_STYLES[card.category].accent,
+                  }}
+                  onClick={() => {
+                    setCategories(new Set([card.category]));
+                    setSelectedSubcategories(new Set("subcategories" in card ? card.subcategories : []));
+                    document.getElementById("listings")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                >
+                  <span
+                    className="mk-category-icon"
+                    aria-hidden="true"
+                    style={{ background: CATEGORY_CARD_STYLES[card.category].iconBg, color: CATEGORY_CARD_STYLES[card.category].accent }}
+                  >{card.icon}</span>
+                  <strong>{card.title}</strong>
+                  <small>{card.subtitle}</small>
+                </button>
+              );
+            })}
           </div>
         </section>
 
         <section id="about" className="mk-benefits">
-          <div className="mk-why"><p>Why Choose</p><h2>MYKSA <span>CONNECT?</span></h2><ul><li>100% Free to Use</li><li>Post Unlimited Ads</li><li>Chat Directly &amp; Securely</li><li>Reach Local Buyers Faster</li><li>Available Across 7 Major Cities</li></ul></div>
-          <div className="mk-map-card"><div className="mk-map-art">✦<br />☀</div><div><strong>One Platform.<br />7 Major Cities.</strong><b>Millions of Opportunities.</b></div></div>
+          <div className="mk-why"><p>Why Choose</p><h2>MYKSA <span>CONNECT?</span></h2><ul><li>100% Free to Use</li><li>Post Unlimited Ads</li><li>Chat Directly &amp; Securely</li><li>Reach Local Buyers Faster</li><li>Available Across Every Region of Saudi Arabia</li></ul></div>
+          <div className="mk-map-card"><div className="mk-map-art">✦<br />☀</div><div><strong>One Platform.<br />19 Cities, 5 Regions.</strong><b>Millions of Opportunities.</b></div></div>
           <div className="mk-app-card"><div><p className="mk-app-kicker">TAKE MYKSA CONNECT</p><h2>With You Anywhere</h2><p>Post, chat and manage your ads on the go.</p><div className="mk-store-row"><a href="https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect" target="_blank" rel="noreferrer">▶ Google Play</a><a href="/ksa-connect/faq"> App Store</a></div></div><div className="mk-mini-phone">MYKSA<br /><b>CONNECT</b></div></div>
         </section>
 
@@ -638,7 +936,7 @@ export default function KsaConnectPage() {
                 })}
                 <button className="view-more-toggle" onClick={() => setCitiesExpanded((v) => !v)}>{citiesExpanded ? "View less ˄" : "All regions ˅"}</button>
               </div>
-              <div className="filter-group"><p className="filter-group-title">Category</p>{CATEGORIES.map((c) => <label className={`checkbox-row${categories.has(c) ? " checkbox-row-active" : ""}`} key={c}><input type="checkbox" checked={categories.has(c)} onChange={() => toggle(categories, setCategories, c)} /><span className="checkbox-icon">{CATEGORY_ICONS[c]}</span>{c}</label>)}</div>
+              <div className="filter-group"><p className="filter-group-title">Category</p>{CATEGORIES.map((c) => <label className={`checkbox-row${categories.has(c) ? " checkbox-row-active" : ""}`} key={c}><input type="checkbox" checked={categories.has(c)} onChange={() => { toggle(categories, setCategories, c); setSelectedSubcategories(new Set()); }} /><span className="checkbox-icon">{CATEGORY_ICONS[c]}</span>{c}</label>)}</div>
             </aside>
             <div className="listings-main">
               <div className="listings-topbar"><input className="search-input" type="text" placeholder="Search listings by title…" value={search} onChange={(e) => setSearch(e.target.value)} style={{ flex: 1, minWidth: 180 }} /><select className="sort-select" value={sort} onChange={(e) => setSort(e.target.value as SortMode)}><option value="newest">Newest first</option><option value="price_low">Price: Low to High</option><option value="price_high">Price: High to Low</option></select><a href="/ksa-connect/post" className="mk-btn mk-btn-gold listings-post-btn">＋ Post an Ad</a></div>
@@ -649,7 +947,7 @@ export default function KsaConnectPage() {
                   {!regionSelected && cities.size === 1 && (
                     <> in <strong>{Array.from(cities)[0]}</strong></>
                   )}
-                  {categories.size === 1 && <> · {Array.from(categories)[0]}</>}
+                  {categories.size === 1 && <> · {Array.from(categories)[0]}</>}{selectedSubcategories.size > 0 && <> · {Array.from(selectedSubcategories).join(" / ")}</>}
                 </p>
               )}
               {loading && <div className="listing-grid" style={{ margin: "20px 0 0" }}>{Array.from({ length: 6 }).map((_, i) => <div className="skeleton-card" key={i}><div className="skeleton skeleton-image" /><div className="skeleton-body"><div className="skeleton skeleton-line" style={{ width: "80%" }} /><div className="skeleton skeleton-line" style={{ width: "50%" }} /><div className="skeleton skeleton-line" style={{ width: "65%", marginBottom: 0 }} /></div></div>)}</div>}
@@ -741,7 +1039,7 @@ export default function KsaConnectPage() {
           <section className="mk-trust-strip" aria-label="Trust and support info">
             <div><span>♙</span><strong>Safe &amp; Secure</strong><small>Your privacy and safety are our priority.</small></div>
             <div><span>♢</span><strong>Verified Users</strong><small>Build trust with verified buyers and sellers.</small></div>
-            <div><span>◎</span><strong>All Across Saudi Arabia</strong><small>7 Major cities. One trusted platform.</small></div>
+            <div><span>◎</span><strong>All Across Saudi Arabia</strong><small>19 cities across 5 regions. One trusted platform.</small></div>
             <div><span>♧</span><strong>24/7 Support</strong><small>We are here to help you anytime.</small></div>
           </section>
         </div>
@@ -754,7 +1052,7 @@ export default function KsaConnectPage() {
           <a href="/ksa-connect/faq">FAQ</a> ·{" "}
           <a href="/ksa-connect/privacy">Privacy Policy</a> ·{" "}
           <a href="/ksa-connect/safety">Safety &amp; Fraud Prevention</a> ·{" "}
-          <a href="mailto:abuman.moa@gmail.com">Contact</a>
+          <a href="mailto:myksaconnect@gmail.com">Contact</a>
         </p>
       </footer>
     </div>

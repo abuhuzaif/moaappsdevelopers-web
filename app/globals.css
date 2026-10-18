@@ -1512,3 +1512,60 @@ a {
 @media (max-width:420px){
   .mk-tools-grid{grid-template-columns:1fr}
 }
+
+/* MYKSA CONNECT — compact desktop hero, preserve original design */
+@media (min-width: 761px) {
+  .mk-hero {
+    min-height: clamp(520px, 28vw, 580px);
+    padding-bottom: 20px;
+  }
+
+  .mk-hero-inner {
+    padding-top: 14px;
+    padding-bottom: 90px;
+  }
+
+  .mk-hero-copy {
+    margin-top: 35px;
+  }
+
+  .mk-hero-copy h1 {
+    margin-bottom: 11px;
+  }
+
+  .mk-hero-copy > p {
+    margin-bottom: 17px;
+  }
+
+  .mk-hero-actions {
+    margin-bottom: 20px;
+  }
+
+  .mk-trust-mini {
+    gap: 22px;
+  }
+}
+
+
+/* MYKSA CONNECT: consistent homepage section alignment */
+@media (min-width: 761px) {
+  .mk-main {
+    width: 90vw;
+    max-width: 1500px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 30px;
+    padding-right: 30px;
+    box-sizing: border-box;
+  }
+
+  .mk-main .mk-pdf-popular,
+  .mk-main .mk-tools-strip,
+  .mk-main .mk-restaurant-strip {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    box-sizing: border-box;
+  }
+}
