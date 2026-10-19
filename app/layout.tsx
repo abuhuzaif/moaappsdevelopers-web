@@ -182,8 +182,7 @@ export default function RootLayout({
             rel="preload"
             as="image"
             href="/images/ksa-connect-hero.webp"
-            // @ts-expect-error -- fetchPriority is valid HTML but not yet in React's type defs
-            fetchpriority="high"
+            fetchPriority="high"
           />
         )}
 
