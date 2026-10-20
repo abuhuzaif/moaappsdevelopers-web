@@ -12,7 +12,7 @@ import { REGIONS } from "@/lib/categories";
 import { timeAgo } from "@/lib/timeago";
 
 const CITY_OPTIONS = [
-  { value: "Madinah", label: "Madina", image: "madina" },
+  { value: "Madinah", label: "Madinah", image: "madina" },
   { value: "Riyadh", label: "Riyadh", image: "riyadh" },
   { value: "Jeddah", label: "Jeddah", image: "jeddah" },
   { value: "Dammam", label: "Dammam", image: "dammam" },
@@ -146,6 +146,9 @@ export default function KsaConnectPage() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortMode>("newest");
   const [citiesExpanded, setCitiesExpanded] = useState(false);
+  // Homepage "Explore 12 more cities" panel — hidden for now (being redesigned in the RND
+  // project). Set to true to bring the "View all cities →" button and panel back.
+  const SHOW_EXTRA_CITIES = false;
   const [showAllCities, setShowAllCities] = useState(false);
   const [blogPosts, setBlogPosts] = useState<{ slug: string; title: string; description: string }[]>([]);
 
@@ -721,9 +724,11 @@ export default function KsaConnectPage() {
           <div className="mk-section-head">
             <h2>Browse Ads by City</h2>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <button type="button" onClick={() => setShowAllCities((v) => !v)} aria-expanded={showAllCities}>
-                {showAllCities ? "Show main cities ↑" : "View all cities →"}
-              </button>
+              {SHOW_EXTRA_CITIES && (
+                <button type="button" onClick={() => setShowAllCities((v) => !v)} aria-expanded={showAllCities}>
+                  {showAllCities ? "Show main cities ↑" : "View all cities →"}
+                </button>
+              )}
               <button type="button" onClick={() => { setCities(new Set()); document.getElementById("listings")?.scrollIntoView({ behavior: "smooth" }); }}>
                 View all ads →
               </button>
@@ -763,7 +768,7 @@ export default function KsaConnectPage() {
             })}
           </div>
 
-          {showAllCities && (
+          {SHOW_EXTRA_CITIES && showAllCities && (
             <div className="mk-extra-cities-panel" aria-label="Additional Saudi cities">
               <div className="mk-extra-cities-heading">
                 <strong style={{ color: "#0c1730", fontSize: 13 }}>Explore 12 more cities</strong>
