@@ -2,18 +2,18 @@ import type { Metadata } from "next";
 import AndroidRedirect from "./AndroidRedirect";
 
 const PLAY_URL = "https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect";
-const URL = "https://www.myksaconnect.com/app";
+const PAGE_URL = "https://www.myksaconnect.com/app";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.myksaconnect.com"),
-  title: "Download MYKSA-Connect App — Free Ads, Menus & Daily Tools for Saudi Expats",
+  title: "Download MYKSA-Connect App â€” Free Ads, Menus & Daily Tools for Saudi Expats",
   description:
-    "Buy, sell, rent and connect across Saudi Arabia. Free ads, restaurant menus and daily tools — Hijri converter, VAT, Iqama reminders and Scan to PDF. Get the free Android app.",
-  alternates: { canonical: URL },
+    "Buy, sell, rent and connect across Saudi Arabia. Free ads, restaurant menus and daily tools â€” Hijri converter, VAT, Iqama reminders and Scan to PDF. Get the free Android app.",
+  alternates: { canonical: PAGE_URL },
   openGraph: {
-    title: "MYKSA-Connect — Free App for Saudi Expats",
+    title: "MYKSA-Connect â€” Free App for Saudi Expats",
     description: "Free ads, restaurant menus & daily tools (Hijri, VAT, Iqama reminders, Scan to PDF). Download free on Google Play.",
-    url: URL,
+    url: PAGE_URL,
     type: "website",
     siteName: "MYKSA Connect",
   },
@@ -21,12 +21,12 @@ export const metadata: Metadata = {
 };
 
 const features = [
-  ["🏠", "Free ads", "Rooms, flats, cars, jobs & more in 19 cities"],
-  ["🍽️", "Digital menus", "Browse restaurant menus & order on WhatsApp"],
-  ["🧰", "Daily tools", "Hijri converter, VAT, End of Service, currency"],
-  ["⏰", "Iqama reminders", "Never miss Iqama, passport or licence expiry"],
-  ["📄", "Scan to PDF", "Turn papers into clean PDFs in seconds"],
-  ["💬", "Chat & WhatsApp", "Contact sellers with one tap"],
+  ["ðŸ ", "Free ads", "Rooms, flats, cars, jobs & more in 19 cities"],
+  ["ðŸ½ï¸", "Digital menus", "Browse restaurant menus & order on WhatsApp"],
+  ["ðŸ§°", "Daily tools", "Hijri converter, VAT, End of Service, currency"],
+  ["â°", "Iqama reminders", "Never miss Iqama, passport or licence expiry"],
+  ["ðŸ“„", "Scan to PDF", "Turn papers into clean PDFs in seconds"],
+  ["ðŸ’¬", "Chat & WhatsApp", "Contact sellers with one tap"],
 ];
 
 export default function AppDownloadPage() {
@@ -39,7 +39,7 @@ export default function AppDownloadPage() {
         <h1 style={{ margin: "18px 0 6px", fontSize: "clamp(1.8rem, 6vw, 2.6rem)", lineHeight: 1.15 }}>
           MYKSA<span style={{ color: "#f6b91f" }}>-Connect</span>
         </h1>
-        <p style={{ margin: 0, fontSize: "1.1rem", opacity: 0.9 }}>Buy, sell, rent &amp; connect across Saudi Arabia 🇸🇦</p>
+        <p style={{ margin: 0, fontSize: "1.1rem", opacity: 0.9 }}>Buy, sell, rent &amp; connect across Saudi Arabia ðŸ‡¸ðŸ‡¦</p>
 
         <a
           href={PLAY_URL}
@@ -48,10 +48,10 @@ export default function AppDownloadPage() {
             color: "#071228", fontWeight: 900, fontSize: "1.1rem", textDecoration: "none", boxShadow: "0 10px 28px rgba(246,185,31,.35)",
           }}
         >
-          ▶ Get it free on Google Play
+          â–¶ Get it free on Google Play
         </a>
         <p style={{ margin: "10px 0 0", fontSize: 13, opacity: 0.75 }}>
-          No Android? <a href="/" style={{ color: "#f6b91f" }}>Use the website →</a>
+          No Android? <a href="/" style={{ color: "#f6b91f" }}>Use the website â†’</a>
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginTop: 34, textAlign: "left" }}>
