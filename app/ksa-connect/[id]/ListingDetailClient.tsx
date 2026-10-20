@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { doc, deleteDoc, updateDoc, increment, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import ExpiredAd from "./ExpiredAd";
 import { Listing, formattedPrice } from "@/lib/types";
 import { timeAgo } from "@/lib/timeago";
 import { useAuth } from "@/lib/useAuth";
@@ -195,7 +196,7 @@ export default function ListingDetailClient() {
         )}
 
         {loading && <p>Loading…</p>}
-        {error && <div className="empty-state">{error}</div>}
+        {error && (error.includes("doesn't exist") ? <ExpiredAd /> : <div className="empty-state">{error}</div>)}
 
         {listing && (
           <div
