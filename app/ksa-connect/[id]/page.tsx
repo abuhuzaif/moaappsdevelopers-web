@@ -36,7 +36,7 @@ type SeoListing = {
  * Reads the listing on the server with Firestore's REST API.
  * Returns the listing, "missing" (404) or null (couldn't tell, e.g. 403 from rules).
  */
-async function fetchListing(id: string): Promise<SeoListing | "missing" | null> {
+async function fetchListing(id: string): Promise<SeoListing | "missing" | "hidden" | null> {
   if (!PROJECT_ID) return null;
   try {
     const url =
@@ -44,7 +44,10 @@ async function fetchListing(id: string): Promise<SeoListing | "missing" | null> 
       `${encodeURIComponent(id)}${API_KEY ? `?key=${API_KEY}` : ""}`;
     const res = await fetch(url, { next: { revalidate: 60 } });
     if (res.status === 404) return "missing";
-    if (!res.ok) return null; // 403: rules hide missing/private docs — let the client decide
+    // 403: security rules hide deleted/expired or sold ads from anonymous readers.
+    // The page still works for the owner (client side), but Google must not index it.
+    if (res.status === 403) return "hidden";
+    if (!res.ok) return null;
     const doc = (await res.json()) as { fields?: Record<string, FsValue> };
     const f = doc.fields ?? {};
     const str = (k: string) => (f[k]?.stringValue ?? "").trim();
@@ -89,10 +92,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const url = `${SITE}/ksa-connect/${encodeURIComponent(id)}`;
   const l = await fetchListing(id);
 
-  if (!l || l === "missing") {
+  if (!l || l === "missing" || l === "hidden") {
     return {
       title: "Ad on MYKSA Connect — Classifieds for Saudi Expats",
       alternates: { canonical: url },
+      // Expired/removed/sold ads: tell Google to drop them (avoids "Soft 404").
+      ...(l === "hidden" || l === "missing" ? { robots: { index: false, follow: true } } : {}),
     };
   }
 
