@@ -67,10 +67,10 @@ export const metadata: Metadata = isKsaConnectSite
         locale: "en_SA",
         images: [
           {
-            url: "/images/myksa-tools-banner.png",
+            url: "/og",
             width: 1200,
             height: 630,
-            alt: "MYKSA CONNECT Saudi Arabia classifieds and expat tools",
+            alt: "MYKSA CONNECT — Saudi Arabia classifieds and expat tools",
           },
         ],
       },
@@ -79,7 +79,7 @@ export const metadata: Metadata = isKsaConnectSite
         title: "MYKSA CONNECT — Saudi Arabia Classifieds & Expat Tools",
         description:
           "Classifieds, local services and free Saudi expat tools for residents across Saudi Arabia.",
-        images: ["/images/myksa-tools-banner.png"],
+        images: ["/og"],
       },
       other: {
         "facebook-domain-verification": "6clnzykpdbwzf363ahl9yqy3olpz25",
