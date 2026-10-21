@@ -20,19 +20,29 @@ async function getRestaurant(slug: string): Promise<R | null> {
   }
 }
 
-/** Loads an image as a data URL — only PNG/JPEG (what the image renderer supports). */
+/**
+ * Loads an image as a data URL for the card. Only real PNG/JPEG files are used
+ * (checked by their first bytes — the server's content-type can be wrong, e.g.
+ * a WebP saved as .jpg), small enough and fast enough; anything else is skipped
+ * so the card still renders (navy background / first letter instead).
+ */
 async function asDataUrl(url?: string): Promise<string | null> {
   if (!url) return null;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 4000);
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, { signal: controller.signal });
     if (!res.ok) return null;
-    const type = (res.headers.get("content-type") ?? "").split(";")[0].trim();
-    if (!["image/png", "image/jpeg", "image/jpg"].includes(type)) return null;
     const buf = Buffer.from(await res.arrayBuffer());
-    if (buf.length > 4_000_000) return null;
-    return `data:${type};base64,${buf.toString("base64")}`;
+    if (buf.length < 16 || buf.length > 2_500_000) return null;
+    const isPng = buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47;
+    const isJpg = buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
+    if (!isPng && !isJpg) return null;
+    return `data:${isPng ? "image/png" : "image/jpeg"};base64,${buf.toString("base64")}`;
   } catch {
     return null;
+  } finally {
+    clearTimeout(timer);
   }
 }
 
