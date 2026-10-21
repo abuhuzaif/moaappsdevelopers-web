@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { doc, deleteDoc, updateDoc, increment, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import ExpiredAd from "./ExpiredAd";
+import { track } from "@/lib/analytics";
 import { Listing, formattedPrice } from "@/lib/types";
 import { timeAgo } from "@/lib/timeago";
 import { useAuth } from "@/lib/useAuth";
@@ -87,6 +88,17 @@ export default function ListingDetailClient() {
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Remember visitors who came from Facebook/Instagram, so if they post an ad
+  // we know the social channels brought them (saved as `source` on the ad).
+  useEffect(() => {
+    try {
+      const qs = new URLSearchParams(window.location.search).get("utm_source");
+      const ref = document.referrer.toLowerCase();
+      const src = qs || (ref.includes("facebook.com") ? "facebook" : ref.includes("instagram.com") ? "instagram" : "");
+      if (src && !sessionStorage.getItem("mk_src")) sessionStorage.setItem("mk_src", src.slice(0, 30));
+    } catch {}
+  }, []);
   const [activeImage, setActiveImage] = useState(0);
   const [deleting, setDeleting] = useState(false);
 
@@ -258,6 +270,7 @@ export default function ListingDetailClient() {
                   cursor: "pointer", textDecoration: "none",
                 } as const;
                 const onShare = async () => {
+                  track("share_ad", { method: "share_button", listing_id: id, category: listing.category, city: listing.city });
                   if (typeof navigator !== "undefined" && navigator.share) {
                     try {
                       await navigator.share({ title: listing.title, text, url });
@@ -282,10 +295,10 @@ export default function ListingDetailClient() {
                     </button>
                     {shareOpen && (
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
-                        <a href={`https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`} target="_blank" rel="noopener noreferrer" style={btn}>
+                        <a href={`https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`} target="_blank" rel="noopener noreferrer" style={btn} onClick={() => track("share_ad", { method: "whatsapp", listing_id: id })}>
                           💬 WhatsApp
                         </a>
-                        <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" style={btn}>
+                        <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" style={btn} onClick={() => track("share_ad", { method: "facebook", listing_id: id })}>
                           📘 Facebook
                         </a>
                         <a href={`https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" style={btn}>
@@ -355,6 +368,7 @@ export default function ListingDetailClient() {
               <div style={{ display: "flex", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
                 <a
                   href={`tel:+966${listing.phone}`}
+                  onClick={() => track("contact_call", { listing_id: id, category: listing.category, city: listing.city })}
                   style={{
                     flex: "1 1 140px", textAlign: "center", padding: "12px 18px", borderRadius: 12,
                     border: "2px solid #005744", color: "#005744", background: "#fff",
@@ -365,6 +379,7 @@ export default function ListingDetailClient() {
                 </a>
                 <a
                   href={`https://wa.me/966${listing.phone.replace(/[^0-9]/g, "")}`}
+                  onClick={() => track("contact_whatsapp", { listing_id: id, category: listing.category, city: listing.city })}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -437,6 +452,7 @@ export default function ListingDetailClient() {
                     {(
                       <a
                         href={`https://wa.me/?text=${shareText}`}
+                        onClick={() => track("share_ad", { method: "whatsapp_box", listing_id: id, is_owner: isOwner })}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{

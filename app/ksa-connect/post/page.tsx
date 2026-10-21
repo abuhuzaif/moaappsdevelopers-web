@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/useAuth";
 import { isAdmin } from "@/lib/admin";
 import { CITIES, CATEGORIES, SUB_CATEGORIES, REGIONS } from "@/lib/categories";
 import { DRAFT_TEMPLATES } from "@/lib/draftTemplates";
+import { track } from "@/lib/analytics";
 
 const MAX_PHOTOS = 3;
 const LISTING_LIFESPAN_DAYS = 8;
@@ -51,6 +52,19 @@ function PostListingForm() {
   const [error, setError] = useState<string | null>(null);
   const [editLoading, setEditLoading] = useState(!!editId);
   const [notAuthorized, setNotAuthorized] = useState(false);
+
+  // New ad from a link like /ksa-connect/post?category=Housing (Facebook "post for free" CTA):
+  // pre-select that category, and remember where the visitor came from.
+  useEffect(() => {
+    if (editId) return;
+    const c = searchParams.get("category");
+    if (c && CATEGORIES.some((x) => x.key === c)) onCategoryChange(c);
+    const src = searchParams.get("utm_source");
+    if (src) {
+      try { sessionStorage.setItem("mk_src", src.slice(0, 30)); } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Edit mode: load the existing listing and prefill the form. Runs once
   // the signed-in user is known, so we can check owner/admin authorization.
@@ -225,7 +239,9 @@ function PostListingForm() {
         const expiresAt = Timestamp.fromDate(
           new Date(Date.now() + LISTING_LIFESPAN_DAYS * 24 * 60 * 60 * 1000)
         );
-        await addDoc(collection(db, "listings"), {
+        let source: string | null = null;
+        try { source = sessionStorage.getItem("mk_src"); } catch {}
+        const newListing = {
           ...commonFields,
           userId: user.uid,
           userName: adminPosting ? ADMIN_PUBLIC_NAME : user.displayName ?? "User",
@@ -237,9 +253,26 @@ function PostListingForm() {
           status: "active",
           latitude: null,
           longitude: null,
-        });
+        };
+        try {
+          // `source` (e.g. "facebook") shows which channel brings new posters.
+          await addDoc(collection(db, "listings"), source ? { ...newListing, source } : newListing);
+        } catch (e: any) {
+          // If security rules don't allow the extra field, post without it.
+          if (source && String(e?.code ?? e?.message ?? "").includes("permission")) {
+            await addDoc(collection(db, "listings"), newListing);
+          } else {
+            throw e;
+          }
+        }
       }
 
+      track(editId ? "edit_ad_success" : "post_ad_success", {
+        category,
+        sub_category: subCategory,
+        city,
+        photos: existingImageUrls.length + files.length,
+      });
       router.push(editId ? `/ksa-connect/${editId}` : "/ksa-connect");
     } catch (err: any) {
       setError(err.message ?? "Something went wrong while posting.");

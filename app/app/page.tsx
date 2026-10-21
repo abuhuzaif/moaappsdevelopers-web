@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import AndroidRedirect from "./AndroidRedirect";
+import PlayButton from "./PlayButton";
 
 const PLAY_URL = "https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect";
 const PAGE_URL = "https://www.myksaconnect.com/app";
@@ -41,7 +42,7 @@ export default function AppDownloadPage() {
         </h1>
         <p style={{ margin: 0, fontSize: "1.1rem", opacity: 0.9 }}>Buy, sell, rent &amp; connect across Saudi Arabia 🇸🇦</p>
 
-        <a
+        <PlayButton
           href={PLAY_URL}
           style={{
             display: "inline-block", marginTop: 24, padding: "15px 30px", borderRadius: 14, background: "#f6b91f",
@@ -49,7 +50,7 @@ export default function AppDownloadPage() {
           }}
         >
           ▶ Get it free on Google Play
-        </a>
+        </PlayButton>
         <p style={{ margin: "10px 0 0", fontSize: 13, opacity: 0.75 }}>
           No Android? <a href="/" style={{ color: "#f6b91f" }}>Use the website →</a>
         </p>
