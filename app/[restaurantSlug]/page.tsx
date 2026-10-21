@@ -80,13 +80,15 @@ export async function generateMetadata({
   if (!isKsaConnectSite) return {};
   const { restaurantSlug } = await params;
   const found = await getRestaurant(restaurantSlug);
-  if (!found) return { title: "Restaurant Not Found — KSA-Connect" };
+  if (!found) return { title: "Restaurant Not Found — MYKSA Connect" };
   const restaurant = found.data;
 
-  const title = `${restaurant.name} — Digital Menu | KSA-Connect`;
+  const where = restaurant.city ? ` in ${restaurant.city}` : "";
+  const title = `${restaurant.name} — Digital Menu${where} | MYKSA Connect`;
+  const kind = restaurant.tagline || restaurant.cuisine || "Restaurant";
   const description =
     restaurant.description ||
-    `View the full menu, prices, and contact details for ${restaurant.name}${restaurant.city ? ` in ${restaurant.city}` : ""}. Powered by KSA-Connect.`;
+    `${kind}${where}. View the full menu with photos, prices & calories and order on WhatsApp. Powered by MYKSA Connect.`;
 
   return {
     title,
@@ -98,8 +100,9 @@ export async function generateMetadata({
       description,
       type: "website",
       url: `https://www.myksaconnect.com/${restaurant.slug}`,
-      images: restaurant.coverImageUrl ? [restaurant.coverImageUrl] : undefined,
+      siteName: "MYKSA Connect",
     },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
