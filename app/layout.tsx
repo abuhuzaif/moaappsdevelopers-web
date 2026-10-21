@@ -43,7 +43,9 @@ export const metadata: Metadata = isKsaConnectSite
         "SAR currency converter",
         "Saudi online tools",
       ],
-      alternates: { canonical: "/" },
+      // No site-wide canonical here: a canonical in the root layout is inherited by
+      // every page that doesn't set its own, telling Google they are all copies of
+      // the homepage. Each page sets its own canonical instead.
       robots: {
         index: true,
         follow: true,
@@ -120,11 +122,6 @@ const ksaConnectSchema = {
         "Saudi Arabia classifieds and free expat tools for housing, cars, services, work and everyday life.",
       publisher: { "@id": "https://www.myksaconnect.com/#organization" },
       inLanguage: "en-SA",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: "https://www.myksaconnect.com/ksa-connect?q={search_term_string}",
-        "query-input": "required name=search_term_string",
-      },
     },
   ],
 };

@@ -76,7 +76,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // only redirects), and Google reports redirecting sitemap URLs as not indexed.
     return [
       { url: `${base}/`, lastModified: now, changeFrequency: "daily", priority: 1 },
-      { url: `${base}/ksa-connect`, lastModified: now, changeFrequency: "hourly", priority: 0.95 },
       { url: `${base}/ksa-connect/post`, changeFrequency: "monthly", priority: 0.7 },
       { url: `${base}/app`, changeFrequency: "monthly", priority: 0.8 },
       { url: `${base}/tools`, changeFrequency: "weekly", priority: 0.95 },
