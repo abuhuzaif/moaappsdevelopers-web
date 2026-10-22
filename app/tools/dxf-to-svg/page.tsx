@@ -4,7 +4,7 @@ import CadToolPage from "../_components/CadToolPage";
 export const metadata: Metadata = {
   title: "DXF to SVG Converter Online | MYKSA CONNECT",
   description: "Convert DXF drawings to SVG online with MYKSA CONNECT.",
-  alternates: { canonical: "/tools/dxf-to-svg/" },
+  alternates: { canonical: "/tools/dxf-to-svg" },
 };
 
 export default function Page() {

@@ -4,7 +4,7 @@ import CadToolPage from "../_components/CadToolPage";
 export const metadata: Metadata = {
   title: "DWG to SVG Converter Online | MYKSA CONNECT",
   description: "Convert AutoCAD DWG drawings to SVG online with MYKSA CONNECT.",
-  alternates: { canonical: "/tools/dwg-to-svg/" },
+  alternates: { canonical: "/tools/dwg-to-svg" },
 };
 
 export default function Page() {

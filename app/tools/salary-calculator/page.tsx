@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     "Free Saudi salary calculator. Calculate monthly and annual salary including basic salary, housing, transport and other allowances in SAR.",
   alternates: {
-    canonical: "/tools/salary-calculator/",
+    canonical: "/tools/salary-calculator",
   },
   openGraph: {
     title: "Saudi Salary Calculator | MYKSA CONNECT",

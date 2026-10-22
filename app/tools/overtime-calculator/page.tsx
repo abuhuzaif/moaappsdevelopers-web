@@ -4,7 +4,7 @@ import ProfessionalTool from "./calculator";
 export const metadata: Metadata = {
   title: "Saudi Overtime Calculator | MYKSA CONNECT",
   description: "Estimate Saudi overtime compensation from basic salary and overtime hours.",
-  alternates: { canonical: "/tools/overtime-calculator/" },
+  alternates: { canonical: "/tools/overtime-calculator" },
   openGraph: {
     title: "Saudi Overtime Calculator | MYKSA CONNECT",
     description: "Estimate Saudi overtime compensation from basic salary and overtime hours.",

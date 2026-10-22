@@ -4,7 +4,7 @@ import ProfessionalTool from "./calculator";
 export const metadata: Metadata = {
   title: "Saudi Annual Leave Calculator | MYKSA CONNECT",
   description: "Estimate annual leave accrued and remaining under Saudi minimum leave rules.",
-  alternates: { canonical: "/tools/annual-leave-calculator/" },
+  alternates: { canonical: "/tools/annual-leave-calculator" },
   openGraph: {
     title: "Saudi Annual Leave Calculator | MYKSA CONNECT",
     description: "Estimate annual leave accrued and remaining under Saudi minimum leave rules.",

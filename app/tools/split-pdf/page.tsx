@@ -4,7 +4,7 @@ import SplitPdfClient from "../_components/SplitPdfClient";
 export const metadata: Metadata = {
   title: "Split PDF Online – Extract PDF Pages | MYKSA CONNECT",
   description: "Split PDF files online by page numbers and ranges. Extract selected pages, remove pages, or create separate PDFs directly in your browser.",
-  alternates: { canonical: "/tools/split-pdf/" },
+  alternates: { canonical: "/tools/split-pdf" },
 };
 
 export default function SplitPdfPage() {

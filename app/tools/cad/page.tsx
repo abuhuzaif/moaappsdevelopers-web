@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "CAD Tools — DWG & DXF Converters | MYKSA CONNECT",
   description: "Free online CAD conversion tools for DWG and DXF drawings: DWG to DXF, DWG to PDF, DWG to SVG and DXF to SVG.",
-  alternates: { canonical: "/tools/cad/" },
+  alternates: { canonical: "/tools/cad" },
 };
 
 const CAD_TOOLS = [

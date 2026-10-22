@@ -4,7 +4,7 @@ import MergePdfClient from "../_components/MergePdfClient";
 export const metadata: Metadata = {
   title: "Merge PDF Online – Combine Multiple PDF Files | MYKSA CONNECT",
   description: "Combine multiple PDF files into one PDF online. Add several files, reorder them, and merge them directly in your browser.",
-  alternates: { canonical: "/tools/merge-pdf/" },
+  alternates: { canonical: "/tools/merge-pdf" },
 };
 
 export default function MergePdfPage() {

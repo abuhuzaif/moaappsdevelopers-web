@@ -4,7 +4,7 @@ import PdfCompressionClient from "../_components/PdfCompressionClient";
 export const metadata: Metadata = {
   title: "Compress PDF Online – Free PDF Compressor | MYKSA CONNECT",
   description: "Compress PDF files online in your browser. Reduce PDF file size for easier sharing and upload while keeping your original PDF unchanged.",
-  alternates: { canonical: "/tools/compress-pdf/" },
+  alternates: { canonical: "/tools/compress-pdf" },
   robots: { index: true, follow: true },
   openGraph: {
     title: "Compress PDF Online – Free PDF Compressor | MYKSA CONNECT",

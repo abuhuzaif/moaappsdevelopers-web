@@ -4,7 +4,7 @@ import { CONVERTER_DEFINITIONS } from "@/lib/converters/converterTypes";
 export const metadata: Metadata = {
   title: "Document, PDF, Data & Image Converters | MYKSA CONNECT",
   description: "Free online document, PDF, data and image converter tools from MYKSA CONNECT.",
-  alternates: { canonical: "/tools/converters/" },
+  alternates: { canonical: "/tools/converters" },
 };
 
 const categoryTitles = {

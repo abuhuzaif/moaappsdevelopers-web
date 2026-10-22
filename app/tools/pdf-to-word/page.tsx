@@ -4,7 +4,7 @@ import BrowserPdfWordClient from "../_components/BrowserPdfWordClient";
 export const metadata: Metadata = {
   title: "PDF to Word Converter Online – Convert PDF to DOCX | MYKSA CONNECT",
   description: "Convert PDF documents to editable Word DOCX files online. Browser-based PDF to Word conversion without the Vercel upload limit.",
-  alternates: { canonical: "/tools/pdf-to-word/" },
+  alternates: { canonical: "/tools/pdf-to-word" },
 };
 
 export default function PdfToWordPage() {

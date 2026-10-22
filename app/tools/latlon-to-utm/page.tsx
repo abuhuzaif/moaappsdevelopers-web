@@ -5,7 +5,7 @@ import GisRelatedLinks from "../_components/GisRelatedLinks";
 export const metadata: Metadata = {
   title: "Latitude Longitude to UTM Converter | Free GIS Tool",
   description: "Convert latitude and longitude coordinates to UTM zone, easting and northing online. Free GIS coordinate converter from MYKSA CONNECT.",
-  alternates: { canonical: "/tools/latlon-to-utm/" },
+  alternates: { canonical: "/tools/latlon-to-utm" },
 };
 
 export default function Page() {

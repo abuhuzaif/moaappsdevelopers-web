@@ -4,7 +4,7 @@ import PdfCompressionClient from "../_components/PdfCompressionClient";
 export const metadata: Metadata = {
   title: "PDF to JPG Online – Convert PDF Pages to JPG | MYKSA CONNECT",
   description: "Convert PDF pages to high-quality JPG images online in your browser. Download all pages as a ZIP while keeping your original PDF unchanged.",
-  alternates: { canonical: "/tools/pdf-to-jpg/" },
+  alternates: { canonical: "/tools/pdf-to-jpg" },
   robots: { index: true, follow: true },
   openGraph: {
     title: "PDF to JPG Online – Convert PDF Pages to JPG | MYKSA CONNECT",

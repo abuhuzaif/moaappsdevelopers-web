@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description:
     "Free Saudi VAT calculator using the 15% standard rate. Add VAT to a price or remove VAT from a total to calculate the net amount and VAT breakdown.",
   alternates: {
-    canonical: "/tools/vat-calculator/",
+    canonical: "/tools/vat-calculator",
   },
   openGraph: {
     title: "Saudi VAT Calculator (15%) | MYKSA CONNECT",

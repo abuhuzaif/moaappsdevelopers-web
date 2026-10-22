@@ -5,7 +5,7 @@ import GisRelatedLinks from "../_components/GisRelatedLinks";
 export const metadata: Metadata = {
   title: "KML to CSV Converter Online | Free GIS Tool",
   description: "Convert KML coordinates and basic attributes to CSV online. Free browser-friendly GIS conversion tool from MYKSA CONNECT.",
-  alternates: { canonical: "/tools/kml-to-csv/" },
+  alternates: { canonical: "/tools/kml-to-csv" },
 };
 
 export default function Page() {

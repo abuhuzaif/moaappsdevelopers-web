@@ -4,7 +4,7 @@ import BrowserPdfOcrClient from "../_components/BrowserPdfOcrClient";
 export const metadata: Metadata = {
   title: "PDF OCR Online – Extract Text from Scanned PDF | MYKSA CONNECT",
   description: "Extract text from scanned and image-based PDF files online with browser-based OCR. Supports English and Arabic PDFs without a server upload.",
-  alternates: { canonical: "/tools/pdf-ocr/" },
+  alternates: { canonical: "/tools/pdf-ocr" },
 };
 
 const faqs = [

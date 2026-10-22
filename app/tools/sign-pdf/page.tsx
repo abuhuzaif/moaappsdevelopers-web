@@ -4,7 +4,7 @@ import SignPdfToolClient from "../_components/SignPdfToolClientV3";
 export const metadata: Metadata = {
   title: "Sign PDF Online Free – Add Signature to PDF | MYKSA CONNECT",
   description: "Sign PDF online for free. Upload a PDF, add a signature image, draw or type your signature, drag and resize it, then download the signed PDF.",
-  alternates: { canonical: "/tools/sign-pdf/" },
+  alternates: { canonical: "/tools/sign-pdf" },
 };
 
 const faqs = [

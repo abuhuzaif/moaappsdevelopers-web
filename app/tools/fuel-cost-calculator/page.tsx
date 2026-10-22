@@ -4,7 +4,7 @@ import ProfessionalTool from "./calculator";
 export const metadata: Metadata = {
   title: "Saudi Fuel Cost Calculator | MYKSA CONNECT",
   description: "Estimate Saudi trip, weekly and monthly fuel costs.",
-  alternates: { canonical: "/tools/fuel-cost-calculator/" },
+  alternates: { canonical: "/tools/fuel-cost-calculator" },
   openGraph: {
     title: "Saudi Fuel Cost Calculator | MYKSA CONNECT",
     description: "Estimate Saudi trip, weekly and monthly fuel costs.",

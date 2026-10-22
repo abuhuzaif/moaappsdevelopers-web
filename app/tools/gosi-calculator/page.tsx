@@ -4,7 +4,7 @@ import ProfessionalTool from "./calculator";
 export const metadata: Metadata = {
   title: "Saudi GOSI Calculator | MYKSA CONNECT",
   description: "Estimate Saudi GOSI employee and employer contributions.",
-  alternates: { canonical: "/tools/gosi-calculator/" },
+  alternates: { canonical: "/tools/gosi-calculator" },
   openGraph: {
     title: "Saudi GOSI Calculator | MYKSA CONNECT",
     description: "Estimate Saudi GOSI employee and employer contributions.",
