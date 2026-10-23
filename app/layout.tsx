@@ -188,7 +188,9 @@ export default function RootLayout({
           content="googleeed0f7655921d9e45"
         />
 
-        <link rel="stylesheet" href="/myksa-tool-colors.css?v=2" />
+        {/* MYKSA tool colours — only on myksaconnect.com (it restyles shared classes
+            like buttons and cards, which broke the MOA company homepage). */}
+        {isKsaConnectSite && <link rel="stylesheet" href="/myksa-tool-colors.css?v=2" />}
 
         <style>{`
           .mk-page .mk-tools-showcase {
@@ -231,7 +233,8 @@ export default function RootLayout({
       </head>
 
       <body>
-        <ToolsBanner />
+        {/* MYKSA-only banner (its styles must not touch the MOA company homepage) */}
+        {isKsaConnectSite && <ToolsBanner />}
         {children}
         <Analytics />
       </body>
