@@ -38,24 +38,51 @@ export default function MergePdfClient() {
   const [items, setItems] = useState<MergeItem[]>([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [adding, setAdding] = useState(false);
+  const [dragging, setDragging] = useState(false);
 
-  async function addFile(file: File | null) {
-    if (!file) return;
-    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
-      setMessage("Please choose a PDF file.");
+  const isPdf = (file: File) => file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+  const sameFile = (a: File, b: File) => a.name === b.name && a.size === b.size && a.lastModified === b.lastModified;
+
+  /** Adds one or many PDFs (file picker with several selected, or drag & drop). */
+  async function addFiles(list: File[]) {
+    if (!list.length) return;
+    const pdfs = list.filter(isPdf);
+    const notPdf = list.length - pdfs.length;
+    if (!pdfs.length) {
+      setMessage("Please choose PDF files only.");
       return;
     }
-    if (items.some((item) => item.file.name === file.name && item.file.size === file.size && item.file.lastModified === file.lastModified)) {
-      setMessage("That PDF is already in the merge list.");
-      return;
-    }
+    setAdding(true);
     setMessage("");
+    let duplicates = 0;
+    let unreadable = 0;
+    const added: MergeItem[] = [];
     try {
       const PDFLib = await loadPdfLib();
-      const pdf = await PDFLib.PDFDocument.load(await file.arrayBuffer());
-      setItems((current) => [...current, { file, pageCount: pdf.getPageCount() }]);
+      for (const file of pdfs) {
+        if (items.some((it) => sameFile(it.file, file)) || added.some((it) => sameFile(it.file, file))) {
+          duplicates++;
+          continue;
+        }
+        try {
+          const pdf = await PDFLib.PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
+          added.push({ file, pageCount: pdf.getPageCount() });
+        } catch {
+          unreadable++;
+        }
+      }
+      setItems((current) => [...current, ...added.filter((a) => !current.some((c) => sameFile(c.file, a.file)))]);
+      const notes: string[] = [];
+      if (added.length) notes.push(`${added.length} PDF${added.length === 1 ? "" : "s"} added`);
+      if (duplicates) notes.push(`${duplicates} already in the list`);
+      if (unreadable) notes.push(`${unreadable} could not be read`);
+      if (notPdf) notes.push(`${notPdf} non-PDF file${notPdf === 1 ? "" : "s"} skipped`);
+      setMessage(notes.length && (duplicates || unreadable || notPdf) ? notes.join(" • ") : "");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not read this PDF.");
+      setMessage(error instanceof Error ? error.message : "Could not read these PDFs.");
+    } finally {
+      setAdding(false);
     }
   }
 
@@ -99,12 +126,29 @@ export default function MergePdfClient() {
   return (
     <div style={{ marginTop: 28, padding: 22, borderRadius: 18, background: "#f7faf8", border: "1px solid #d9e6e0" }}>
       <div style={{ display: "grid", gap: 14 }}>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, border: 0, borderRadius: 12, padding: "12px 16px", background: "#005744", color: "#fff", fontWeight: 800, cursor: "pointer" }}>
-            + Add PDF
-            <input type="file" accept=".pdf,application/pdf" hidden onChange={(e) => { void addFile(e.target.files?.[0] ?? null); e.currentTarget.value = ""; }} />
+        <div
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => { e.preventDefault(); setDragging(false); void addFiles(Array.from(e.dataTransfer.files || [])); }}
+          style={{
+            display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap", padding: 18, borderRadius: 14,
+            border: `2px dashed ${dragging ? "#005744" : "#9bbab1"}`, background: dragging ? "#eaf6f1" : "#fbfaf7",
+          }}
+        >
+          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, border: 0, borderRadius: 12, padding: "12px 20px", background: "#005744", color: "#fff", fontWeight: 800, cursor: adding ? "wait" : "pointer" }}>
+            {adding ? "Reading PDFs…" : items.length ? "+ Add more PDFs" : "+ Choose PDF files"}
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              multiple
+              hidden
+              disabled={adding}
+              onChange={(e) => { void addFiles(Array.from(e.target.files || [])); e.currentTarget.value = ""; }}
+            />
           </label>
-          <span style={{ color: "#65716f", fontSize: 13 }}>Add files one at a time and arrange them before merging.</span>
+          <span style={{ color: "#52615e", fontSize: 13 }}>
+            Select <strong>several PDFs at once</strong> (hold Ctrl or Shift), or drag &amp; drop them here. Then arrange the order with ↑ ↓.
+          </span>
         </div>
 
         {items.length > 0 && <div style={{ display: "grid", gap: 8 }}>

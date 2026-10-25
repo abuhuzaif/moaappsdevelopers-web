@@ -167,6 +167,56 @@ const easySlugs = new Set([
 
 export function converterIsInteractive(slug: string) { return easySlugs.has(slug); }
 
+// ── Accepted input files per tool ─────────────────────────────
+type FileKind = "jpgpng" | "jpg" | "png" | "webp" | "images" | "pdf" | "txt" | "csv" | "json" | "xml" | "excel";
+
+const FILE_KINDS: Record<FileKind, { accept: string; exts: string[]; label: string }> = {
+  jpgpng: { accept: ".jpg,.jpeg,.png,image/jpeg,image/png", exts: ["jpg", "jpeg", "png"], label: "JPG or PNG images" },
+  jpg: { accept: ".jpg,.jpeg,image/jpeg", exts: ["jpg", "jpeg"], label: "a JPG image" },
+  png: { accept: ".png,image/png", exts: ["png"], label: "a PNG image" },
+  webp: { accept: ".webp,image/webp", exts: ["webp"], label: "a WEBP image" },
+  images: { accept: ".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp", exts: ["jpg", "jpeg", "png", "webp"], label: "JPG, PNG or WEBP images" },
+  pdf: { accept: ".pdf,application/pdf", exts: ["pdf"], label: "a PDF file" },
+  txt: { accept: ".txt,text/plain", exts: ["txt"], label: "a TXT file" },
+  csv: { accept: ".csv,text/csv", exts: ["csv"], label: "a CSV file" },
+  json: { accept: ".json,application/json", exts: ["json"], label: "a JSON file" },
+  xml: { accept: ".xml,text/xml,application/xml", exts: ["xml"], label: "an XML file" },
+  excel: { accept: ".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel", exts: ["xlsx", "xls"], label: "an Excel file (XLSX/XLS)" },
+};
+
+/** Input file type for a tool — the part before "-to-", or the tool itself. */
+function fileKindFor(slug: string): FileKind {
+  const fixed: Record<string, FileKind> = {
+    "jpg-to-pdf": "jpgpng", // PDF builder embeds JPG and PNG
+    "images-to-pdf": "jpgpng",
+    "image-merger": "images",
+    "image-compressor": "images",
+    "image-resizer": "images",
+    "merge-pdf": "pdf",
+    "split-pdf": "pdf",
+    "rotate-pdf": "pdf",
+    "extract-pdf-pages": "pdf",
+    "json-formatter": "json",
+  };
+  if (fixed[slug]) return fixed[slug];
+  const from = slug.includes("-to-") ? slug.split("-to-")[0] : slug;
+  if (from === "jpg" || from === "jpeg") return "jpg";
+  if (from === "png") return "png";
+  if (from === "webp") return "webp";
+  if (from === "pdf") return "pdf";
+  if (from === "txt") return "txt";
+  if (from === "csv") return "csv";
+  if (from === "json") return "json";
+  if (from === "xml") return "xml";
+  if (from === "excel") return "excel";
+  return "images";
+}
+
+function matchesKind(file: File, kind: FileKind): boolean {
+  const ext = (file.name.split(".").pop() || "").toLowerCase();
+  return FILE_KINDS[kind].exts.includes(ext);
+}
+
 export default function ConverterClient({ slug, input, output }: { slug: string; input: string; output: string }) {
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
@@ -177,15 +227,10 @@ export default function ConverterClient({ slug, input, output }: { slug: string;
   const [quality, setQuality] = useState(82);
   const [text, setText] = useState("");
 
-  const accept = useMemo(() => {
-    if (slug.includes("csv")) return ".csv,text/csv";
-    if (slug.includes("json")) return ".json,application/json";
-    if (slug.includes("xml")) return ".xml,text/xml,application/xml";
-    if (slug.includes("excel")) return ".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    if (slug.includes("pdf")) return ".pdf,application/pdf";
-    if (slug.includes("txt")) return ".txt,text/plain";
-    return "image/jpeg,image/png,image/webp";
-  }, [slug]);
+  // Which files the picker shows, based on what the tool takes IN (not what it makes).
+  // e.g. "jpg-to-pdf" takes images — before, it matched "pdf" and only showed PDFs.
+  const inputKind = useMemo(() => fileKindFor(slug), [slug]);
+  const accept = FILE_KINDS[inputKind].accept;
 
   async function run() {
     setBusy(true); setMessage("");
@@ -309,7 +354,26 @@ export default function ConverterClient({ slug, input, output }: { slug: string;
     <div style={{ marginTop: 28, padding: 22, borderRadius: 18, background: "#f7faf8", border: "1px solid #d9e6e0" }}>
       <div style={{ display: "grid", gap: 14 }}>
         {needsText && <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Or paste text here…" rows={7} style={{ width: "100%", border: "1px solid #cbd8d3", borderRadius: 12, padding: 12, font: "inherit" }} />}
-        <input type="file" accept={accept} multiple={multi} onChange={(e) => setFiles(Array.from(e.target.files || []))} />
+        <input
+          type="file"
+          accept={accept}
+          multiple={multi}
+          onChange={(e) => {
+            const chosen = Array.from(e.target.files || []);
+            const wrong = chosen.filter((f) => !matchesKind(f, inputKind));
+            if (wrong.length) {
+              setFiles(chosen.filter((f) => matchesKind(f, inputKind)));
+              setMessage(`"${wrong[0].name}" can't be used here. Please choose ${FILE_KINDS[inputKind].label}.`);
+              e.currentTarget.value = "";
+            } else {
+              setFiles(chosen);
+              setMessage("");
+            }
+          }}
+        />
+        <small style={{ color: "#52615e", marginTop: -8 }}>
+          Accepted: {FILE_KINDS[inputKind].exts.map((x) => x.toUpperCase()).join(", ")}{multi ? " · you can select several files" : ""}
+        </small>
         {files.length > 0 && <small style={{ color: "#52615e" }}>{files.length} file(s) selected: {files.map((f) => f.name).join(", ")}</small>}
         {slug === "image-merger" && <label>Direction: <select value={direction} onChange={(e) => setDirection(e.target.value as any)}><option value="vertical">Vertical</option><option value="horizontal">Horizontal</option></select></label>}
         {slug === "image-resizer" && <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}><label>Width <input type="number" min="1" value={width} onChange={(e) => setWidth(Number(e.target.value))} /></label><label>Height <input type="number" min="1" value={height} onChange={(e) => setHeight(Number(e.target.value))} /></label></div>}
