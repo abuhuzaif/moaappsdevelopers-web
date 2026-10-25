@@ -20,6 +20,9 @@ const LANG_KEY = "rm-lang";
 
 // ── Fixed UI text ─────────────────────────────────────────────
 const ui = {
+  categories: { en: "Menu Categories", ar: "أقسام القائمة" },
+  allCategories: { en: "All categories", ar: "كل الأقسام" },
+  items: { en: "items", ar: "أصناف" },
   priceLabel: {
     single: { en: "Single", ar: "فردي" },
     full: { en: "Full", ar: "كامل" },
@@ -53,7 +56,7 @@ const ui = {
     signature: { en: "House favourite", ar: "طبق مميز" },
   } as Record<string, T>,
   menu: { en: "Menu", ar: "القائمة" },
-  kcal: { en: "kcal", ar: "سعرة" },
+  kcal: { en: "Cal", ar: "سعرة" },
   contains: { en: "Contains", ar: "يحتوي على" },
   search: { en: "Search the menu", ar: "ابحث في القائمة" },
   clear: { en: "Clear", ar: "مسح" },
@@ -133,7 +136,7 @@ function Cal({ p, lang, inline }: { p: MenuPrice; lang: Lang; inline?: boolean }
   if (p.cal == null) return null;
   return (
     <span className={inline ? "rm-cal rm-cal-inline" : "rm-cal"}>
-      {p.cal} {ui.kcal[lang]}
+      <span aria-hidden>🔥</span> {p.cal} {ui.kcal[lang]}
     </span>
   );
 }
@@ -259,6 +262,49 @@ function Card({ item, lang }: { item: MenuItem; lang: Lang }) {
 }
 
 /* Leather plaque header cut from the printed menu; the title is real text on top of it. */
+/** "tiles" layout dish card: photo on top, name, short description (Read more), price + Add. */
+function TileCard({ item, lang }: { item: MenuItem; lang: Lang }) {
+  const [failed, setFailed] = useState(false);
+  const [more, setMore] = useState(false);
+  const label = (l?: string) => (l ? ui.priceLabel[l]?.[lang] ?? l : "");
+  const desc = item.desc ? pick(lang, item.desc, item.descAr) : "";
+  return (
+    <article className="rm-tcard" id={`rm-item-${item.id}`}>
+      <div className="rm-tcard-photo">
+        {item.imageUrl && !failed ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={item.imageUrl} alt={pick(lang, item.name, item.nameAr)} loading="lazy" onError={() => setFailed(true)} />
+        ) : (
+          <span className="rm-tcard-noimg" aria-hidden>🍽️</span>
+        )}
+      </div>
+      <div className="rm-tcard-body">
+        <h3 className="rm-tcard-name">{pick(lang, item.name, item.nameAr)}</h3>
+        {desc && (
+          <>
+            <p className={`rm-tcard-desc${more ? " is-open" : ""}`}>{desc}</p>
+            {desc.length > 70 && (
+              <button type="button" className="rm-tcard-more" onClick={() => setMore((m) => !m)}>
+                {more ? (lang === "ar" ? "إخفاء" : "Show less") : lang === "ar" ? "اقرأ المزيد" : "Read more"}
+              </button>
+            )}
+          </>
+        )}
+        <div className="rm-tcard-prices">
+          {item.prices.map((p, i) => (
+            <div className="rm-tcard-price" key={i}>
+              {p.label && <span className="rm-price-label">{label(p.label)}</span>}
+              <Amount p={p} lang={lang} />
+              <Cal p={p} lang={lang} inline />
+              <AddControl item={item} p={p} lang={lang} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </article>
+  );
+}
+
 function Plaque({ title, id }: { title: string; id?: string }) {
   return (
     <header className="rm-plaque">
@@ -444,6 +490,9 @@ export default function RestaurantMenu({
   const [lang, setLang] = useState<Lang>("en");
   const [q, setQ] = useState("");
   const [active, setActive] = useState(sections[0]?.id ?? "");
+  // "tiles" layout: null = category grid, otherwise the open category
+  const tiles = restaurant.theme?.layout === "tiles";
+  const [openCat, setOpenCat] = useState<string | null>(null);
   const chipsRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -518,7 +567,32 @@ export default function RestaurantMenu({
     bar.scrollTo({ left: chip.offsetLeft - bar.clientWidth / 2 + chip.clientWidth / 2, behavior: "smooth" });
   }, [active]);
 
+  // tiles: #category in the URL, so the phone's Back button returns to the grid
+  useEffect(() => {
+    if (!tiles) return;
+    const read = () => {
+      const h = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+      setOpenCat(sections.some((s) => s.id === h) ? h : null);
+    };
+    read();
+    window.addEventListener("popstate", read);
+    return () => window.removeEventListener("popstate", read);
+  }, [tiles, sections]);
+
+  const openCategory = (id: string | null) => {
+    setOpenCat(id);
+    setQ("");
+    if (id) setActive(id);
+    try {
+      const url = id ? `#${id}` : window.location.pathname + window.location.search;
+      if (id && openCat) window.history.replaceState(null, "", url);
+      else window.history.pushState(null, "", url);
+    } catch {}
+    requestAnimationFrame(() => rootRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
+
   const goTo = (id: string) => {
+    if (tiles) return openCategory(id);
     setActive(id);
     document.getElementById(`rm-cat-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -616,7 +690,7 @@ export default function RestaurantMenu({
             {ui.langSwitch[lang]}
           </button>
         </div>
-        {!q && (
+        {!q && (!tiles || openCat) && (
           <div className="rm-chips" ref={chipsRef}>
             {sections.map((s) => (
               <button
@@ -634,14 +708,52 @@ export default function RestaurantMenu({
         )}
       </nav>
 
+      {tiles && !q && !openCat ? (
+        <section className="rm-tiles-wrap" aria-labelledby="rm-tiles-h">
+          <h2 id="rm-tiles-h" className="rm-tiles-title">{ui.categories[lang]}</h2>
+          <div className="rm-tiles">
+            {sections.map((s) => (
+              <button type="button" key={s.id} className="rm-tile" onClick={() => openCategory(s.id)}>
+                {s.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={s.image} alt="" loading="lazy" />
+                )}
+                <span className="rm-tile-name">{pick(lang, s.name, s.nameAr)}</span>
+                <span className="rm-tile-count">{s.items.length} {ui.items[lang]}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : (
       <div className="rm-list">
+        {tiles && !q && openCat && (
+          <button type="button" className="rm-back" onClick={() => openCategory(null)}>
+            {lang === "ar" ? "→" : "←"} {ui.allCategories[lang]}
+          </button>
+        )}
         {filtered.length === 0 ? (
           <p className="rm-empty">{ui.noResults[lang]}</p>
         ) : (
-          filtered.map((s) => {
+          (tiles && !q && openCat ? filtered.filter((x) => x.id === openCat) : filtered).map((s) => {
             const reserve = s.items.some((it) => it.imageUrl);
             const title = pick(lang, s.name, s.nameAr);
             const note = s.note ? <p className="rm-cat-note">{pick(lang, s.note, s.noteAr)}</p> : null;
+
+            if (tiles) {
+              return (
+                <section key={s.id} className="rm-cat" id={`rm-cat-${s.id}`} data-cat={s.id} aria-labelledby={`rm-h-${s.id}`}>
+                  <header className="rm-cat-head">
+                    <h2 id={`rm-h-${s.id}`}>{title}</h2>
+                    {note}
+                  </header>
+                  <div className="rm-tgrid">
+                    {s.items.map((it) => (
+                      <TileCard key={it.id} item={it} lang={lang} />
+                    ))}
+                  </div>
+                </section>
+              );
+            }
 
             if (classic) {
               return <ClassicSection key={s.id} s={s} lang={lang} corner={fr.corner} />;
@@ -686,6 +798,7 @@ export default function RestaurantMenu({
           })
         )}
       </div>
+      )}
 
       {classic && <ClassicCover restaurant={restaurant} lang={lang} thanks />}
 

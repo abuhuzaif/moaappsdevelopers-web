@@ -21,6 +21,7 @@ export interface MenuCategory {
   note?: string;
   noteAr?: string;
   sort: number;
+  image?: string; // category tile photo ("tiles" layout)
 }
 
 export interface MenuItem {
@@ -44,6 +45,7 @@ export interface MenuSection extends MenuCategory {
 
 export interface MenuTheme {
   style?: "default" | "ornate" | "classic"; // ornate = dark printed look (Quetta Grill), classic = cream printed look (Al Jalsa)
+  layout?: "tiles"; // tiles = opens on a grid of category photos (Nawaab's); tap a tile to see its dishes
   bg?: string;
   surface?: string;
   text?: string;
@@ -119,6 +121,7 @@ export function parseCategories(raw: unknown): MenuCategory[] {
       note: str(c?.note),
       noteAr: str(c?.noteAr),
       sort: num(c?.sort) ?? i * 10,
+      image: str(c?.image),
     }))
     .filter((c) => c.id && c.name)
     .sort((a, b) => a.sort - b.sort);
