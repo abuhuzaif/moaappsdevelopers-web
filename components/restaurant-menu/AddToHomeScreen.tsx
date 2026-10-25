@@ -8,21 +8,24 @@ type BIPEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ out
  * Small bar on restaurant menus: "Add <name> menu to your home screen".
  * Android (Chrome): one tap installs it like an app.
  * iPhone (Safari): shows the 2-step Share → "Add to Home Screen" tip.
- * Hidden when already opened from the home screen, or after "Not now" (for 30 days).
+ * Comes back on every new visit (e.g. every QR scan) until the menu is added
+ * to the home screen. "×" only hides it for the current visit.
+ * Never shown when the menu is opened from the home-screen icon.
  */
 export default function AddToHomeScreen({ name, logoUrl, slug }: { name: string; logoUrl?: string; slug: string }) {
   const [show, setShow] = useState(false);
   const [deferred, setDeferred] = useState<BIPEvent | null>(null);
   const [ios, setIos] = useState(false);
-  const key = `a2hs-dismissed-${slug}`;
+  const dismissKey = `a2hs-dismissed-${slug}`; // this visit only (sessionStorage)
+  const installedKey = `a2hs-installed-${slug}`; // set when Chrome confirms the install
 
   useEffect(() => {
     const standalone =
       window.matchMedia?.("(display-mode: standalone)").matches || (navigator as unknown as { standalone?: boolean }).standalone === true;
     if (standalone) return;
     try {
-      const t = Number(localStorage.getItem(key) || 0);
-      if (t && Date.now() - t < 30 * 24 * 3600 * 1000) return;
+      if (localStorage.getItem(installedKey)) return; // already on the home screen
+      if (sessionStorage.getItem(dismissKey)) return; // closed during this visit
     } catch {}
 
     const ua = navigator.userAgent;
@@ -34,25 +37,36 @@ export default function AddToHomeScreen({ name, logoUrl, slug }: { name: string;
       e.preventDefault();
       setDeferred(e as BIPEvent);
     };
+    const onInstalled = () => {
+      try { localStorage.setItem(installedKey, String(Date.now())); } catch {}
+      setShow(false);
+    };
     window.addEventListener("beforeinstallprompt", onPrompt);
-    const timer = setTimeout(() => { setIos(isIos); setShow(true); }, 6000); // after they've looked at the menu
+    window.addEventListener("appinstalled", onInstalled);
+    // Came from the table QR → ask sooner; otherwise after they've looked at the menu.
+    const fromQr = new URLSearchParams(window.location.search).get("utm_source") === "qr";
+    const timer = setTimeout(() => { setIos(isIos); setShow(true); }, fromQr ? 3000 : 6000);
     return () => {
       window.removeEventListener("beforeinstallprompt", onPrompt);
+      window.removeEventListener("appinstalled", onInstalled);
       clearTimeout(timer);
     };
-  }, [key]);
+  }, [dismissKey, installedKey]);
 
   if (!show) return null;
 
   const close = () => {
     setShow(false);
-    try { localStorage.setItem(key, String(Date.now())); } catch {}
+    try { sessionStorage.setItem(dismissKey, "1"); } catch {}
   };
 
   const add = async () => {
     if (deferred) {
       await deferred.prompt();
-      await deferred.userChoice.catch(() => undefined);
+      const choice = await deferred.userChoice.catch(() => ({ outcome: "dismissed" }));
+      if (choice.outcome === "accepted") {
+        try { localStorage.setItem(installedKey, String(Date.now())); } catch {}
+      }
       setDeferred(null);
       setShow(false);
     }
