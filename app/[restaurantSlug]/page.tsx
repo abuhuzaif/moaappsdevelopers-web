@@ -5,6 +5,7 @@ import { db } from "@/lib/firebase";
 import Image from "next/image";
 import RestaurantMenu from "@/components/restaurant-menu/RestaurantMenu";
 import StickyRestaurantBar from "@/components/restaurant-menu/StickyRestaurantBar";
+import AddToHomeScreen from "@/components/restaurant-menu/AddToHomeScreen";
 import {
   getMenuSections,
   parseCategories,
@@ -103,6 +104,10 @@ export async function generateMetadata({
       siteName: "MYKSA Connect",
     },
     twitter: { card: "summary_large_image", title, description },
+    // "Add to Home screen" — opens like an app next time (no QR scan)
+    manifest: `/${restaurant.slug}/app-manifest`,
+    icons: { apple: `/${restaurant.slug}/app-icon?size=180` },
+    appleWebApp: { capable: true, title: restaurant.name, statusBarStyle: "default" },
   };
 }
 
@@ -224,6 +229,8 @@ export default async function RestaurantMenuPage({
           </a>
         )}
       </div>
+
+      <AddToHomeScreen name={restaurant.name} logoUrl={restaurant.logoUrl} slug={restaurant.slug} />
 
       <StickyRestaurantBar
         name={restaurant.name}
