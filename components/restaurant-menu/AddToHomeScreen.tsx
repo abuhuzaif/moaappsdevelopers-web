@@ -32,6 +32,8 @@ export default function AddToHomeScreen({ name, logoUrl, slug }: { name: string;
     const isIos = /iphone|ipad|ipod/i.test(ua) && !/crios|fxios/i.test(ua);
     const isAndroid = /android/i.test(ua);
     if (!isIos && !isAndroid) return; // phones only
+    // Inside an app's WebView (e.g. the MYKSA Connect app) — the menu already lives in an app
+    if (/; wv\)/.test(ua) || /MYKSA/i.test(ua)) return;
 
     const onPrompt = (e: Event) => {
       e.preventDefault();
