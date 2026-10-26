@@ -21,6 +21,12 @@ const LANG_KEY = "rm-lang";
 // ── Fixed UI text ─────────────────────────────────────────────
 const ui = {
   categories: { en: "Menu Categories", ar: "أقسام القائمة" },
+  today: { en: "Today", ar: "اليوم" },
+  note: { en: "Note", ar: "ملاحظة" },
+  partyTitle: { en: "We accept party orders", ar: "نستقبل طلبات الحفلات" },
+  partyText: { en: "Weddings, family gatherings & office events — biryani handi, haleem and more.", ar: "الأعراس والتجمعات العائلية ومناسبات العمل — برياني هاندي وحليم والمزيد." },
+  partyBtn: { en: "Order on WhatsApp", ar: "اطلب عبر واتساب" },
+  specialsFor: { en: "Daily specials", ar: "أطباق اليوم" },
   allCategories: { en: "All categories", ar: "كل الأقسام" },
   items: { en: "items", ar: "أصناف" },
   priceLabel: {
@@ -269,15 +275,13 @@ function TileCard({ item, lang }: { item: MenuItem; lang: Lang }) {
   const label = (l?: string) => (l ? ui.priceLabel[l]?.[lang] ?? l : "");
   const desc = item.desc ? pick(lang, item.desc, item.descAr) : "";
   return (
-    <article className="rm-tcard" id={`rm-item-${item.id}`}>
-      <div className="rm-tcard-photo">
-        {item.imageUrl && !failed ? (
-          // eslint-disable-next-line @next/next/no-img-element
+    <article className={`rm-tcard${item.imageUrl && !failed ? "" : " no-photo"}`} id={`rm-item-${item.id}`}>
+      {item.imageUrl && !failed && (
+        <div className="rm-tcard-photo">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={item.imageUrl} alt={pick(lang, item.name, item.nameAr)} loading="lazy" onError={() => setFailed(true)} />
-        ) : (
-          <span className="rm-tcard-noimg" aria-hidden>🍽️</span>
-        )}
-      </div>
+        </div>
+      )}
       <div className="rm-tcard-body">
         <h3 className="rm-tcard-name">{pick(lang, item.name, item.nameAr)}</h3>
         {desc && (
@@ -302,6 +306,97 @@ function TileCard({ item, lang }: { item: MenuItem; lang: Lang }) {
         </div>
       </div>
     </article>
+  );
+}
+
+const DAY_NAMES: Record<Lang, string[]> = {
+  en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  ar: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+};
+
+/** "poster" style: black & gold printed menu — banner headings, dotted price lines, + to add. */
+function PosterBody({
+  sections, q, lang, today, selDay, setSelDay, restaurant,
+}: {
+  sections: MenuSection[]; q: string; lang: Lang; today: number | null; selDay: number | null; setSelDay: (d: number) => void;
+  restaurant: MenuRestaurantInfo;
+}) {
+  const wa = (restaurant.whatsapp || "").replace(/[^0-9]/g, "");
+  const days = Array.from(new Set(sections.filter((s) => s.day != null).map((s) => s.day as number))).sort((a, b) => a - b);
+  const shown = q ? sections : sections.filter((s) => s.day == null || s.day === selDay);
+  const label = (l?: string) => (l ? ui.priceLabel[l]?.[lang] ?? l : "");
+  return (
+    <div className="rm-poster">
+      {!q && days.length > 0 && (
+        <div className="rm-pdays" role="tablist" aria-label={ui.specialsFor[lang]}>
+          <span className="rm-pdays-label">{ui.specialsFor[lang]}</span>
+          <div className="rm-pdays-row">
+            {days.map((d) => (
+              <button
+                key={d}
+                type="button"
+                role="tab"
+                aria-selected={d === selDay}
+                className={`rm-pday${d === selDay ? " is-on" : ""}${d === today ? " is-today" : ""}`}
+                onClick={() => setSelDay(d)}
+              >
+                {DAY_NAMES[lang][d]}
+                {d === today && <small>{ui.today[lang]}</small>}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {shown.length === 0 && <p className="rm-empty">{ui.noResults[lang]}</p>}
+      {shown.map((s) => (
+        <section key={s.id} className="rm-psec" id={`rm-cat-${s.id}`} data-cat={s.id} aria-labelledby={`rm-ph-${s.id}`}>
+          {s.image && (
+            <div className="rm-psec-photo">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="rm-psec-img" src={s.image} alt="" loading="lazy" />
+            </div>
+          )}
+          <h2 className="rm-pbanner" id={`rm-ph-${s.id}`}>
+            <span aria-hidden>✦</span> {pick(lang, s.name, s.nameAr)} <span aria-hidden>✦</span>
+            {s.day != null && s.day === today && <em className="rm-ptoday">{ui.today[lang]}</em>}
+          </h2>
+          {(s.note || s.noteAr) && (
+            <p className="rm-pnote">
+              <b>{ui.note[lang]}:</b> {pick(lang, s.note, s.noteAr)}
+            </p>
+          )}
+          <ul className="rm-plist">
+            {s.items.flatMap((it) =>
+              it.prices.map((p, i) => (
+                <li key={`${it.id}-${i}`} className="rm-prow" id={i === 0 ? `rm-item-${it.id}` : undefined}>
+                  <span className="rm-pname">
+                    {pick(lang, it.name, it.nameAr)}
+                    {p.label && <span className="rm-plabel"> – {label(p.label)}</span>}
+                    {p.cal != null && <span className="rm-pcal"> 🔥 {p.cal} {ui.kcal[lang]}</span>}
+                  </span>
+                  <span className="rm-pdots" aria-hidden />
+                  <span className="rm-pprice">
+                    <Amount p={p} lang={lang} />
+                  </span>
+                  <AddControl item={it} p={p} lang={lang} />
+                </li>
+              ))
+            )}
+          </ul>
+        </section>
+      ))}
+      {!q && wa && (
+        <section className="rm-pparty">
+          <p className="rm-pparty-icon" aria-hidden>🎉</p>
+          <h2>{ui.partyTitle[lang]}</h2>
+          <p>{ui.partyText[lang]}</p>
+          <a className="rm-pparty-btn" href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer">
+            💬 {ui.partyBtn[lang]} <span dir="ltr">+{wa}</span>
+          </a>
+        </section>
+      )}
+      <p className="rm-pfoot">Real Taste • Real Hyderabad</p>
+    </div>
   );
 }
 
@@ -493,6 +588,21 @@ export default function RestaurantMenu({
   // "tiles" layout: null = category grid, otherwise the open category
   const tiles = restaurant.theme?.layout === "tiles";
   const [openCat, setOpenCat] = useState<string | null>(null);
+  // day-of-week specials: today's (Riyadh time) goes first — computed on the client only
+  const [today, setToday] = useState<number | null>(null);
+  useEffect(() => {
+    const wd = new Date().toLocaleDateString("en-US", { weekday: "short", timeZone: "Asia/Riyadh" });
+    setToday(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(wd));
+  }, []);
+  const [selDay, setSelDay] = useState<number | null>(null);
+  useEffect(() => {
+    if (today != null && selDay == null) setSelDay(today);
+  }, [today, selDay]);
+  const tileOrder = useMemo(() => {
+    if (today == null) return sections;
+    const t = sections.filter((s) => s.day === today);
+    return [...t, ...sections.filter((s) => s.day !== today)];
+  }, [sections, today]);
   const chipsRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -601,6 +711,7 @@ export default function RestaurantMenu({
   const fr = restaurant.frame ?? {};
   const ornate = th.style === "ornate" && !!fr.top;
   const classic = th.style === "classic";
+  const poster = th.style === "poster";
   const css = (u?: string) => (u ? `url("${u}")` : undefined);
   const style = {
     "--rm-frame-top": css(fr.top),
@@ -666,6 +777,32 @@ export default function RestaurantMenu({
           </div>
           <p className="rm-intro-band">{ui.dailyIntake[lang]}</p>
         </section>
+      ) : poster ? (
+        <header className={`rm-phead${fr.top ? " has-banner" : ""}`}>
+          {fr.top ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="rm-phead-banner" src={fr.top} alt={restaurant.name} />
+          ) : (
+            <>
+              <p className="rm-phead-crown" aria-hidden>♛</p>
+              <h2 className="rm-phead-name" lang="en" dir="ltr">{restaurant.name}</h2>
+              {(restaurant.tagline || restaurant.taglineAr) && (
+                <p className="rm-phead-tag">{pick(lang, restaurant.tagline, restaurant.taglineAr)}</p>
+              )}
+            </>
+          )}
+          {lang === "ar" && restaurant.nameAr && <p className="rm-phead-name-ar">{restaurant.nameAr}</p>}
+          <div className="rm-phead-pills">
+            {hours && <span>🕒 {hours}</span>}
+            {sections
+              .filter((x) => x.day == null && (x.note || x.noteAr))
+              .slice(0, 2)
+              .map((x) => (
+                <span key={x.id}>🍲 {pick(lang, x.name, x.nameAr)}: {pick(lang, x.note, x.noteAr)}</span>
+              ))}
+            {restaurant.whatsapp && <span>🎉 {ui.partyTitle[lang]}</span>}
+          </div>
+        </header>
       ) : (
         <div className="rm-top">
           <div className="rm-title">
@@ -690,7 +827,7 @@ export default function RestaurantMenu({
             {ui.langSwitch[lang]}
           </button>
         </div>
-        {!q && (!tiles || openCat) && (
+        {!q && !poster && (!tiles || openCat) && (
           <div className="rm-chips" ref={chipsRef}>
             {sections.map((s) => (
               <button
@@ -708,12 +845,15 @@ export default function RestaurantMenu({
         )}
       </nav>
 
-      {tiles && !q && !openCat ? (
+      {poster ? (
+        <PosterBody sections={filtered} q={q} lang={lang} today={today} selDay={selDay ?? today ?? 0} setSelDay={setSelDay} restaurant={restaurant} />
+      ) : tiles && !q && !openCat ? (
         <section className="rm-tiles-wrap" aria-labelledby="rm-tiles-h">
           <h2 id="rm-tiles-h" className="rm-tiles-title">{ui.categories[lang]}</h2>
           <div className="rm-tiles">
-            {sections.map((s) => (
-              <button type="button" key={s.id} className="rm-tile" onClick={() => openCategory(s.id)}>
+            {tileOrder.map((s) => (
+              <button type="button" key={s.id} className={`rm-tile${s.day != null && s.day === today ? " is-today" : ""}`} onClick={() => openCategory(s.id)}>
+                {s.day != null && s.day === today && <span className="rm-tile-today">{ui.today[lang]}</span>}
                 {s.image && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={s.image} alt="" loading="lazy" />

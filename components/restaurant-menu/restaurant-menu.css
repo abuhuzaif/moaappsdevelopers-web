@@ -1217,3 +1217,302 @@
   gap: 6px;
   font-weight: 800;
 }
+
+/* tiles: today's day-special + dish cards without a photo */
+.rm .rm-tile.is-today { outline: 3px solid var(--rm-accent-soft, #f6c344); outline-offset: 2px; }
+.rm .rm-tile-today {
+  position: absolute;
+  top: 8px;
+  inset-inline-start: 8px;
+  z-index: 2;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--rm-accent-soft, #f6c344);
+  color: #1d140c;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.rm .rm-tcard.no-photo { border-top: 4px solid var(--rm-accent-soft, #f6c344); }
+.rm .rm-tcard.no-photo .rm-tcard-body { padding-top: 12px; }
+
+
+/* ── "poster" style: black & gold printed menu (Biryani Nation) ──────────── */
+.rm .rm-phead {
+  padding: 26px 18px 18px;
+  text-align: center;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(232, 176, 74, 0.16), transparent 60%),
+    #0d0a07;
+  border-bottom: 1px solid rgba(232, 176, 74, 0.35);
+}
+.rm .rm-phead-crown { margin: 0; color: #e8b04a; font-size: 1.6rem; line-height: 1; }
+.rm .rm-phead-name {
+  margin: 4px 0 0;
+  font-family: var(--rm-font-caps), Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(1.9rem, 8vw, 2.8rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #ffe7a3 0%, #e8b04a 45%, #a86f12 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.rm .rm-phead-name-ar { margin: 2px 0 0; color: #e8b04a; font-weight: 700; font-size: 1.2rem; }
+.rm .rm-phead-tag {
+  margin: 6px auto 0;
+  padding-top: 6px;
+  max-width: 340px;
+  border-top: 1px solid rgba(232, 176, 74, 0.5);
+  color: #f3ead7;
+  font-family: var(--rm-font-caps), Georgia, serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.rm .rm-phead-hours { margin: 8px 0 0; color: #c9b48a; font-size: 0.85rem; }
+
+.rm .rm-poster {
+  padding: 8px 14px 30px;
+  background:
+    radial-gradient(90% 60% at 100% 20%, rgba(232, 176, 74, 0.08), transparent 60%),
+    #0d0a07;
+  color: #f3ead7;
+}
+.rm .rm-pdays { padding: 12px 2px 4px; }
+.rm .rm-pdays-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #c9b48a;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.rm .rm-pdays-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.rm .rm-pday {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 56px;
+  padding: 8px 10px;
+  border: 1px solid rgba(232, 176, 74, 0.45);
+  border-radius: 12px;
+  background: transparent;
+  color: #f3ead7;
+  font-weight: 800;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+.rm .rm-pday small { font-size: 0.62rem; font-weight: 800; color: #e8b04a; text-transform: uppercase; }
+.rm .rm-pday.is-on { background: linear-gradient(180deg, #f5c968, #d89a2b); border-color: transparent; color: #1a1108; }
+.rm .rm-pday.is-on small { color: #1a1108; }
+
+.rm .rm-psec {
+  position: relative;
+  margin-top: 22px;
+  padding: 18px 14px 14px;
+  border: 1px solid rgba(232, 176, 74, 0.35);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(0, 0, 0, 0.15));
+  overflow: hidden;
+}
+/* phones: photo as a wide band on top (fades into the black); wider screens: photo on the side */
+.rm .rm-psec-photo {
+  position: relative;
+  z-index: 1;
+  margin: -18px -14px 12px;
+  height: 170px;
+  overflow: hidden;
+}
+.rm .rm-psec-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(13, 10, 7, 0) 45%, rgba(13, 10, 7, 0.95) 100%);
+}
+.rm .rm-psec-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* wider screens: two columns — dishes on the left, photo on the right (no float, so prices line up) */
+@media (min-width: 600px) {
+  .rm .rm-psec:has(.rm-psec-photo) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(170px, 30%, 250px);
+    grid-template-areas: "banner photo" "note photo" "list photo";
+    grid-template-rows: auto auto 1fr;
+    column-gap: 18px;
+    align-items: start;
+  }
+  .rm .rm-psec:has(.rm-psec-photo) > .rm-pbanner { grid-area: banner; justify-self: start; }
+  .rm .rm-psec:has(.rm-psec-photo) > .rm-pnote { grid-area: note; }
+  .rm .rm-psec:has(.rm-psec-photo) > .rm-plist { grid-area: list; }
+  .rm .rm-psec-photo {
+    grid-area: photo;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    margin: 0;
+    border-radius: 16px;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(232, 176, 74, 0.4);
+  }
+  .rm .rm-psec-photo::after { display: none; }
+}
+.rm .rm-pbanner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 6px 16px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, rgba(232, 176, 74, 0) 0%, rgba(232, 176, 74, 0.28) 12%, rgba(232, 176, 74, 0.28) 88%, rgba(232, 176, 74, 0) 100%);
+  color: #f2c25c;
+  font-family: var(--rm-font-caps), Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(1.1rem, 4.6vw, 1.5rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.rm .rm-pbanner span { font-size: 0.7em; color: #e8b04a; }
+.rm .rm-ptoday {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e8b04a;
+  color: #1a1108;
+  font-style: normal;
+  font-family: inherit;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+}
+.rm .rm-pnote {
+  clear: none;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1.5px solid #e8b04a;
+  border-radius: 12px;
+  color: #f3ead7;
+  font-size: 0.9rem;
+}
+.rm .rm-pnote b { color: #e8b04a; text-transform: uppercase; letter-spacing: 0.06em; }
+.rm .rm-plist { clear: both; list-style: none; margin: 0; padding: 0; }
+
+.rm .rm-prow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 0;
+}
+.rm .rm-pname {
+  font-family: var(--rm-font-display), Georgia, serif;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.25;
+  color: #fbf4e4;
+}
+.rm .rm-plabel { color: #e9d9b6; font-weight: 600; }
+.rm .rm-pcal { display: block; font-family: inherit; font-size: 0.72rem; font-weight: 600; color: #c9b48a; }
+.rm .rm-pdots {
+  flex: 1;
+  min-width: 18px;
+  align-self: flex-end;
+  margin-bottom: 10px;
+  border-bottom: 2px dotted rgba(243, 234, 215, 0.45);
+}
+.rm .rm-pprice {
+  color: #f2c25c;
+  font-weight: 900;
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+
+/* poster: banner header, info pills, nicer rows, party card */
+.rm .rm-phead.has-banner { padding: 0 0 14px; }
+.rm .rm-phead-banner {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-bottom: 2px solid #e8b04a;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+.rm .rm-phead-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 0 12px;
+}
+.rm .rm-phead-pills span {
+  padding: 6px 12px;
+  border: 1px solid rgba(232, 176, 74, 0.55);
+  border-radius: 999px;
+  background: rgba(232, 176, 74, 0.08);
+  color: #f3ead7;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.rm .rm-psec {
+  box-shadow: 0 0 0 1px rgba(232, 176, 74, 0.08), 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+.rm .rm-psec::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(232, 176, 74, 0.14);
+  border-radius: 12px;
+  pointer-events: none;
+}
+.rm .rm-prow + .rm-prow { border-top: 1px solid rgba(232, 176, 74, 0.08); }
+.rm .rm-pday.is-today:not(.is-on) { box-shadow: 0 0 0 2px rgba(232, 176, 74, 0.6) inset; }
+.rm .rm-pparty {
+  margin-top: 26px;
+  padding: 22px 18px;
+  border-radius: 18px;
+  text-align: center;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(232, 176, 74, 0.25), transparent 70%),
+    linear-gradient(180deg, #2a0f0a, #160a06);
+  border: 1.5px solid #e8b04a;
+}
+.rm .rm-pparty-icon { margin: 0; font-size: 2rem; }
+.rm .rm-pparty h2 {
+  margin: 6px 0 6px;
+  font-family: var(--rm-font-caps), Georgia, serif;
+  color: #f2c25c;
+  font-size: 1.35rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.rm .rm-pparty p { margin: 0 auto; max-width: 420px; color: #e9dcc0; font-size: 0.9rem; }
+.rm .rm-pparty-btn {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 14px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: #25d366;
+  color: #fff;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 8px 22px rgba(37, 211, 102, 0.35);
+}
+.rm .rm-pfoot {
+  margin: 22px 0 0;
+  text-align: center;
+  color: #c9b48a;
+  font-family: var(--rm-font-script), cursive;
+  font-size: 1.6rem;
+}
+
+/* poster polish: bigger readable names, aligned price column, calmer note */
+.rm .rm-pname { font-size: 1.05rem; }
+.rm .rm-pcal { margin-top: 2px; font-size: 0.76rem; }
+.rm .rm-pprice { min-width: 52px; text-align: end; }
+.rm .rm-prow { padding: 7px 0; }
+.rm .rm-pnote { display: inline-block; padding: 7px 12px; font-size: 0.85rem; }
+.rm .rm-psec { margin-top: 18px; padding: 16px 14px 12px; }
+.rm .rm-pbanner { margin-bottom: 10px; }
+.rm .rm-bar { background: #0d0a07; }

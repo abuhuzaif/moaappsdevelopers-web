@@ -239,11 +239,43 @@ export default async function RestaurantMenuPage({
         whatsapp={restaurant.whatsapp}
       />
 
-      {restaurant.description && (
-        <p style={{ padding: "16px 20px 0", color: "var(--text-muted)", fontSize: 14, lineHeight: 1.6 }}>
-          {restaurant.description}
-        </p>
-      )}
+      {restaurant.description && (() => {
+        // Poster-style menus (black & gold) get a bold gold band; others a warm cream card
+        // tinted with the menu's own accent colour.
+        const dark = restaurant.menuTheme?.style === "poster";
+        const accent = restaurant.menuTheme?.highlight || restaurant.menuTheme?.accent || "#b8860b";
+        return (
+          <div
+            style={{
+              margin: dark ? "16px 0 0" : "16px 16px 0",
+              padding: dark ? "18px 22px" : "16px 20px",
+              borderRadius: dark ? 0 : 16,
+              background: dark
+                ? "linear-gradient(135deg, #ffd766 0%, #f2b632 55%, #d9951c 100%)"
+                : "linear-gradient(135deg, #fffaf0, #fff4dd)",
+              borderInlineStart: `4px solid ${dark ? "#7a4b00" : accent}`,
+              boxShadow: dark ? "none" : "0 6px 20px rgba(120, 80, 20, 0.08)",
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                fontFamily: "Georgia, 'Times New Roman', serif",
+                fontStyle: "italic",
+                fontSize: "clamp(15px, 2.2vw, 18px)",
+                lineHeight: 1.65,
+                color: dark ? "#1d140c" : "#3b2a12",
+                fontWeight: dark ? 600 : 400,
+              }}
+            >
+              <span aria-hidden style={{ color: dark ? "#7a4b00" : accent, fontSize: "1.6em", lineHeight: 0, marginInlineEnd: 4, verticalAlign: "-0.25em" }}>
+                “
+              </span>
+              {restaurant.description}
+            </p>
+          </div>
+        );
+      })()}
 
       {/* ── Digital Menu ── */}
       {hasInlineMenu ? (

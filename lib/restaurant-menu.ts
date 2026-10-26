@@ -22,6 +22,7 @@ export interface MenuCategory {
   noteAr?: string;
   sort: number;
   image?: string; // category tile photo ("tiles" layout)
+  day?: number; // day-of-week special (0 = Sunday … 6 = Saturday): shown first as "Today" on that day
 }
 
 export interface MenuItem {
@@ -44,7 +45,7 @@ export interface MenuSection extends MenuCategory {
 }
 
 export interface MenuTheme {
-  style?: "default" | "ornate" | "classic"; // ornate = dark printed look (Quetta Grill), classic = cream printed look (Al Jalsa)
+  style?: "default" | "ornate" | "classic" | "poster"; // poster = black & gold printed-poster look with dotted price lines (Biryani Nation) // ornate = dark printed look (Quetta Grill), classic = cream printed look (Al Jalsa)
   layout?: "tiles"; // tiles = opens on a grid of category photos (Nawaab's); tap a tile to see its dishes
   bg?: string;
   surface?: string;
@@ -122,6 +123,7 @@ export function parseCategories(raw: unknown): MenuCategory[] {
       noteAr: str(c?.noteAr),
       sort: num(c?.sort) ?? i * 10,
       image: str(c?.image),
+      day: typeof c?.day === "number" && c.day >= 0 && c.day <= 6 ? c.day : undefined,
     }))
     .filter((c) => c.id && c.name)
     .sort((a, b) => a.sort - b.sort);
