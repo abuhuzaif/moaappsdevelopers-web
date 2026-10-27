@@ -3,6 +3,10 @@ import type { Metadata } from "next";
 import { collection, query, where, limit, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Image from "next/image";
+import { Playfair_Display } from "next/font/google";
+
+// Elegant serif for the restaurant's description line
+const descFont = Playfair_Display({ subsets: ["latin"], weight: ["500", "600"], style: ["italic"], display: "swap" });
 import RestaurantMenu from "@/components/restaurant-menu/RestaurantMenu";
 import StickyRestaurantBar from "@/components/restaurant-menu/StickyRestaurantBar";
 import AddToHomeScreen from "@/components/restaurant-menu/AddToHomeScreen";
@@ -240,7 +244,7 @@ export default async function RestaurantMenuPage({
       />
 
       {restaurant.description && (() => {
-        // Poster-style menus (black & gold) get a bold gold band; others a warm cream card
+        // Poster-style menus (black & gold) get a chocolate-brown band (gold accents); others a warm cream card
         // tinted with the menu's own accent colour.
         const dark = restaurant.menuTheme?.style === "poster";
         const accent = restaurant.menuTheme?.highlight || restaurant.menuTheme?.accent || "#b8860b";
@@ -251,24 +255,25 @@ export default async function RestaurantMenuPage({
               padding: dark ? "18px 22px" : "16px 20px",
               borderRadius: dark ? 0 : 16,
               background: dark
-                ? "linear-gradient(135deg, #ffd766 0%, #f2b632 55%, #d9951c 100%)"
+                ? "repeating-linear-gradient(45deg, rgba(255,200,120,0.035) 0 2px, transparent 2px 6px), linear-gradient(180deg, #442812 0%, #361d0f 55%, #1e0c08 100%)"
                 : "linear-gradient(135deg, #fffaf0, #fff4dd)",
-              borderInlineStart: `4px solid ${dark ? "#7a4b00" : accent}`,
+              borderInlineStart: `4px solid ${dark ? "#e8b04a" : accent}`,
               boxShadow: dark ? "none" : "0 6px 20px rgba(120, 80, 20, 0.08)",
             }}
           >
             <p
+              className={descFont.className}
               style={{
                 margin: 0,
-                fontFamily: "Georgia, 'Times New Roman', serif",
                 fontStyle: "italic",
+                letterSpacing: "0.01em",
                 fontSize: "clamp(15px, 2.2vw, 18px)",
                 lineHeight: 1.65,
-                color: dark ? "#1d140c" : "#3b2a12",
-                fontWeight: dark ? 600 : 400,
+                color: dark ? "#f6e7cb" : "#3b2a12",
+                fontWeight: dark ? 600 : 500,
               }}
             >
-              <span aria-hidden style={{ color: dark ? "#7a4b00" : accent, fontSize: "1.6em", lineHeight: 0, marginInlineEnd: 4, verticalAlign: "-0.25em" }}>
+              <span aria-hidden style={{ color: dark ? "#e8b04a" : accent, fontSize: "1.6em", lineHeight: 0, marginInlineEnd: 4, verticalAlign: "-0.25em" }}>
                 “
               </span>
               {restaurant.description}

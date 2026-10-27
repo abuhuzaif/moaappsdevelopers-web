@@ -354,6 +354,10 @@ function PosterBody({
             <div className="rm-psec-photo">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className="rm-psec-img" src={s.image} alt="" loading="lazy" />
+              {/* rising steam over the hot dish */}
+              <span className="rm-steam" aria-hidden>
+                <i /><i /><i /><i />
+              </span>
             </div>
           )}
           <h2 className="rm-pbanner" id={`rm-ph-${s.id}`}>
