@@ -21,11 +21,15 @@ const isKsaConnectSite = process.env.SITE_MODE === "ksaconnect";
 // Drafts (isActive: false) also show on localhost and Vercel preview deployments, never on production.
 const showDrafts = process.env.VERCEL_ENV !== "production";
 
+// Rebuild this list at most every 5 minutes, so a new (or un-hidden) restaurant
+// shows up on its own — no redeploy needed. Same as the menu pages.
+export const revalidate = 300;
+
 export const metadata: Metadata = isKsaConnectSite
   ? {
-      title: "Digital Menus — Restaurants in Saudi Arabia | KSA-Connect",
+      title: "Digital Menus — Restaurants in Saudi Arabia | MYKSA Connect",
       description:
-        "Browse digital menus from restaurants across Saudi Arabia. View prices, order via WhatsApp, and discover new places to eat — powered by KSA-Connect.",
+        "Browse digital menus from restaurants across Saudi Arabia. View prices, order via WhatsApp, and discover new places to eat — powered by MYKSA Connect.",
     }
   : {};
 
