@@ -45,7 +45,7 @@ export interface MenuSection extends MenuCategory {
 }
 
 export interface MenuTheme {
-  style?: "default" | "ornate" | "classic" | "poster"; // poster = black & gold printed-poster look with dotted price lines (Biryani Nation) // ornate = dark printed look (Quetta Grill), classic = cream printed look (Al Jalsa)
+  style?: "default" | "ornate" | "classic" | "poster" | "lunchbox"; // lunchbox = bright brochure look (The Lunch Box) // poster = black & gold printed-poster look with dotted price lines (Biryani Nation) // ornate = dark printed look (Quetta Grill), classic = cream printed look (Al Jalsa)
   layout?: "tiles"; // tiles = opens on a grid of category photos (Nawaab's); tap a tile to see its dishes
   bg?: string;
   surface?: string;
@@ -77,6 +77,15 @@ export interface MenuOrdering {
   types?: OrderType[]; // order of buttons; first is the default
 }
 
+/** A branch with its own WhatsApp for orders (e.g. The Lunch Box: Riyadh, Khobar). */
+export interface MenuBranch {
+  id: string;
+  name: string;
+  nameAr?: string;
+  whatsapp: string; // digits with country code, e.g. 966540573641
+  phone?: string;
+}
+
 /** Restaurant info the menu component needs (plain, serialisable). */
 export interface MenuRestaurantInfo {
   name: string;
@@ -94,6 +103,7 @@ export interface MenuRestaurantInfo {
   hoursAr?: string;
   phone?: string;
   whatsapp?: string;
+  branches?: MenuBranch[]; // when set, the customer picks a branch and orders go to that branch's WhatsApp
   theme?: MenuTheme;
   footerNotes?: L10n[];
   cateringText?: L10n;

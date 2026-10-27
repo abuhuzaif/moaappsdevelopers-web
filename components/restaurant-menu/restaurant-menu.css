@@ -1515,7 +1515,7 @@
 .rm .rm-pnote { display: inline-block; padding: 7px 12px; font-size: 0.85rem; }
 .rm .rm-psec { margin-top: 18px; padding: 16px 14px 12px; }
 .rm .rm-pbanner { margin-bottom: 10px; }
-.rm .rm-bar { background: #0d0a07; }
+.rm.rm-posterstyle .rm-bar { background: #0d0a07; } /* poster style only */
 
 /* poster: soft steam rising from the dish photo */
 .rm .rm-steam {
@@ -1550,3 +1550,223 @@
 @media (prefers-reduced-motion: reduce) {
   .rm .rm-steam { display: none; }
 }
+
+
+/* ── "lunchbox" style: bright brochure look (The Lunch Box) ─────────────── */
+.rm.rm-lunch { font-family: var(--rm-font-lb), "Montserrat", system-ui, sans-serif; }
+.rm .rm-lb {
+  position: relative;
+  padding: 0 14px 30px;
+  background-color: #ffffff;
+  /* faint doodle-like dots, like the printed menu's background */
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(43, 35, 64, 0.05) 1.5px, transparent 2px),
+    radial-gradient(circle at 70% 70%, rgba(232, 64, 42, 0.05) 1.5px, transparent 2px);
+  background-size: 34px 34px, 46px 46px;
+  overflow: hidden;
+}
+.rm .rm-lb-band {
+  position: relative;
+  margin: 0 -14px 6px;
+  height: 64px;
+  background: #e8402a;
+  border-bottom-right-radius: 100% 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 22px;
+}
+.rm .rm-lb-band span {
+  color: #ffffff;
+  font-family: var(--rm-font-hand), cursive;
+  font-size: clamp(1.15rem, 4.6vw, 1.5rem);
+  transform: rotate(-4deg);
+  white-space: nowrap;
+}
+.rm .rm-lbsec { position: relative; margin-top: 18px; }
+.rm .rm-lbsec-img {
+  display: block;
+  width: 64%;
+  max-width: 240px;
+  max-height: 140px;
+  margin: 0 0 -6px auto;
+  object-fit: contain;
+  mix-blend-mode: multiply; /* the photos' white background melts into the page */
+}
+.rm .rm-lbpill {
+  position: relative;
+  display: inline-block;
+  margin: 0 0 10px -14px;
+  padding: 8px 26px 8px 22px;
+  background: #f7c51e;
+  border-radius: 0 999px 999px 0;
+  color: #1b1b1b;
+  font-weight: 800;
+  font-size: clamp(1.15rem, 4.8vw, 1.45rem);
+  box-shadow: inset 10px 0 0 #8dc63f;
+}
+.rm .rm-lbpill::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -8px;
+  width: 40px;
+  height: 22px;
+  background: #8dc63f;
+  border-radius: 0 0 40px 0;
+  z-index: -1;
+}
+.rm .rm-lbnote {
+  display: inline-block;
+  margin: 0 0 8px 10px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: rgba(141, 198, 63, 0.16);
+  color: #4d7a17;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+.rm .rm-lbtable { display: grid; }
+.rm .rm-lbrow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px 46px 44px 40px;
+  align-items: center;
+  column-gap: 6px;
+  min-height: 40px;
+}
+.rm .rm-lbhead { min-height: 26px; }
+.rm .rm-lbc-sar { color: #6aa828; font-weight: 800; font-size: 0.78rem; text-align: center; }
+.rm .rm-lbc-cal { color: #f08a24; font-weight: 800; font-size: 0.78rem; text-align: center; }
+.rm .rm-lbname { color: #2b2b2b; font-weight: 600; font-size: 0.98rem; line-height: 1.25; }
+.rm .rm-lblabel { color: #6b6478; font-weight: 500; }
+.rm .rm-lbprice { text-align: center; color: #2b2b2b; font-weight: 700; }
+/* Arabic price column sits in a rounded green-outlined box, like the printed menu */
+.rm .rm-lbprice-ar {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1.5px solid #8dc63f;
+  border-right: 1.5px solid #8dc63f;
+  color: #2b2b2b;
+  font-family: var(--rm-font-arabic), serif;
+  font-weight: 700;
+}
+.rm .rm-lbhead .rm-lbc-sar:nth-child(3) {
+  border: 1.5px solid #8dc63f;
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  padding-top: 2px;
+}
+.rm .rm-lbrow:last-child .rm-lbprice-ar {
+  border-bottom: 1.5px solid #8dc63f;
+  border-radius: 0 0 10px 10px;
+}
+.rm .rm-lbcal { text-align: center; color: #f08a24; font-weight: 700; }
+.rm .rm-lb-foot {
+  margin: 26px 0 0;
+  text-align: center;
+  color: #4b3d8f;
+  font-family: var(--rm-font-hand), cursive;
+  font-size: 1.5rem;
+}
+@media (min-width: 640px) {
+  .rm .rm-lbsec:has(.rm-lbsec-img) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 230px;
+    grid-template-areas: "pill img" "note img" "table img";
+    grid-template-rows: auto auto 1fr;
+    column-gap: 20px;
+    align-items: start;
+  }
+  .rm .rm-lbsec:has(.rm-lbsec-img) > .rm-lbpill { grid-area: pill; justify-self: start; }
+  .rm .rm-lbsec:has(.rm-lbsec-img) > .rm-lbnote { grid-area: note; justify-self: start; }
+  .rm .rm-lbsec:has(.rm-lbsec-img) > .rm-lbtable { grid-area: table; }
+  .rm .rm-lbsec-img { grid-area: img; width: 100%; max-height: 220px; margin: 30px 0 0; }
+  .rm .rm-lbrow { grid-template-columns: minmax(0, 1fr) 52px 56px 52px 40px; }
+}
+
+.rm .rm-lb-footimg {
+  display: block;
+  width: calc(100% + 28px);
+  max-width: none;
+  margin: 26px -14px -30px;
+  height: auto;
+}
+
+/* branch picker (restaurants with several branches, each with its own WhatsApp) */
+.rm .rm-branchbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--rm-surface, #fff);
+  border-bottom: 1px solid var(--rm-line, rgba(0, 0, 0, 0.1));
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--rm-text, #222);
+}
+.rm .rm-branchbtn {
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--rm-accent, #e8402a);
+  background: transparent;
+  color: var(--rm-accent, #e8402a);
+  font-weight: 800;
+  cursor: pointer;
+}
+.rm .rm-branchbtn.is-on { background: var(--rm-accent, #e8402a); color: #fff; }
+.rm .rm-branchmodal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(10, 10, 20, 0.55);
+}
+.rm .rm-branchcard {
+  width: 100%;
+  max-width: 380px;
+  padding: 22px 20px;
+  border-radius: 18px;
+  background: #fff;
+  color: #222;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+.rm .rm-branchcard h3 { margin: 0 0 6px; font-size: 1.25rem; }
+.rm .rm-branchcard p { margin: 0 0 16px; color: #666; font-size: 0.9rem; }
+.rm .rm-branchopts { display: grid; gap: 10px; }
+.rm .rm-branchopts button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 2px solid var(--rm-accent, #e8402a);
+  background: #fff;
+  color: var(--rm-accent, #e8402a);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.rm .rm-branchopts button small { color: #555; font-size: 0.85rem; font-weight: 600; }
+.rm .rm-branchopts button:hover { background: var(--rm-accent, #e8402a); color: #fff; }
+.rm .rm-branchopts button:hover small { color: #fff; }
+
+.rm .rm-branchcontact { display: inline-flex; flex-wrap: wrap; gap: 8px; margin-inline-start: auto; }
+.rm .rm-branchcontact a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--rm-line, rgba(0, 0, 0, 0.15));
+  color: var(--rm-text, #222);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+.rm .rm-branchcontact .rm-branchwa { background: #25d366; border-color: #25d366; color: #fff; }

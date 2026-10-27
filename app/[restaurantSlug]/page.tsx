@@ -16,6 +16,7 @@ import {
   type L10n,
   type MenuFrame,
   type MenuOrdering,
+  type MenuBranch,
   type MenuRestaurantInfo,
   type MenuTheme,
 } from "@/lib/restaurant-menu";
@@ -41,6 +42,7 @@ interface Restaurant {
   hoursAr?: string;
   phone?: string;
   whatsapp?: string;
+  branches?: MenuBranch[];
   cuisine?: string;
   isActive?: boolean;
   // Unlisted: page works by direct link, but is hidden from /restaurants and search engines.
@@ -167,6 +169,7 @@ export default async function RestaurantMenuPage({
     hoursAr: restaurant.hoursAr,
     phone: restaurant.phone,
     whatsapp: restaurant.whatsapp,
+    branches: restaurant.branches,
     theme: restaurant.menuTheme,
     footerNotes: restaurant.menuFooterNotes,
     cateringText: restaurant.cateringText,
@@ -222,7 +225,20 @@ export default async function RestaurantMenuPage({
             📞 <span dir="ltr">{restaurant.phone}</span>
           </a>
         )}
-        {restaurant.whatsapp && (
+        {restaurant.branches && restaurant.branches.length > 1 ? (
+          restaurant.branches.map((b) => (
+            <a
+              key={b.id}
+              href={`https://wa.me/${b.whatsapp.replace(/[^0-9]/g, "")}`}
+              target="_blank" rel="noreferrer"
+              className="mk-btn mk-btn-gold"
+              style={{ fontSize: 13, padding: "6px 14px" }}
+            >
+              💬 {b.name} Order
+            </a>
+          ))
+        ) : (
+          restaurant.whatsapp && (
           <a
             href={`https://wa.me/${restaurant.whatsapp.replace(/[^0-9]/g, "")}`}
             target="_blank" rel="noreferrer"
@@ -231,6 +247,7 @@ export default async function RestaurantMenuPage({
           >
             💬 WhatsApp Order
           </a>
+          )
         )}
       </div>
 
@@ -239,8 +256,8 @@ export default async function RestaurantMenuPage({
       <StickyRestaurantBar
         name={restaurant.name}
         logoUrl={restaurant.logoUrl}
-        phone={restaurant.phone}
-        whatsapp={restaurant.whatsapp}
+        phone={restaurant.branches && restaurant.branches.length > 1 ? undefined : restaurant.phone}
+        whatsapp={restaurant.branches && restaurant.branches.length > 1 ? undefined : restaurant.whatsapp}
       />
 
       {restaurant.description && (() => {

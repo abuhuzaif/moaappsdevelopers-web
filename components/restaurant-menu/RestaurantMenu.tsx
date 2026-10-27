@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { Playfair_Display, Noto_Naskh_Arabic, Great_Vibes, Cinzel, Roboto_Condensed, Tajawal } from "next/font/google";
+import { Playfair_Display, Noto_Naskh_Arabic, Great_Vibes, Cinzel, Roboto_Condensed, Tajawal, Montserrat, Gochi_Hand } from "next/font/google";
 import type { MenuItem, MenuPrice, MenuRestaurantInfo, MenuSection, OrderType } from "@/lib/restaurant-menu";
 import { AddControl, CartBar, CartProvider, CartSheet, useCartState } from "./cart";
 import "./restaurant-menu.css";
@@ -13,6 +13,8 @@ const caps = Cinzel({ subsets: ["latin"], weight: ["400", "600"], variable: "--r
 // "classic" style (cream printed menu, e.g. Al Jalsa) — not preloaded, only fetched when used
 const condensed = Roboto_Condensed({ subsets: ["latin"], weight: ["400", "700", "800"], variable: "--rm-font-condensed", preload: false });
 const arabicSans = Tajawal({ subsets: ["arabic"], weight: ["400", "500", "700", "800"], variable: "--rm-font-arabic-sans", preload: false });
+const lbSans = Montserrat({ subsets: ["latin"], weight: ["500", "600", "700", "800"], variable: "--rm-font-lb", preload: false });
+const lbHand = Gochi_Hand({ subsets: ["latin"], weight: "400", variable: "--rm-font-hand", preload: false });
 
 type Lang = "en" | "ar";
 type T = { en: string; ar: string };
@@ -23,6 +25,9 @@ const ui = {
   categories: { en: "Menu Categories", ar: "أقسام القائمة" },
   today: { en: "Today", ar: "اليوم" },
   note: { en: "Note", ar: "ملاحظة" },
+  orderingFrom: { en: "Ordering from", ar: "الطلب من فرع" },
+  chooseBranch: { en: "Choose your branch", ar: "اختر الفرع" },
+  chooseBranchText: { en: "Your order will be sent on WhatsApp to the branch you pick.", ar: "سيتم إرسال طلبك عبر واتساب إلى الفرع الذي تختاره." },
   partyTitle: { en: "We accept party orders", ar: "نستقبل طلبات الحفلات" },
   partyText: { en: "Weddings, family gatherings & office events — biryani handi, haleem and more.", ar: "الأعراس والتجمعات العائلية ومناسبات العمل — برياني هاندي وحليم والمزيد." },
   partyBtn: { en: "Order on WhatsApp", ar: "اطلب عبر واتساب" },
@@ -404,6 +409,60 @@ function PosterBody({
   );
 }
 
+const arNum = (n: number) => new Intl.NumberFormat("ar-SA").format(n);
+
+/** "lunchbox" style: bright brochure look — yellow/green section pills, SAR | ريال | CAL. columns. */
+function LunchBody({ sections, q, lang, tagline, footer }: { sections: MenuSection[]; q: string; lang: Lang; tagline?: string; footer?: string }) {
+  const label = (l?: string) => (l ? ui.priceLabel[l]?.[lang] ?? l : "");
+  return (
+    <div className="rm-lb">
+      <div className="rm-lb-band" aria-hidden>
+        <span>{tagline || "Eat Good, Feel Good, Do Good"}</span>
+      </div>
+      {sections.length === 0 && <p className="rm-empty">{ui.noResults[lang]}</p>}
+      {sections.map((s) => (
+        <section key={s.id} className="rm-lbsec" id={`rm-cat-${s.id}`} data-cat={s.id} aria-labelledby={`rm-lh-${s.id}`}>
+          {s.image && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="rm-lbsec-img" src={s.image} alt="" loading="lazy" />
+          )}
+          <h2 className="rm-lbpill" id={`rm-lh-${s.id}`}>{pick(lang, s.name, s.nameAr)}</h2>
+          {(s.note || s.noteAr) && <p className="rm-lbnote">{pick(lang, s.note, s.noteAr)}</p>}
+          <div className="rm-lbtable" role="table">
+            <div className="rm-lbrow rm-lbhead" role="row">
+              <span role="columnheader" />
+              <span role="columnheader" className="rm-lbc-sar">SAR</span>
+              <span role="columnheader" className="rm-lbc-sar">ريال</span>
+              <span role="columnheader" className="rm-lbc-cal">CAL.</span>
+              <span role="columnheader" aria-hidden />
+            </div>
+            {s.items.flatMap((it) =>
+              it.prices.map((p, i) => (
+                <div key={`${it.id}-${i}`} className="rm-lbrow" role="row" id={i === 0 ? `rm-item-${it.id}` : undefined}>
+                  <span className="rm-lbname" role="cell">
+                    {pick(lang, it.name, it.nameAr)}
+                    {p.label && <span className="rm-lblabel"> – {label(p.label)}</span>}
+                  </span>
+                  <span className="rm-lbprice" role="cell">{p.amount}</span>
+                  <span className="rm-lbprice-ar" role="cell">{arNum(p.amount)}</span>
+                  <span className="rm-lbcal" role="cell">{p.cal ?? ""}</span>
+                  <span role="cell"><AddControl item={it} p={p} lang={lang} /></span>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      ))}
+      {!q && footer ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className="rm-lb-footimg" src={footer} alt="" loading="lazy" />
+      ) : (
+        !q && <p className="rm-lb-foot">Essence of Hyderabad Cuisine</p>
+      )}
+    </div>
+  );
+}
+
 function Plaque({ title, id }: { title: string; id?: string }) {
   return (
     <header className="rm-plaque">
@@ -610,7 +669,27 @@ export default function RestaurantMenu({
   const chipsRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
-  const wa = restaurant.whatsapp?.replace(/[^0-9]/g, "");
+  // ── Branches: each branch has its own WhatsApp (customer picks one, remembered on this phone) ──
+  const branches = restaurant.branches ?? [];
+  const branchKey = `rm-branch-${restaurant.slug ?? restaurant.name}`;
+  const [branchId, setBranchId] = useState<string | null>(null);
+  const [branchAsk, setBranchAsk] = useState(false);
+  useEffect(() => {
+    if (!branches.length) return;
+    if (branches.length === 1) return setBranchId(branches[0].id);
+    let saved: string | null = null;
+    try { saved = localStorage.getItem(branchKey); } catch {}
+    if (saved && branches.some((b) => b.id === saved)) setBranchId(saved);
+    else setBranchAsk(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [branchKey, branches.length]);
+  const chooseBranch = (id: string) => {
+    setBranchId(id);
+    setBranchAsk(false);
+    try { localStorage.setItem(branchKey, id); } catch {}
+  };
+  const branch = branches.find((b) => b.id === branchId);
+  const wa = (branches.length ? branch?.whatsapp : restaurant.whatsapp)?.replace(/[^0-9]/g, "");
 
   // ── WhatsApp ordering ──
   const orderingOn = !!restaurant.ordering?.enabled && !!wa;
@@ -716,6 +795,7 @@ export default function RestaurantMenu({
   const ornate = th.style === "ornate" && !!fr.top;
   const classic = th.style === "classic";
   const poster = th.style === "poster";
+  const lunch = th.style === "lunchbox";
   const css = (u?: string) => (u ? `url("${u}")` : undefined);
   const style = {
     "--rm-frame-top": css(fr.top),
@@ -740,7 +820,7 @@ export default function RestaurantMenu({
     <div
       ref={rootRef}
       id="menu"
-      className={`rm ${display.variable} ${arabic.variable} ${script.variable} ${caps.variable}${classic ? ` ${condensed.variable} ${arabicSans.variable} rm-classic` : ""}${ornate ? " rm-ornate" : ""}${lang === "ar" ? " rm-ar" : ""}`}
+      className={`rm ${display.variable} ${arabic.variable} ${script.variable} ${caps.variable}${lunch ? ` ${lbSans.variable} ${lbHand.variable} rm-lunch` : ""}${poster ? " rm-posterstyle" : ""}${classic ? ` ${condensed.variable} ${arabicSans.variable} rm-classic` : ""}${ornate ? " rm-ornate" : ""}${lang === "ar" ? " rm-ar" : ""}`}
       style={style}
       lang={lang}
       dir={lang === "ar" ? "rtl" : "ltr"}
@@ -849,7 +929,58 @@ export default function RestaurantMenu({
         )}
       </nav>
 
-      {poster ? (
+      {branches.length > 1 && (
+        <div className="rm-branchbar">
+          <span>📍 {ui.orderingFrom[lang]}:</span>
+          {branches.map((b) => (
+            <button
+              key={b.id}
+              type="button"
+              className={`rm-branchbtn${b.id === branchId ? " is-on" : ""}`}
+              aria-pressed={b.id === branchId}
+              onClick={() => chooseBranch(b.id)}
+            >
+              {pick(lang, b.name, b.nameAr)}
+            </button>
+          ))}
+          {branch && (
+            <span className="rm-branchcontact">
+              {branch.phone && (
+                <a href={`tel:+${branch.whatsapp.replace(/[^0-9]/g, "")}`} dir="ltr">📞 {branch.phone}</a>
+              )}
+              <a
+                className="rm-branchwa"
+                href={`https://wa.me/${branch.whatsapp.replace(/[^0-9]/g, "")}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                💬 WhatsApp
+              </a>
+            </span>
+          )}
+        </div>
+      )}
+
+      {branchAsk && (
+        <div className="rm-branchmodal" role="dialog" aria-modal="true" aria-label={ui.chooseBranch[lang]}>
+          <div className="rm-branchcard">
+            <h3>📍 {ui.chooseBranch[lang]}</h3>
+            <p>{ui.chooseBranchText[lang]}</p>
+            <div className="rm-branchopts">
+              {branches.map((b) => (
+                <button key={b.id} type="button" onClick={() => chooseBranch(b.id)}>
+                  <b>{pick(lang, b.name, b.nameAr)}</b>
+                  {b.phone && <small dir="ltr">{b.phone}</small>}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {lunch ? (
+        <LunchBody sections={filtered} q={q} lang={lang} tagline={undefined} footer={fr.bottom} />
+      ) : poster ? (
         <PosterBody sections={filtered} q={q} lang={lang} today={today} selDay={selDay ?? today ?? 0} setSelDay={setSelDay} restaurant={restaurant} />
       ) : tiles && !q && !openCat ? (
         <section className="rm-tiles-wrap" aria-labelledby="rm-tiles-h">
