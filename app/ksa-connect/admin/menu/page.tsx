@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { collection, doc, getDoc, getDocs, writeBatch } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, updateDoc, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
 import { isAdmin } from "@/lib/admin";
@@ -39,6 +39,12 @@ export default function MenuEditorPage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+  // WhatsApp ordering options for the selected restaurant
+  type OType = "dinein" | "takeaway" | "delivery";
+  const [ordEnabled, setOrdEnabled] = useState(false);
+  const [ordTypes, setOrdTypes] = useState<OType[]>([]);
+  const [ordSaving, setOrdSaving] = useState(false);
+  const [ordMsg, setOrdMsg] = useState("");
 
   useEffect(() => {
     if (!admin) return;
@@ -59,6 +65,10 @@ export default function MenuEditorPage() {
     (async () => {
       try {
         const rDoc = await getDoc(doc(db, "restaurants", rid));
+        const ord = rDoc.get("ordering") as { enabled?: boolean; types?: OType[] } | undefined;
+        setOrdEnabled(!!ord?.enabled);
+        setOrdTypes(Array.isArray(ord?.types) && ord!.types!.length ? ord!.types! : ["dinein", "takeaway"]);
+        setOrdMsg("");
         const rawCats = (rDoc?.get("menuCategories") as unknown[]) ?? [];
         const c: Cat[] = Array.isArray(rawCats)
           ? rawCats
@@ -108,6 +118,22 @@ export default function MenuEditorPage() {
     if (orphans.length) out.push({ cat: { id: "other", name: "Other", sort: 99999 }, items: orphans });
     return out;
   }, [items, cats, q]);
+
+  async function saveOrdering(enabled: boolean, types: OType[]) {
+    if (enabled && !types.length) return setOrdMsg("Pick at least one order type.");
+    setOrdSaving(true);
+    setOrdMsg("");
+    try {
+      await updateDoc(doc(db, "restaurants", rid), { ordering: { enabled, types } });
+      setOrdEnabled(enabled);
+      setOrdTypes(types);
+      setOrdMsg("✅ Saved — live menu updates within ~5 minutes.");
+    } catch (e) {
+      setOrdMsg(e instanceof Error ? `Save failed: ${e.message}` : "Save failed.");
+    } finally {
+      setOrdSaving(false);
+    }
+  }
 
   async function save() {
     if (!dirty.size) return;
@@ -165,6 +191,55 @@ export default function MenuEditorPage() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search dish…" style={{ ...input, flex: 1, minWidth: 180 }} />
         {restaurant && <a href={`/${restaurant.slug}`} target="_blank" rel="noreferrer" style={{ color: "#005744", fontWeight: 700 }}>View live menu ↗</a>}
       </div>
+
+      {rid && !loading && (
+        <div style={{ marginBottom: 16, padding: 14, borderRadius: 14, border: "1px solid #d9e6e0", background: "#f7faf8" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <strong>🛒 WhatsApp ordering</strong>
+            <label style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700 }}>
+              <input
+                type="checkbox"
+                checked={ordEnabled}
+                disabled={ordSaving}
+                onChange={(e) => saveOrdering(e.target.checked, ordTypes)}
+                style={{ width: "auto", padding: 0, border: 0 }}
+              />
+              {ordEnabled ? "On" : "Off"}
+            </label>
+          </div>
+          {ordEnabled && (
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+              {([
+                ["dinein", "🍽️ Dine-in"],
+                ["takeaway", "🥡 Takeaway"],
+                ["delivery", "🛵 Delivery"],
+              ] as [OType, string][]).map(([t, label]) => {
+                const on = ordTypes.includes(t);
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    disabled={ordSaving}
+                    onClick={() => {
+                      const order: OType[] = ["dinein", "takeaway", "delivery"];
+                      const next = on ? ordTypes.filter((x) => x !== t) : order.filter((x) => x === t || ordTypes.includes(x));
+                      saveOrdering(true, next);
+                    }}
+                    style={{
+                      padding: "8px 14px", borderRadius: 999, fontWeight: 800, cursor: "pointer",
+                      border: on ? "2px solid #005744" : "1px solid #cbd8d3",
+                      background: on ? "#005744" : "#fff", color: on ? "#fff" : "#31403d",
+                    }}
+                  >
+                    {on ? "✓ " : ""}{label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          {ordMsg && <p style={{ margin: "8px 0 0", fontSize: 13, color: ordMsg.startsWith("✅") ? "#005744" : "#9a4d00" }}>{ordMsg}</p>}
+        </div>
+      )}
 
       {loading && <p>Loading menu…</p>}
       {!loading && !items.length && rid && <p style={{ color: "#52615e" }}>This restaurant has no dishes yet.</p>}

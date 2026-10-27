@@ -53,6 +53,13 @@ const t = {
     ar: "سيؤكد المطعم طلبك عبر واتساب. الدفع في المطعم.",
   },
   more: { en: "Add more", ar: "أضف المزيد" },
+  address: { en: "Delivery address (area, street, building)", ar: "عنوان التوصيل (الحي، الشارع، المبنى)" },
+  shareLocation: { en: "📍 Share my location", ar: "📍 مشاركة موقعي" },
+  locating: { en: "Getting your location…", ar: "جارٍ تحديد موقعك…" },
+  locationOk: { en: "✓ Location added — the restaurant will get a map link", ar: "✓ تمت إضافة الموقع — سيصل للمطعم رابط الخريطة" },
+  locationFail: { en: "Couldn't get your location. Please type your address.", ar: "تعذّر تحديد موقعك. يرجى كتابة العنوان." },
+  needAddress: { en: "Please share your location or type your address for delivery.", ar: "يرجى مشاركة موقعك أو كتابة عنوانك للتوصيل." },
+  needMobileDelivery: { en: "Please enter your mobile number for delivery.", ar: "يرجى إدخال رقم جوالك للتوصيل." },
 } satisfies Record<string, T>;
 
 const priceLabel: Record<string, T> = {
@@ -226,8 +233,10 @@ function buildMessage(opts: {
   mobile: string;
   note: string;
   pageUrl: string;
+  address?: string;
+  location?: { lat: number; lng: number } | null;
 }) {
-  const { restaurantName, lines, type, table, name, mobile, note, pageUrl } = opts;
+  const { restaurantName, lines, type, table, name, mobile, note, pageUrl, address, location } = opts;
   const total = lines.reduce((s, l) => s + l.price * l.qty, 0);
   const count = lines.reduce((s, l) => s + l.qty, 0);
   const when = new Intl.DateTimeFormat("en-GB", {
@@ -268,6 +277,10 @@ function buildMessage(opts: {
     `*Type:* ${typeText}`,
     ...(name ? [`*Name:* ${name}`] : []),
     ...(mobile ? [`*Mobile:* ${mobile}`] : []),
+    ...(type === "delivery" && address ? [`*Address:* ${address}`] : []),
+    ...(type === "delivery" && location
+      ? [`📍 *Location:* https://maps.google.com/?q=${location.lat.toFixed(6)},${location.lng.toFixed(6)}`]
+      : []),
   ];
   const parts = [
     head.join("\n"),
@@ -339,6 +352,21 @@ export function CartSheet({
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
   const [note, setNote] = useState("");
+  const [address, setAddress] = useState("");
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locStatus, setLocStatus] = useState<"" | "busy" | "ok" | "fail">("");
+  const shareLocation = () => {
+    if (!("geolocation" in navigator)) return setLocStatus("fail");
+    setLocStatus("busy");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocStatus("ok");
+      },
+      () => setLocStatus("fail"),
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+    );
+  };
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
 
@@ -383,6 +411,8 @@ export function CartSheet({
     if (type === "dinein" && !table.trim()) return setError(t.needTable[lang]);
     if (type === "takeaway" && !name.trim()) return setError(t.needName[lang]);
     if (type === "takeaway" && !mobile.trim()) return setError(t.needMobile[lang]);
+    if (type === "delivery" && !mobile.trim()) return setError(t.needMobileDelivery[lang]);
+    if (type === "delivery" && !location && !address.trim()) return setError(t.needAddress[lang]);
     const cleanMobile = mobile.trim() ? normalizeSaudiMobile(mobile) : "";
     if (cleanMobile === null) return setError(t.badMobile[lang]);
     setError("");
@@ -399,6 +429,8 @@ export function CartSheet({
       mobile: cleanMobile,
       note: note.trim(),
       pageUrl: window.location.origin + window.location.pathname,
+      address: address.trim(),
+      location,
     });
     const waUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`;
     // Inside the KSA-Connect app (WebView) new tabs don't exist — navigate instead,
@@ -502,7 +534,7 @@ export function CartSheet({
               <input value={name} onChange={(e) => setName(e.target.value.slice(0, 60))} autoComplete="name" />
             </label>
             <label className="rm-field">
-              <span>{type === "takeaway" ? t.mobile[lang] : t.mobileOptional[lang]}</span>
+              <span>{type === "takeaway" || type === "delivery" ? t.mobile[lang] : t.mobileOptional[lang]}</span>
               <input
                 type="tel"
                 inputMode="tel"
@@ -513,6 +545,29 @@ export function CartSheet({
                 autoComplete="tel"
               />
             </label>
+            {type === "delivery" && (
+              <div className="rm-field">
+                <button
+                  type="button"
+                  onClick={shareLocation}
+                  disabled={locStatus === "busy"}
+                  style={{
+                    padding: "12px 14px", borderRadius: 12, border: "1.5px solid #25d366",
+                    background: locStatus === "ok" ? "#25d366" : "#fff", color: locStatus === "ok" ? "#fff" : "#128c4a",
+                    fontWeight: 800, fontSize: 15, cursor: "pointer",
+                  }}
+                >
+                  {locStatus === "busy" ? t.locating[lang] : locStatus === "ok" ? t.locationOk[lang] : t.shareLocation[lang]}
+                </button>
+                {locStatus === "fail" && <small style={{ color: "#b45309", fontWeight: 600 }}>{t.locationFail[lang]}</small>}
+              </div>
+            )}
+            {type === "delivery" && (
+              <label className="rm-field">
+                <span>{t.address[lang]}</span>
+                <textarea rows={2} value={address} onChange={(e) => setAddress(e.target.value.slice(0, 200))} autoComplete="street-address" />
+              </label>
+            )}
             <label className="rm-field">
               <span>{t.note[lang]}</span>
               <textarea rows={2} value={note} onChange={(e) => setNote(e.target.value.slice(0, 300))} />
