@@ -29,6 +29,9 @@ const COLORS: { name: string; fg: string; accent: string; bg: string }[] = [
   { name: "Green", fg: "#005744", accent: "#d4a017", bg: "#f1f8f5" },
   { name: "Black", fg: "#111111", accent: "#c8a13c", bg: "#f7f7f7" },
   { name: "Red", fg: "#8e1b1b", accent: "#d4a017", bg: "#fdf3f2" },
+  // The Lunch Box brand colours (dark enough to scan reliably)
+  { name: "Lunch Green", fg: "#3f7d16", accent: "#f08a24", bg: "#f4fbe9" },
+  { name: "Lunch Orange", fg: "#c2410c", accent: "#6aa828", bg: "#fff4ea" },
 ];
 
 function loadQrLib(): Promise<QRFactory> {
