@@ -320,7 +320,9 @@ export default function ListingDetailClient() {
                 <>
                   <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid var(--border)" }} />
                   <h3 style={{ fontSize: 16 }}>Description</h3>
-                  <p style={{ color: "var(--text-muted)", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{listing.description}</p>
+                  <p style={{ color: "var(--text-muted)", lineHeight: 1.6, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
+                    <Linkified text={listing.description} />
+                  </p>
                 </>
               )}
 
@@ -502,6 +504,37 @@ export default function ListingDetailClient() {
           </div>
         )}
       </main>
+    </>
+  );
+}
+
+/** Turns web addresses in an ad's description into clickable links. */
+function Linkified({ text }: { text: string }) {
+  const parts = text.split(/((?:https?:\/\/|www\.)[^\s<>"]+)/gi);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (i % 2 === 0) return part;
+        // keep trailing punctuation (e.g. "…/menu." or "…/menu)") outside the link
+        const m = part.match(/^(.*?)([.,!?;:)\]]*)$/);
+        const url = m ? m[1] : part;
+        const tail = m ? m[2] : "";
+        const href = url.startsWith("http") ? url : `https://${url}`;
+        const internal = /^https?:\/\/(www\.)?myksaconnect\.com/i.test(href);
+        return (
+          <span key={i}>
+            <a
+              href={href}
+              target={internal ? undefined : "_blank"}
+              rel={internal ? undefined : "noopener noreferrer"}
+              style={{ color: "#005744", fontWeight: 700, textDecoration: "underline", wordBreak: "break-all" }}
+            >
+              {url}
+            </a>
+            {tail}
+          </span>
+        );
+      })}
     </>
   );
 }
