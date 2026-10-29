@@ -60,6 +60,13 @@ const t = {
   locationFail: { en: "Couldn't get your location. Please type your address.", ar: "تعذّر تحديد موقعك. يرجى كتابة العنوان." },
   needAddress: { en: "Please share your location or type your address for delivery.", ar: "يرجى مشاركة موقعك أو كتابة عنوانك للتوصيل." },
   needMobileDelivery: { en: "Please enter your mobile number for delivery.", ar: "يرجى إدخال رقم جوالك للتوصيل." },
+  whenFor: { en: "When for?", ar: "متى؟" },
+  now: { en: "Now", ar: "الآن" },
+  preorder: { en: "Pre-order", ar: "حجز مسبق" },
+  preorderDate: { en: "Date", ar: "التاريخ" },
+  preorderTime: { en: "Time", ar: "الوقت" },
+  needDate: { en: "Please select a date for your pre-order.", ar: "يرجى اختيار تاريخ للحجز المسبق." },
+  needTime: { en: "Please select a time for your pre-order.", ar: "يرجى اختيار وقت للحجز المسبق." },
 } satisfies Record<string, T>;
 
 const priceLabel: Record<string, T> = {
@@ -235,8 +242,11 @@ function buildMessage(opts: {
   pageUrl: string;
   address?: string;
   location?: { lat: number; lng: number } | null;
+  whenFor?: "now" | "preorder";
+  preorderDate?: string;
+  preorderTime?: string;
 }) {
-  const { restaurantName, lines, type, table, name, mobile, note, pageUrl, address, location } = opts;
+  const { restaurantName, lines, type, table, name, mobile, note, pageUrl, address, location, whenFor, preorderDate, preorderTime } = opts;
   const total = lines.reduce((s, l) => s + l.price * l.qty, 0);
   const count = lines.reduce((s, l) => s + l.qty, 0);
   const when = new Intl.DateTimeFormat("en-GB", {
@@ -275,6 +285,7 @@ function buildMessage(opts: {
     `*Order:* ${orderCode(restaurantName)}`,
     `*Date:* ${when}`,
     `*Type:* ${typeText}`,
+    ...(whenFor === "preorder" && preorderDate ? [`*Pre-order Date:* ${preorderDate}${preorderTime ? ` at ${preorderTime}` : ""}`] : []),
     ...(name ? [`*Name:* ${name}`] : []),
     ...(mobile ? [`*Mobile:* ${mobile}`] : []),
     ...(type === "delivery" && address ? [`*Address:* ${address}`] : []),
@@ -355,6 +366,9 @@ export function CartSheet({
   const [address, setAddress] = useState("");
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locStatus, setLocStatus] = useState<"" | "busy" | "ok" | "fail">("");
+  const [whenFor, setWhenFor] = useState<"now" | "preorder">("now");
+  const [preorderDate, setPreorderDate] = useState("");
+  const [preorderTime, setPreorderTime] = useState("");
   const shareLocation = () => {
     if (!("geolocation" in navigator)) return setLocStatus("fail");
     setLocStatus("busy");
@@ -413,6 +427,8 @@ export function CartSheet({
     if (type === "takeaway" && !mobile.trim()) return setError(t.needMobile[lang]);
     if (type === "delivery" && !mobile.trim()) return setError(t.needMobileDelivery[lang]);
     if (type === "delivery" && !location && !address.trim()) return setError(t.needAddress[lang]);
+    if (whenFor === "preorder" && !preorderDate) return setError(t.needDate[lang]);
+    if (whenFor === "preorder" && !preorderTime) return setError(t.needTime[lang]);
     const cleanMobile = mobile.trim() ? normalizeSaudiMobile(mobile) : "";
     if (cleanMobile === null) return setError(t.badMobile[lang]);
     setError("");
@@ -431,6 +447,9 @@ export function CartSheet({
       pageUrl: window.location.origin + window.location.pathname,
       address: address.trim(),
       location,
+      whenFor,
+      preorderDate,
+      preorderTime,
     });
     const waUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`;
     // Inside the KSA-Connect app (WebView) new tabs don't exist — navigate instead,
@@ -521,6 +540,41 @@ export function CartSheet({
                   </label>
                 ))}
               </fieldset>
+            )}
+
+            {/* ── When For ── */}
+            <fieldset className="rm-types">
+              <legend>{t.whenFor[lang]}</legend>
+              {(["now", "preorder"] as const).map((w) => (
+                <label key={w} className={whenFor === w ? "is-on" : undefined}>
+                  <input type="radio" name="rm-when" value={w} checked={whenFor === w} onChange={() => setWhenFor(w)} />
+                  {t[w][lang]}
+                </label>
+              ))}
+            </fieldset>
+
+            {whenFor === "preorder" && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <label className="rm-field">
+                  <span>{t.preorderDate[lang]}</span>
+                  <input
+                    type="date"
+                    value={preorderDate}
+                    min={new Date().toISOString().split("T")[0]}
+                    onChange={(e) => setPreorderDate(e.target.value)}
+                    style={{ padding: "10px 12px", borderRadius: 10, border: "1.5px solid var(--rm-border, #e5e7eb)", fontSize: 14, width: "100%" }}
+                  />
+                </label>
+                <label className="rm-field">
+                  <span>{t.preorderTime[lang]}</span>
+                  <input
+                    type="time"
+                    value={preorderTime}
+                    onChange={(e) => setPreorderTime(e.target.value)}
+                    style={{ padding: "10px 12px", borderRadius: 10, border: "1.5px solid var(--rm-border, #e5e7eb)", fontSize: 14, width: "100%" }}
+                  />
+                </label>
+              </div>
             )}
 
             {type === "dinein" && (

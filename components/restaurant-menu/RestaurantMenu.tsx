@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Playfair_Display, Noto_Naskh_Arabic, Great_Vibes, Cinzel, Roboto_Condensed, Tajawal, Montserrat, Gochi_Hand } from "next/font/google";
@@ -22,7 +22,8 @@ const LANG_KEY = "rm-lang";
 
 // ── Fixed UI text ─────────────────────────────────────────────
 const ui = {
-  categories: { en: "Menu Categories", ar: "أقسام القائمة" },
+  categories: { en: "Menu", ar: "القائمة" },
+  categoriesHint: { en: "Tap a section to view it", ar: "اضغط على قسم لعرضه" },
   today: { en: "Today", ar: "اليوم" },
   note: { en: "Note", ar: "ملاحظة" },
   orderingFrom: { en: "Ordering from", ar: "الطلب من فرع" },
@@ -985,6 +986,7 @@ export default function RestaurantMenu({
       ) : tiles && !q && !openCat ? (
         <section className="rm-tiles-wrap" aria-labelledby="rm-tiles-h">
           <h2 id="rm-tiles-h" className="rm-tiles-title">{ui.categories[lang]}</h2>
+          <p className="rm-tiles-hint">☝ {ui.categoriesHint[lang]}</p>
           <div className="rm-tiles">
             {tileOrder.map((s) => (
               <button type="button" key={s.id} className={`rm-tile${s.day != null && s.day === today ? " is-today" : ""}`} onClick={() => openCategory(s.id)}>
