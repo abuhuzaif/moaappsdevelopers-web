@@ -225,8 +225,21 @@ export default function RootLayout({
               {`
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){window.dataLayer.push(arguments);}
+
+                // Mark our own devices as internal traffic so GA4's
+                // "Internal Traffic" data filter removes them from reports.
+                // Open any page once with ?internal=1 on each device/browser
+                // to turn it on, or ?internal=0 to turn it off again.
+                var mkInternal = false;
+                try {
+                  var mkFlag = new URLSearchParams(window.location.search).get('internal');
+                  if (mkFlag === '1') localStorage.setItem('mk_internal', '1');
+                  if (mkFlag === '0') localStorage.removeItem('mk_internal');
+                  mkInternal = localStorage.getItem('mk_internal') === '1';
+                } catch (e) {}
+
                 gtag('js', new Date());
-                gtag('config', '${GA_MEASUREMENT_ID}');
+                gtag('config', '${GA_MEASUREMENT_ID}', mkInternal ? { traffic_type: 'internal' } : {});
               `}
             </Script>
           </>
