@@ -1,0 +1,2106 @@
+{
+  "restaurant": {
+    "slug": "khana-khazana",
+    "name": "Khana Khazana Restaurant",
+    "nameAr": "مطعم خانا خزانة",
+    "tagline": "Indian & Hyderabadi Cuisine",
+    "taglineAr": "مأكولات هندية وحيدرآبادية",
+    "isActive": false,
+    "hidden": true,
+    "logoSource": "https://pqr-items-images-v2.s3.amazonaws.com/8b8ac942.jpeg",
+    "menuTheme": {
+      "style": "default",
+      "accent": "#b1331c",
+      "accentSoft": "#fbeae6"
+    },
+    "ordering": {
+      "enabled": false,
+      "types": [
+        "takeaway",
+        "dinein"
+      ]
+    },
+    "menuCategories": [
+      {
+        "id": "soup",
+        "name": "Soup",
+        "nameAr": "شوربة",
+        "sort": 10
+      },
+      {
+        "id": "bbq",
+        "name": "BBQ & Kababs",
+        "nameAr": "المشويات",
+        "sort": 20
+      },
+      {
+        "id": "chicken",
+        "name": "Chicken",
+        "nameAr": "أطباق الدجاج",
+        "sort": 30
+      },
+      {
+        "id": "mutton",
+        "name": "Mutton & Beef",
+        "nameAr": "أطباق اللحم",
+        "sort": 40
+      },
+      {
+        "id": "rice",
+        "name": "Biryani & Rice",
+        "nameAr": "أطباق الأرز",
+        "sort": 50
+      },
+      {
+        "id": "fish",
+        "name": "Fish",
+        "nameAr": "أطباق السمك",
+        "sort": 60
+      },
+      {
+        "id": "prawn",
+        "name": "Prawns",
+        "nameAr": "أطباق الروبيان",
+        "sort": 70
+      },
+      {
+        "id": "veg",
+        "name": "Vegetarian",
+        "nameAr": "أطباق الخضار",
+        "sort": 80
+      },
+      {
+        "id": "bread",
+        "name": "Bread",
+        "nameAr": "خبز",
+        "sort": 90
+      },
+      {
+        "id": "dessert",
+        "name": "Desserts",
+        "nameAr": "حلويات",
+        "sort": 100
+      }
+    ]
+  },
+  "menuItems": [
+    {
+      "id": "soup-chicken-corn-soup",
+      "categoryId": "soup",
+      "sort": 10,
+      "name": "Chicken Corn Soup",
+      "prices": [
+        {
+          "amount": 14,
+          "cal": 140
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "شوربة ذرة الدجاج",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/9e147d93.jpeg",
+      "plumqrIds": [
+        "43386"
+      ]
+    },
+    {
+      "id": "soup-hot-sour-soup",
+      "categoryId": "soup",
+      "sort": 20,
+      "name": "Hot & Sour Soup",
+      "prices": [
+        {
+          "amount": 16,
+          "cal": 160
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "شوربة ساخنة وحامضة",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/0f59536e.jpeg",
+      "plumqrIds": [
+        "43387"
+      ]
+    },
+    {
+      "id": "soup-chicken-clear-soup",
+      "categoryId": "soup",
+      "sort": 30,
+      "name": "Chicken Clear Soup",
+      "prices": [
+        {
+          "amount": 12,
+          "cal": 120
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "شوربة دجاج",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/f983ccfd.jpeg",
+      "plumqrIds": [
+        "43388"
+      ]
+    },
+    {
+      "id": "soup-veg-soup",
+      "categoryId": "soup",
+      "sort": 40,
+      "name": "Veg Soup",
+      "prices": [
+        {
+          "amount": 10,
+          "cal": 100
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "شوربة الخضار",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/e2788d28.jpeg",
+      "plumqrIds": [
+        "43389"
+      ]
+    },
+    {
+      "id": "bbq-chicken-boti",
+      "categoryId": "bbq",
+      "sort": 10,
+      "name": "Chicken Boti",
+      "prices": [
+        {
+          "amount": 38,
+          "cal": 260
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "بوتي الدجاج",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/66fb5350.jpeg",
+      "plumqrIds": [
+        "43390"
+      ]
+    },
+    {
+      "id": "bbq-chicken-kali-mirch",
+      "categoryId": "bbq",
+      "sort": 20,
+      "name": "Chicken Kali Mirch",
+      "prices": [
+        {
+          "amount": 38,
+          "cal": 270
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج بالفلفل الأسود",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/f54dcc16.jpeg",
+      "plumqrIds": [
+        "43391"
+      ]
+    },
+    {
+      "id": "bbq-chicken-tandoori",
+      "categoryId": "bbq",
+      "sort": 30,
+      "name": "Chicken Tandoori",
+      "prices": [
+        {
+          "amount": 28,
+          "label": "Half (2 pcs)",
+          "cal": 280
+        },
+        {
+          "amount": 50,
+          "label": "Full (4 pcs)",
+          "cal": 560
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج تندوري",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/71779935.jpeg",
+      "plumqrIds": [
+        "43392",
+        "43393"
+      ]
+    },
+    {
+      "id": "bbq-chicken-irani-kabab",
+      "categoryId": "bbq",
+      "sort": 40,
+      "name": "Chicken Irani Kabab",
+      "prices": [
+        {
+          "amount": 38,
+          "cal": 290
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "كباب دجاج ايراني",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/c6ee69b6.jpeg",
+      "plumqrIds": [
+        "43394"
+      ]
+    },
+    {
+      "id": "bbq-chicken-reshmi-kabab",
+      "categoryId": "bbq",
+      "sort": 50,
+      "name": "Chicken Reshmi Kabab",
+      "prices": [
+        {
+          "amount": 38,
+          "cal": 280
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "كباب دجاج رشمى",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/443ab608.jpeg",
+      "plumqrIds": [
+        "43395"
+      ]
+    },
+    {
+      "id": "bbq-chicken-tikka-kabab",
+      "categoryId": "bbq",
+      "sort": 60,
+      "name": "Chicken Tikka Kabab",
+      "prices": [
+        {
+          "amount": 38
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج تكا كباب",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/f7a5377d.jpeg",
+      "plumqrIds": [
+        "43396"
+      ]
+    },
+    {
+      "id": "bbq-seekh-kabab",
+      "categoryId": "bbq",
+      "sort": 70,
+      "name": "Seekh Kabab",
+      "prices": [
+        {
+          "amount": 30
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "سيخ كباب",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/8696e02c.jpeg",
+      "plumqrIds": [
+        "43397"
+      ]
+    },
+    {
+      "id": "bbq-fish-tikka",
+      "categoryId": "bbq",
+      "sort": 80,
+      "name": "Fish Tikka",
+      "prices": [
+        {
+          "amount": 45,
+          "cal": 250
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "سمك تكا",
+      "plumqrIds": [
+        "43398"
+      ]
+    },
+    {
+      "id": "bbq-mix-platter",
+      "categoryId": "bbq",
+      "sort": 90,
+      "name": "Mix Platter",
+      "prices": [
+        {
+          "amount": 115,
+          "cal": 1140
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "مشويات المشكل",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/8137b73c.jpeg",
+      "plumqrIds": [
+        "43399"
+      ]
+    },
+    {
+      "id": "bbq-chicken-malai-kabab",
+      "categoryId": "bbq",
+      "sort": 100,
+      "name": "Chicken Malai Kabab",
+      "prices": [
+        {
+          "amount": 38,
+          "cal": 260
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "كباب دجاج مالاي",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/663e7bb5.jpeg",
+      "plumqrIds": [
+        "43400"
+      ]
+    },
+    {
+      "id": "chicken-chicken-haryali",
+      "categoryId": "chicken",
+      "sort": 10,
+      "name": "Chicken Haryali",
+      "prices": [
+        {
+          "amount": 27,
+          "cal": 220
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "هريالي دجاج",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/f90be280.jpeg",
+      "plumqrIds": [
+        "43401"
+      ]
+    },
+    {
+      "id": "bbq-beef-bihari-kabab",
+      "categoryId": "bbq",
+      "sort": 110,
+      "name": "Beef Bihari Kabab",
+      "prices": [
+        {
+          "amount": 40,
+          "cal": 320
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "بيهاري كباب",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/4be0b69f.jpeg",
+      "plumqrIds": [
+        "43402"
+      ]
+    },
+    {
+      "id": "bbq-chicken-angara-kabab",
+      "categoryId": "bbq",
+      "sort": 120,
+      "name": "Chicken Angara Kabab",
+      "prices": [
+        {
+          "amount": 47,
+          "cal": 280
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "انقارة كباب دجاج",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/88cf0080.jpeg",
+      "plumqrIds": [
+        "43403"
+      ]
+    },
+    {
+      "id": "bbq-chicken-nawabi-kabab",
+      "categoryId": "bbq",
+      "sort": 130,
+      "name": "Chicken Nawabi Kabab",
+      "prices": [
+        {
+          "amount": 47,
+          "cal": 290
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج نوابي كباب",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/18d5b1ea.jpeg",
+      "plumqrIds": [
+        "43404"
+      ]
+    },
+    {
+      "id": "chicken-chicken-65",
+      "categoryId": "chicken",
+      "sort": 20,
+      "name": "Chicken 65",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 260
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج 65",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/c4610f8c.jpeg",
+      "plumqrIds": [
+        "43405"
+      ]
+    },
+    {
+      "id": "chicken-chicken-77",
+      "categoryId": "chicken",
+      "sort": 30,
+      "name": "Chicken 77",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 265
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج 77",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/6ba144eb.jpeg",
+      "plumqrIds": [
+        "43406"
+      ]
+    },
+    {
+      "id": "chicken-chicken-555",
+      "categoryId": "chicken",
+      "sort": 40,
+      "name": "Chicken 555",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 270
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج 555",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/e854f864.jpeg",
+      "plumqrIds": [
+        "43407"
+      ]
+    },
+    {
+      "id": "chicken-butter-chicken",
+      "categoryId": "chicken",
+      "sort": 50,
+      "name": "Butter Chicken",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 280
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج بالزبدة",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/e53ef863.jpeg",
+      "plumqrIds": [
+        "43408"
+      ]
+    },
+    {
+      "id": "chicken-butter-chicken-special",
+      "categoryId": "chicken",
+      "sort": 60,
+      "name": "Butter Chicken Special",
+      "prices": [
+        {
+          "amount": 48,
+          "cal": 370
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج بالزبدة اسبيشل",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/2d9214a8.jpeg",
+      "plumqrIds": [
+        "43409"
+      ]
+    },
+    {
+      "id": "chicken-chicken-tikka-masala",
+      "categoryId": "chicken",
+      "sort": 70,
+      "name": "Chicken Tikka Masala",
+      "prices": [
+        {
+          "amount": 48,
+          "cal": 390
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج تكا ماسالا",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/e51cee6e.jpeg",
+      "plumqrIds": [
+        "43410"
+      ]
+    },
+    {
+      "id": "chicken-chicken-ginger",
+      "categoryId": "chicken",
+      "sort": 80,
+      "name": "Chicken Ginger",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 310
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "الدجاج زنجبيل",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/98b95eaa.jpeg",
+      "plumqrIds": [
+        "43411"
+      ]
+    },
+    {
+      "id": "chicken-chicken-kadai",
+      "categoryId": "chicken",
+      "sort": 90,
+      "name": "Chicken Kadai",
+      "prices": [
+        {
+          "amount": 27,
+          "cal": 260
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "كراهي دجاج",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/923c7b18.jpeg",
+      "plumqrIds": [
+        "43412"
+      ]
+    },
+    {
+      "id": "chicken-chicken-achar",
+      "categoryId": "chicken",
+      "sort": 100,
+      "name": "Chicken Achar",
+      "prices": [
+        {
+          "amount": 27,
+          "cal": 270
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج أجار",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/1fea1d51.jpeg",
+      "plumqrIds": [
+        "43413"
+      ]
+    },
+    {
+      "id": "chicken-chicken-patiala",
+      "categoryId": "chicken",
+      "sort": 110,
+      "name": "Chicken Patiala",
+      "prices": [
+        {
+          "amount": 45,
+          "cal": 265
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "باتيال الدجاج",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/dbc7a71b.jpeg",
+      "plumqrIds": [
+        "43414"
+      ]
+    },
+    {
+      "id": "chicken-chicken-manchurian",
+      "categoryId": "chicken",
+      "sort": 120,
+      "name": "Chicken Manchurian",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 310
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج منشوري",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/092d2f30.jpeg",
+      "plumqrIds": [
+        "43415"
+      ]
+    },
+    {
+      "id": "chicken-chicken-masala",
+      "categoryId": "chicken",
+      "sort": 130,
+      "name": "Chicken Masala",
+      "prices": [
+        {
+          "amount": 27,
+          "cal": 290
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "ماسالا دجاج",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/1d49c444.jpeg",
+      "plumqrIds": [
+        "43416"
+      ]
+    },
+    {
+      "id": "chicken-chicken-kali-mirch",
+      "categoryId": "chicken",
+      "sort": 140,
+      "name": "Chicken Kali Mirch",
+      "prices": [
+        {
+          "amount": 28
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج بالفلفل الأسود",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/8da8c15c.jpeg",
+      "plumqrIds": [
+        "43417"
+      ]
+    },
+    {
+      "id": "chicken-chicken-jelfrezi",
+      "categoryId": "chicken",
+      "sort": 150,
+      "name": "Chicken Jelfrezi",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 250
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج جالفريزي",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/fd977b37.jpeg",
+      "plumqrIds": [
+        "43418"
+      ]
+    },
+    {
+      "id": "chicken-chicken-cashewnut",
+      "categoryId": "chicken",
+      "sort": 160,
+      "name": "Chicken Cashewnut",
+      "prices": [
+        {
+          "amount": 33,
+          "cal": 240
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج كاجو",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/6c36178e.jpeg",
+      "plumqrIds": [
+        "43419"
+      ]
+    },
+    {
+      "id": "chicken-chicken-chilli",
+      "categoryId": "chicken",
+      "sort": 170,
+      "name": "Chicken Chilli",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 220
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج بالفلفل الحار",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/ff8f7202.jpeg",
+      "plumqrIds": [
+        "43420"
+      ]
+    },
+    {
+      "id": "chicken-chicken-dahiwala",
+      "categoryId": "chicken",
+      "sort": 180,
+      "name": "Chicken Dahiwala",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 230
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "زبادي الدجاج",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/430ff8be.jpeg",
+      "plumqrIds": [
+        "43421"
+      ]
+    },
+    {
+      "id": "chicken-chicken-majestic",
+      "categoryId": "chicken",
+      "sort": 190,
+      "name": "Chicken Majestic",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 210
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج ماجستيك",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/6933103a.jpeg",
+      "plumqrIds": [
+        "43422"
+      ]
+    },
+    {
+      "id": "chicken-chicken-chilli-gravy",
+      "categoryId": "chicken",
+      "sort": 200,
+      "name": "Chicken Chilli Gravy",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 260
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج فلفل كاري",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/48fa7424.jpeg",
+      "plumqrIds": [
+        "43423"
+      ]
+    },
+    {
+      "id": "chicken-chicken-chatpata",
+      "categoryId": "chicken",
+      "sort": 210,
+      "name": "Chicken Chatpata",
+      "prices": [
+        {
+          "amount": 48,
+          "cal": 250
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج جتباتا",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/23a79a03.jpeg",
+      "plumqrIds": [
+        "43424"
+      ]
+    },
+    {
+      "id": "chicken-chicken-lemon",
+      "categoryId": "chicken",
+      "sort": 220,
+      "name": "Chicken Lemon",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 220
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج بالليمون",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/c980551d.jpeg",
+      "plumqrIds": [
+        "43425"
+      ]
+    },
+    {
+      "id": "chicken-chicken-apollo",
+      "categoryId": "chicken",
+      "sort": 230,
+      "name": "Chicken Apollo",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 220
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج أبولو",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/712faa28.jpeg",
+      "plumqrIds": [
+        "43426"
+      ]
+    },
+    {
+      "id": "mutton-mutton-masala",
+      "categoryId": "mutton",
+      "sort": 10,
+      "name": "Mutton Masala",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 360
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "لحم ماسالا",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/451c8186.jpeg",
+      "plumqrIds": [
+        "43428"
+      ]
+    },
+    {
+      "id": "mutton-mutton-afghani",
+      "categoryId": "mutton",
+      "sort": 20,
+      "name": "Mutton Afghani",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 380
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "لحم أفغاني",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/89d045a9.jpeg",
+      "plumqrIds": [
+        "43429"
+      ]
+    },
+    {
+      "id": "mutton-mutton-achar",
+      "categoryId": "mutton",
+      "sort": 30,
+      "name": "Mutton Achar",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 330
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "لحم أجار",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/bc371e90.jpeg",
+      "plumqrIds": [
+        "43430"
+      ]
+    },
+    {
+      "id": "mutton-mutton-adarki",
+      "categoryId": "mutton",
+      "sort": 40,
+      "name": "Mutton Adarki",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 320
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "لحم الزنجبيل",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/7f6e26f6.jpeg",
+      "plumqrIds": [
+        "43431"
+      ]
+    },
+    {
+      "id": "mutton-mutton-roghan-josh",
+      "categoryId": "mutton",
+      "sort": 50,
+      "name": "Mutton Roghan Josh",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 320
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "لحم روجان جوش",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/5b8c010d.jpeg",
+      "plumqrIds": [
+        "43432"
+      ]
+    },
+    {
+      "id": "mutton-mutton-hyderabadi",
+      "categoryId": "mutton",
+      "sort": 60,
+      "name": "Mutton Hyderabadi",
+      "prices": [
+        {
+          "amount": 52,
+          "cal": 350
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "لحم حيدرابادي",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/f9f2678d.jpeg",
+      "plumqrIds": [
+        "43433"
+      ]
+    },
+    {
+      "id": "mutton-mutton-mughlai",
+      "categoryId": "mutton",
+      "sort": 70,
+      "name": "Mutton Mughlai",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 370
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "لحم مغلاى",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/61e698ad.jpeg",
+      "plumqrIds": [
+        "43434"
+      ]
+    },
+    {
+      "id": "mutton-mutton-kolhapuri",
+      "categoryId": "mutton",
+      "sort": 80,
+      "name": "Mutton Kolhapuri",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 360
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "لحم كولابوري",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/f0a1cf2c.jpeg",
+      "plumqrIds": [
+        "43435"
+      ]
+    },
+    {
+      "id": "mutton-mutton-kassa",
+      "categoryId": "mutton",
+      "sort": 90,
+      "name": "Mutton Kassa",
+      "prices": [
+        {
+          "amount": 47,
+          "cal": 330
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "لحم كاسا",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/13e15053.jpeg",
+      "plumqrIds": [
+        "43436"
+      ]
+    },
+    {
+      "id": "mutton-mutton-handi",
+      "categoryId": "mutton",
+      "sort": 100,
+      "name": "Mutton Handi",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 390
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "لحم هاندي",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/1b4984fe.jpeg",
+      "plumqrIds": [
+        "43437"
+      ]
+    },
+    {
+      "id": "chicken-chicken-punjabi-special",
+      "categoryId": "chicken",
+      "sort": 240,
+      "name": "Chicken Punjabi Special",
+      "prices": [
+        {
+          "amount": 48,
+          "cal": 330
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج بنجابي",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/df8c1bc5.jpeg",
+      "plumqrIds": [
+        "43438"
+      ]
+    },
+    {
+      "id": "mutton-mutton-dahiwala",
+      "categoryId": "mutton",
+      "sort": 110,
+      "name": "Mutton Dahiwala",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 320
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "لحم مع زبادي",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/a4d24a26.jpeg",
+      "plumqrIds": [
+        "43439"
+      ]
+    },
+    {
+      "id": "mutton-beef-fry",
+      "categoryId": "mutton",
+      "sort": 120,
+      "name": "Beef Fry",
+      "prices": [
+        {
+          "amount": 36,
+          "cal": 310
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "بيف فراي",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/dbdc5e4c.jpeg",
+      "plumqrIds": [
+        "43441"
+      ]
+    },
+    {
+      "id": "rice-chicken-biryani",
+      "categoryId": "rice",
+      "sort": 10,
+      "name": "Chicken Biryani",
+      "prices": [
+        {
+          "amount": 27,
+          "label": "Single",
+          "cal": 280
+        },
+        {
+          "amount": 62,
+          "label": "Family",
+          "cal": 680
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "برياني دجاج",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/523b057d.jpeg",
+      "plumqrIds": [
+        "43442",
+        "43443"
+      ]
+    },
+    {
+      "id": "rice-chicken-biryani-special",
+      "categoryId": "rice",
+      "sort": 20,
+      "name": "Chicken Biryani Special",
+      "prices": [
+        {
+          "amount": 75,
+          "cal": 870
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "برياني دجاج اسبيشل",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/0c1da881.jpeg",
+      "plumqrIds": [
+        "43444"
+      ]
+    },
+    {
+      "id": "rice-mutton-biryani",
+      "categoryId": "rice",
+      "sort": 30,
+      "name": "Mutton Biryani",
+      "prices": [
+        {
+          "amount": 37,
+          "label": "Single",
+          "cal": 350
+        },
+        {
+          "amount": 80,
+          "label": "Family",
+          "cal": 670
+        },
+        {
+          "amount": 120,
+          "label": "Jumbo",
+          "cal": 890
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "برياني لحم",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/53a66010.jpeg",
+      "plumqrIds": [
+        "43445",
+        "43446",
+        "43447"
+      ]
+    },
+    {
+      "id": "rice-fish-biryani",
+      "categoryId": "rice",
+      "sort": 40,
+      "name": "Fish Biryani",
+      "prices": [
+        {
+          "amount": 43,
+          "cal": 560
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "برياني سمك",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/5f5788b3.jpeg",
+      "plumqrIds": [
+        "43448"
+      ]
+    },
+    {
+      "id": "rice-veg-biryani",
+      "categoryId": "rice",
+      "sort": 50,
+      "name": "Veg Biryani",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 280
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "برياني الخضار",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/5f1d0643.jpeg",
+      "plumqrIds": [
+        "43449"
+      ]
+    },
+    {
+      "id": "rice-egg-biryani",
+      "categoryId": "rice",
+      "sort": 60,
+      "name": "Egg Biryani",
+      "prices": [
+        {
+          "amount": 26,
+          "cal": 220
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "بيض برياني",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/7c6a9b87.jpeg",
+      "plumqrIds": [
+        "43450"
+      ]
+    },
+    {
+      "id": "rice-veg-fried-rice",
+      "categoryId": "rice",
+      "sort": 70,
+      "name": "Veg Fried Rice",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 170
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "أرز مقلي بالخضار",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/4c76e81f.jpeg",
+      "plumqrIds": [
+        "43451"
+      ]
+    },
+    {
+      "id": "rice-fish-fried-rice",
+      "categoryId": "rice",
+      "sort": 80,
+      "name": "Fish Fried Rice",
+      "prices": [
+        {
+          "amount": 27,
+          "cal": 320
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "أرز مقلي بالسمك",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/848fe4e4.jpeg",
+      "plumqrIds": [
+        "43452"
+      ]
+    },
+    {
+      "id": "rice-kaju-pulao",
+      "categoryId": "rice",
+      "sort": 90,
+      "name": "Kaju Pulao",
+      "prices": [
+        {
+          "amount": 31,
+          "cal": 280
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "كاجو بولاو",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/28fe87ef.jpeg",
+      "plumqrIds": [
+        "43453"
+      ]
+    },
+    {
+      "id": "rice-mixed-fried-rice",
+      "categoryId": "rice",
+      "sort": 100,
+      "name": "Mixed Fried Rice",
+      "prices": [
+        {
+          "amount": 26,
+          "cal": 420
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "أرز مقلي مشكل",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/fa5fe5c2.jpeg",
+      "plumqrIds": [
+        "43454"
+      ]
+    },
+    {
+      "id": "rice-chicken-fried-rice",
+      "categoryId": "rice",
+      "sort": 110,
+      "name": "Chicken Fried Rice",
+      "prices": [
+        {
+          "amount": 24,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "أرز مقلي بالدجاج",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/dc5f462d.jpeg",
+      "plumqrIds": [
+        "43455"
+      ]
+    },
+    {
+      "id": "rice-zeera-rice",
+      "categoryId": "rice",
+      "sort": 120,
+      "name": "Zeera Rice",
+      "prices": [
+        {
+          "amount": 15,
+          "cal": 210
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "كومون رز",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/f3ef4f59.jpeg",
+      "plumqrIds": [
+        "43456"
+      ]
+    },
+    {
+      "id": "rice-biryani-rice",
+      "categoryId": "rice",
+      "sort": 130,
+      "name": "Biryani Rice",
+      "prices": [
+        {
+          "amount": 9,
+          "label": "Half",
+          "cal": 180
+        },
+        {
+          "amount": 17,
+          "label": "Full",
+          "cal": 380
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "أرز برياني",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/62a3046c.jpeg",
+      "plumqrIds": [
+        "43457",
+        "43458"
+      ]
+    },
+    {
+      "id": "fish-fish-achar",
+      "categoryId": "fish",
+      "sort": 10,
+      "name": "Fish Achar",
+      "prices": [
+        {
+          "amount": 29,
+          "cal": 280
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "أسماك أجار",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/2e58bc1d.jpeg",
+      "plumqrIds": [
+        "43459"
+      ]
+    },
+    {
+      "id": "fish-fish-chilli",
+      "categoryId": "fish",
+      "sort": 20,
+      "name": "Fish Chilli",
+      "prices": [
+        {
+          "amount": 29,
+          "cal": 260
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "سمك الفلفل الحار",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/3444f084.jpeg",
+      "plumqrIds": [
+        "43460"
+      ]
+    },
+    {
+      "id": "fish-fish-garlic",
+      "categoryId": "fish",
+      "sort": 30,
+      "name": "Fish Garlic",
+      "prices": [
+        {
+          "amount": 32,
+          "cal": 280
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "سمك الثوم",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/86013af4.jpeg",
+      "plumqrIds": [
+        "43461"
+      ]
+    },
+    {
+      "id": "fish-fish-masala",
+      "categoryId": "fish",
+      "sort": 40,
+      "name": "Fish Masala",
+      "prices": [
+        {
+          "amount": 29,
+          "cal": 250
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "سمك ماسالا",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/739448ea.jpeg",
+      "plumqrIds": [
+        "43462"
+      ]
+    },
+    {
+      "id": "fish-fish-fry",
+      "categoryId": "fish",
+      "sort": 50,
+      "name": "Fish Fry",
+      "prices": [
+        {
+          "amount": 29,
+          "cal": 310
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "سمك مقلي",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/78c4014e.jpeg",
+      "plumqrIds": [
+        "43463"
+      ]
+    },
+    {
+      "id": "fish-fish-apollo",
+      "categoryId": "fish",
+      "sort": 60,
+      "name": "Fish Apollo",
+      "prices": [
+        {
+          "amount": 29,
+          "cal": 330
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "أسماك أبولو",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/36f5e918.jpeg",
+      "plumqrIds": [
+        "43464"
+      ]
+    },
+    {
+      "id": "fish-fish-tikka-kabab",
+      "categoryId": "fish",
+      "sort": 70,
+      "name": "Fish Tikka Kabab",
+      "prices": [
+        {
+          "amount": 45,
+          "cal": 290
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "سمك تكا",
+      "plumqrIds": [
+        "43466"
+      ]
+    },
+    {
+      "id": "fish-fish-kadai",
+      "categoryId": "fish",
+      "sort": 80,
+      "name": "Fish Kadai",
+      "prices": [
+        {
+          "amount": 29,
+          "cal": 280
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "سمك كادي",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/29794911.jpeg",
+      "plumqrIds": [
+        "43467"
+      ]
+    },
+    {
+      "id": "prawn-prawn-65",
+      "categoryId": "prawn",
+      "sort": 10,
+      "name": "Prawn 65",
+      "prices": [
+        {
+          "amount": 55,
+          "cal": 310
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "روبيان 65",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/d89a9e21.jpeg",
+      "plumqrIds": [
+        "43468"
+      ]
+    },
+    {
+      "id": "prawn-loose-prawn",
+      "categoryId": "prawn",
+      "sort": 20,
+      "name": "Loose Prawn",
+      "prices": [
+        {
+          "amount": 55,
+          "cal": 330
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "روبيان اسبيشل",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/5ece6204.jpeg",
+      "plumqrIds": [
+        "43469"
+      ]
+    },
+    {
+      "id": "prawn-prawn-masala",
+      "categoryId": "prawn",
+      "sort": 30,
+      "name": "Prawn Masala",
+      "prices": [
+        {
+          "amount": 55,
+          "cal": 350
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "روبيان ماسالا",
+      "plumqrIds": [
+        "43470"
+      ]
+    },
+    {
+      "id": "prawn-prawn-fry",
+      "categoryId": "prawn",
+      "sort": 40,
+      "name": "Prawn Fry",
+      "prices": [
+        {
+          "amount": 55,
+          "cal": 370
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "جمبري مقلي",
+      "plumqrIds": [
+        "43471"
+      ]
+    },
+    {
+      "id": "prawn-prawn-chilli",
+      "categoryId": "prawn",
+      "sort": 50,
+      "name": "Prawn Chilli",
+      "prices": [
+        {
+          "amount": 55,
+          "cal": 320
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "روبيان تشيلي",
+      "plumqrIds": [
+        "43472"
+      ]
+    },
+    {
+      "id": "prawn-prawn-chatpata",
+      "categoryId": "prawn",
+      "sort": 60,
+      "name": "Prawn Chatpata",
+      "prices": [
+        {
+          "amount": 55,
+          "cal": 310
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "جمبري تشاتباتا",
+      "plumqrIds": [
+        "43473"
+      ]
+    },
+    {
+      "id": "prawn-prawn-dynamite",
+      "categoryId": "prawn",
+      "sort": 70,
+      "name": "Prawn Dynamite",
+      "prices": [
+        {
+          "amount": 58,
+          "cal": 370
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "ديناميت روبيان",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/1eccfaf7.jpeg",
+      "plumqrIds": [
+        "43474"
+      ]
+    },
+    {
+      "id": "veg-veg-manchurian",
+      "categoryId": "veg",
+      "sort": 10,
+      "name": "Veg Manchurian",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 210
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "منشوريا الخضار",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/37947de3.jpeg",
+      "plumqrIds": [
+        "43475"
+      ]
+    },
+    {
+      "id": "veg-veg-kofta-curry",
+      "categoryId": "veg",
+      "sort": 20,
+      "name": "Veg Kofta Curry",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 190
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "كفتة كاري الخضار",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/138f851d.jpeg",
+      "plumqrIds": [
+        "43476"
+      ]
+    },
+    {
+      "id": "veg-veg-kadai",
+      "categoryId": "veg",
+      "sort": 30,
+      "name": "Veg Kadai",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 180
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "كادي الخضار",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/820f2817.jpeg",
+      "plumqrIds": [
+        "43477"
+      ]
+    },
+    {
+      "id": "veg-veg-dopiaza",
+      "categoryId": "veg",
+      "sort": 40,
+      "name": "Veg Dopiaza",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 210
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دوبييازة الخضار",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/bcb200eb.jpeg",
+      "plumqrIds": [
+        "43478"
+      ]
+    },
+    {
+      "id": "veg-paneer-kaju",
+      "categoryId": "veg",
+      "sort": 50,
+      "name": "Paneer Kaju",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 250
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "بانير كاجو",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/70f7bdbb.jpeg",
+      "plumqrIds": [
+        "43479"
+      ]
+    },
+    {
+      "id": "veg-paneer-chilli",
+      "categoryId": "veg",
+      "sort": 60,
+      "name": "Paneer Chilli",
+      "prices": [
+        {
+          "amount": 49,
+          "cal": 220
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "بانير تشيلي",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/9ca0fe87.jpeg",
+      "plumqrIds": [
+        "43480"
+      ]
+    },
+    {
+      "id": "veg-paneer-65",
+      "categoryId": "veg",
+      "sort": 70,
+      "name": "Paneer 65",
+      "prices": [
+        {
+          "amount": 49,
+          "cal": 230
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "بانير 65",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/3756f677.jpeg",
+      "plumqrIds": [
+        "43481"
+      ]
+    },
+    {
+      "id": "veg-veg-65",
+      "categoryId": "veg",
+      "sort": 80,
+      "name": "Veg 65",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 210
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "الخضار 65",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/d9ee7a3d.jpeg",
+      "plumqrIds": [
+        "43482"
+      ]
+    },
+    {
+      "id": "veg-veg-jelfrezi",
+      "categoryId": "veg",
+      "sort": 90,
+      "name": "Veg Jelfrezi",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 230
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "جالفريزي الخضار",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/db89cf7d.jpeg",
+      "plumqrIds": [
+        "43483"
+      ]
+    },
+    {
+      "id": "veg-paneer-kadai",
+      "categoryId": "veg",
+      "sort": 100,
+      "name": "Paneer Kadai",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 240
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "بانير كداي",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/c4af1567.jpeg",
+      "plumqrIds": [
+        "43484"
+      ]
+    },
+    {
+      "id": "veg-paneer-punjabi",
+      "categoryId": "veg",
+      "sort": 110,
+      "name": "Paneer Punjabi",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 260
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "بنجابي بانير",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/73678fca.jpeg",
+      "plumqrIds": [
+        "43485"
+      ]
+    },
+    {
+      "id": "veg-paneer-butter-masala",
+      "categoryId": "veg",
+      "sort": 120,
+      "name": "Paneer Butter Masala",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 310
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "بنير زبدة ماسالا",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/a5c2754e.jpeg",
+      "plumqrIds": [
+        "43486"
+      ]
+    },
+    {
+      "id": "veg-daal-tadka",
+      "categoryId": "veg",
+      "sort": 130,
+      "name": "Daal Tadka",
+      "prices": [
+        {
+          "amount": 13,
+          "cal": 180
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دال تدكا",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/3f2e1ad6.jpeg",
+      "plumqrIds": [
+        "43487"
+      ]
+    },
+    {
+      "id": "veg-capsicum-masala",
+      "categoryId": "veg",
+      "sort": 140,
+      "name": "Capsicum Masala",
+      "prices": [
+        {
+          "amount": 29,
+          "cal": 275
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "فلفل حار ماسالا",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/1e4d708e.jpeg",
+      "plumqrIds": [
+        "44525"
+      ]
+    },
+    {
+      "id": "veg-veg-haryali",
+      "categoryId": "veg",
+      "sort": 150,
+      "name": "Veg Haryali",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 230
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "خضار هاريالي",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/0031b0f9.jpeg",
+      "plumqrIds": [
+        "44526"
+      ]
+    },
+    {
+      "id": "bread-butter-naan",
+      "categoryId": "bread",
+      "sort": 10,
+      "name": "Butter Naan",
+      "prices": [
+        {
+          "amount": 3,
+          "cal": 80
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "زبدة نان",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/b6dda3e5.jpeg",
+      "plumqrIds": [
+        "43488"
+      ]
+    },
+    {
+      "id": "bread-garlic-naan",
+      "categoryId": "bread",
+      "sort": 20,
+      "name": "Garlic Naan",
+      "prices": [
+        {
+          "amount": 4,
+          "cal": 110
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "ثوم نان",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/cd41e98a.jpeg",
+      "plumqrIds": [
+        "43489"
+      ]
+    },
+    {
+      "id": "bread-plain-naan",
+      "categoryId": "bread",
+      "sort": 30,
+      "name": "Plain Naan",
+      "prices": [
+        {
+          "amount": 2,
+          "cal": 70
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "نان عادي",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/07ee8d37.jpeg",
+      "plumqrIds": [
+        "43490"
+      ]
+    },
+    {
+      "id": "dessert-double-ka-meetha",
+      "categoryId": "dessert",
+      "sort": 10,
+      "name": "Double ka Meetha",
+      "prices": [
+        {
+          "amount": 10,
+          "label": "Half",
+          "cal": 220
+        },
+        {
+          "amount": 20,
+          "label": "Full",
+          "cal": 440
+        },
+        {
+          "amount": 40,
+          "label": "Family",
+          "cal": 680
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دبل كا ميتا",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/609b8392.jpeg",
+      "plumqrIds": [
+        "43491",
+        "43492",
+        "43493"
+      ]
+    },
+    {
+      "id": "dessert-qubani-ka-meetha",
+      "categoryId": "dessert",
+      "sort": 20,
+      "name": "Qubani ka Meetha",
+      "prices": [
+        {
+          "amount": 18,
+          "label": "Half",
+          "cal": 320
+        },
+        {
+          "amount": 33,
+          "label": "Full",
+          "cal": 420
+        },
+        {
+          "amount": 70,
+          "label": "Family",
+          "cal": 560
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "حلوى المشمش",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/d9e59312.jpeg",
+      "plumqrIds": [
+        "43494",
+        "43495",
+        "43515"
+      ]
+    },
+    {
+      "id": "dessert-kaddu-ki-kheer",
+      "categoryId": "dessert",
+      "sort": 30,
+      "name": "Kaddu ki Kheer",
+      "prices": [
+        {
+          "amount": 13,
+          "label": "Half",
+          "cal": 220
+        },
+        {
+          "amount": 27,
+          "label": "Full",
+          "cal": 420
+        },
+        {
+          "amount": 45,
+          "label": "Family",
+          "cal": 560
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "خير اليقطين",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/07d84347.jpeg",
+      "plumqrIds": [
+        "43496",
+        "43497",
+        "43498"
+      ]
+    },
+    {
+      "id": "dessert-fruit-custard",
+      "categoryId": "dessert",
+      "sort": 40,
+      "name": "Fruit Custard",
+      "prices": [
+        {
+          "amount": 13,
+          "label": "Half",
+          "cal": 220
+        },
+        {
+          "amount": 27,
+          "label": "Full",
+          "cal": 420
+        },
+        {
+          "amount": 45,
+          "label": "Family",
+          "cal": 560
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "كاسترد الفواكه",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/d098976c.jpeg",
+      "plumqrIds": [
+        "43499",
+        "43500",
+        "43501"
+      ]
+    },
+    {
+      "id": "dessert-gajar-ka-halwa",
+      "categoryId": "dessert",
+      "sort": 50,
+      "name": "Gajar ka Halwa",
+      "prices": [
+        {
+          "amount": 13,
+          "label": "Half",
+          "cal": 290
+        },
+        {
+          "amount": 27,
+          "label": "Full",
+          "cal": 370
+        },
+        {
+          "amount": 45,
+          "label": "Family",
+          "cal": 560
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "حلوى الجزر",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/b3ab39fb.jpeg",
+      "plumqrIds": [
+        "43502",
+        "43503",
+        "43504"
+      ]
+    },
+    {
+      "id": "dessert-anjeer-ka-meetha",
+      "categoryId": "dessert",
+      "sort": 60,
+      "name": "Anjeer ka Meetha",
+      "prices": [
+        {
+          "amount": 17,
+          "label": "Half",
+          "cal": 220
+        },
+        {
+          "amount": 35,
+          "label": "Full",
+          "cal": 320
+        },
+        {
+          "amount": 65,
+          "label": "Family",
+          "cal": 480
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "حلوى التين",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/84b50a46.jpeg",
+      "plumqrIds": [
+        "43516",
+        "43517",
+        "43518"
+      ]
+    },
+    {
+      "id": "bbq-chicken-tangdi",
+      "categoryId": "bbq",
+      "sort": 140,
+      "name": "Chicken Tangdi",
+      "prices": [
+        {
+          "amount": 23,
+          "label": "2 pcs",
+          "cal": 320
+        },
+        {
+          "amount": 35,
+          "label": "4 pcs",
+          "cal": 640
+        }
+      ],
+      "isAvailable": true,
+      "nameAr": "دجاج تنقري",
+      "sourceImage": "https://pqr-items-images-v2.plumqr.com/ec940e4e.jpeg",
+      "plumqrIds": [
+        "45230",
+        "45231"
+      ]
+    }
+  ]
+}

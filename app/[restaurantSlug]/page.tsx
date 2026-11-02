@@ -35,6 +35,7 @@ interface Restaurant {
   description?: string;
   logoUrl?: string;
   coverImageUrl?: string;
+  coverPosition?: string; // e.g. "50% 0%" = show the top of the cover photo
   city?: string;
   address?: string;
   addressAr?: string;
@@ -185,7 +186,7 @@ export default async function RestaurantMenuPage({
       {/* ── Cover + Logo ── */}
       <div style={{ position: "relative", width: "100%", height: 220, background: "#0C1730" }}>
         {restaurant.coverImageUrl && (
-          <Image src={restaurant.coverImageUrl} alt={restaurant.name} fill priority style={{ objectFit: "cover", opacity: 0.85 }} />
+          <Image src={restaurant.coverImageUrl} alt={restaurant.name} fill priority style={{ objectFit: "cover", objectPosition: restaurant.coverPosition ?? "center", opacity: 0.85 }} />
         )}
         <div
           style={{

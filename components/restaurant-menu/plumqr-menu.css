@@ -1,0 +1,350 @@
+/* ── "plumqr" menu style (Khana Khazana) ──────────────────────────
+   Copies the PlumQR app look: red app bar, grey search box,
+   round category photos with an underline, white photo-right cards.
+   Colours come from the restaurant's menuTheme (accent = bar colour). */
+
+.rm.rm-pq {
+  --pq-red: var(--rm-accent, #b1331c);
+  --pq-bg: var(--rm-bg, #fafafa);
+  --pq-card: var(--rm-surface, #ffffff);
+  --pq-text: var(--rm-text, #000000);
+  --pq-muted: var(--rm-muted, #5f5f5f);
+  --pq-line: var(--rm-line, #e6e6e6);
+  /* second colour: pill stripe, column titles, size labels, active underline (defaults to a darker main colour) */
+  --pq-hi: var(--rm-highlight, color-mix(in srgb, var(--pq-red) 65%, #000));
+  --pq-on: var(--rm-on-accent, #ffffff); /* text on the main colour */
+  --pq-box: color-mix(in srgb, var(--pq-hi) 45%, transparent);
+  background: var(--pq-bg);
+  color: var(--pq-text);
+  font-family: Roboto, "Segoe UI", Arial, sans-serif;
+  padding: 0 0 96px;
+}
+.rm.rm-pq.rm-ar { font-family: var(--rm-font-arabic), Tahoma, Arial, sans-serif; }
+
+/* sticky top: bar + search + categories */
+.rm-pq-top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--pq-card);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.rm-pq-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--pq-red);
+  color: var(--pq-on);
+  padding: 10px 16px;
+  min-height: 56px;
+}
+.rm-pq-bar-text { flex: 1; min-width: 0; }
+.rm-pq-bar h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--pq-on);
+  font-family: inherit;
+}
+.rm-pq-bar p { margin: 2px 0 0; font-size: 13.5px; color: var(--pq-on); opacity: 0.85; }
+.rm-pq-lang {
+  background: none;
+  border: none;
+  color: var(--pq-on);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.rm-pq-search { position: relative; padding: 8px 16px 4px; }
+.rm-pq-search input {
+  width: 100%;
+  height: 36px;
+  padding: 0 36px 0 12px;
+  border: 1px solid #1f1f1f;
+  border-radius: 4px;
+  background: #f1f1f1;
+  font-size: 16px; /* no zoom on iPhone */
+  color: var(--pq-text);
+  font-family: inherit;
+}
+.rm-ar .rm-pq-search input { padding: 0 12px 0 36px; }
+.rm-pq-search input::-webkit-search-cancel-button { display: none; }
+.rm-pq-clear {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 24px;
+  transform: translateY(-35%);
+  background: none;
+  border: none;
+  font-size: 15px;
+  color: #444;
+  cursor: pointer;
+}
+
+.rm-pq-cats {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 8px 8px 0;
+  scrollbar-width: none;
+}
+.rm-pq-cats::-webkit-scrollbar { display: none; }
+.rm-pq-catbtn {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 70px;
+  padding: 0 6px 6px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  color: var(--pq-text);
+}
+.rm-pq-catbtn.is-active { border-bottom-color: var(--pq-hi); }
+.rm-pq-catimg {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #eee;
+  font-size: 24px;
+}
+.rm-pq-catimg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rm-pq-catname {
+  font-size: 13.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.rm-pq-catbtn.is-active .rm-pq-catname { color: #000; }
+
+/* ── List: Lunch Box-style table in Khana Khazana colours ── */
+.rm-pqlb {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 4px 14px 30px;
+}
+.rm-pqsec {
+  margin-top: 22px;
+  scroll-margin-top: 215px; /* sits below the sticky red bar + search + categories */
+}
+.rm-pqpill {
+  position: relative;
+  display: inline-block;
+  margin: 0 0 8px -14px;
+  padding: 8px 26px 8px 22px;
+  background: var(--pq-red);
+  border-radius: 0 999px 999px 0;
+  color: var(--pq-on);
+  font-family: inherit;
+  font-weight: 800;
+  font-size: clamp(1.1rem, 4.6vw, 1.35rem);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  box-shadow: inset 8px 0 0 var(--pq-hi);
+}
+.rm-ar .rm-pqpill {
+  margin: 0 -14px 8px 0;
+  padding: 8px 22px 8px 26px;
+  border-radius: 999px 0 0 999px;
+  box-shadow: inset -8px 0 0 var(--pq-hi);
+  text-transform: none;
+}
+.rm-pqnote {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--pq-hi);
+}
+
+.rm-pqtable { display: grid; }
+.rm-pqrow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px 46px 44px 40px;
+  align-items: center;
+  column-gap: 6px;
+  min-height: 40px;
+}
+.rm-pqrow.is-first { padding-top: 8px; border-top: 1px solid var(--pq-line); }
+.rm-pqhead + .rm-pqrow.is-first { border-top: 0; }
+.rm-pqrow.is-more { min-height: 34px; }
+.rm-pqhead { min-height: 26px; }
+.rm-pqc { text-align: center; font-weight: 800; font-size: 0.75rem; color: var(--pq-hi); }
+.rm-pqc-cal { color: var(--pq-muted); }
+
+.rm-pqname {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--pq-text);
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+.rm-pqname-text { min-width: 0; }
+.rm-pqlabel { color: var(--pq-muted); font-weight: 500; }
+.rm-pqlabel.is-alone { color: var(--pq-hi); font-weight: 700; font-size: 0.85rem; }
+.rm-pqthumb {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f1ece9;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  cursor: zoom-in;
+}
+.rm-pqthumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rm-pqthumb.is-empty { cursor: default; box-shadow: none; border-color: transparent; }
+.rm-pqthumb.is-spacer { height: 1px; background: none; border: 0; box-shadow: none; cursor: default; }
+
+.rm-pqprice { text-align: center; color: var(--pq-text); font-weight: 700; }
+/* Arabic price column in a rounded outlined box (Lunch Box style, in red) */
+.rm-pqprice-ar {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1.5px solid var(--pq-box);
+  border-right: 1.5px solid var(--pq-box);
+  color: var(--pq-text);
+  font-family: var(--rm-font-arabic), serif;
+  font-weight: 700;
+}
+.rm-pqhead .rm-pqc-ar {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--pq-box);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+}
+.rm-pqrow:last-child .rm-pqprice-ar {
+  border-bottom: 1.5px solid var(--pq-box);
+  border-radius: 0 0 10px 10px;
+}
+.rm-pqcal { text-align: center; color: var(--pq-muted); font-weight: 600; font-size: 0.88rem; }
+
+@media (min-width: 640px) {
+  .rm-pqrow { grid-template-columns: minmax(0, 1fr) 56px 60px 56px 44px; }
+  .rm-pqthumb { flex-basis: 52px; width: 52px; height: 52px; }
+  .rm-pqname { font-size: 1rem; }
+}
+
+/* tap a dish photo → big photo */
+.rm-pqzoom {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(10, 10, 10, 0.7);
+}
+.rm-pqzoom figure {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  max-width: 460px;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+.rm-pqzoom img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
+.rm-pqzoom figcaption { display: grid; gap: 4px; padding: 12px 16px 14px; text-align: center; }
+.rm-pqzoom figcaption b { font-size: 1.05rem; color: #1f1f1f; }
+.rm-pqzoom figcaption span { font-size: 0.9rem; color: #555; }
+.rm-pqzoom-close {
+  position: absolute;
+  top: 10px;
+  inset-inline-end: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+@media (max-width: 420px) {
+  .rm-pq-catimg { width: 52px; height: 52px; }
+  .rm-pq-catname { font-size: 12.5px; }
+  .rm-pqsec { scroll-margin-top: 205px; }
+}
+
+/* day-of-week special: "Today" badge on its heading */
+.rm-pqtoday {
+  display: inline-block;
+  margin-inline-start: 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--pq-hi);
+  color: var(--pq-on);
+  font-size: 0.72rem;
+  font-weight: 800;
+  vertical-align: middle;
+  text-transform: uppercase;
+}
+
+/* restaurant banner (menuFrame.top) above the app bar, e.g. Biryani Nation */
+.rm-pq-banner { background: var(--pq-red); line-height: 0; }
+.rm-pq-banner img { display: block; width: 100%; height: auto; }
+.rm-pq-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--pq-red);
+}
+.rm-pq-pills span {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pq-hi) 70%, transparent);
+  color: var(--pq-on);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+/* categories without dish photos: no empty circles, the category photo sits at the side */
+.rm-pqsec.no-photos .rm-pqrow.is-more .rm-pqname { padding-inline-start: 14px; }
+.rm-pqsec-img {
+  display: block;
+  width: 100%;
+  max-height: 170px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin: 0 0 10px;
+}
+@media (min-width: 640px) {
+  .rm-pqsec.has-side {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    grid-template-areas: "pill img" "note img" "table img";
+    grid-template-rows: auto auto 1fr;
+    column-gap: 20px;
+    align-items: start;
+  }
+  .rm-pqsec.has-side > .rm-pqpill { grid-area: pill; justify-self: start; }
+  .rm-pqsec.has-side > .rm-pqnote { grid-area: note; }
+  .rm-pqsec.has-side > .rm-pqtable { grid-area: table; }
+  .rm-pqsec.has-side > .rm-pqsec-img { grid-area: img; height: 220px; max-height: none; margin: 6px 0 0; }
+  .rm-ar .rm-pqsec.has-side > .rm-pqpill { justify-self: start; }
+}

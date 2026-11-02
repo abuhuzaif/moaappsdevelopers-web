@@ -1,10 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Playfair_Display, Noto_Naskh_Arabic, Great_Vibes, Cinzel, Roboto_Condensed, Tajawal, Montserrat, Gochi_Hand } from "next/font/google";
 import type { MenuItem, MenuPrice, MenuRestaurantInfo, MenuSection, OrderType } from "@/lib/restaurant-menu";
 import { AddControl, CartBar, CartProvider, CartSheet, useCartState } from "./cart";
 import "./restaurant-menu.css";
+import "./plumqr-menu.css";
 
 const display = Playfair_Display({ subsets: ["latin"], weight: ["500", "700", "900"], variable: "--rm-font-display" });
 const arabic = Noto_Naskh_Arabic({ subsets: ["arabic"], weight: ["400", "600", "700"], variable: "--rm-font-arabic" });
@@ -464,6 +465,110 @@ function LunchBody({ sections, q, lang, tagline, footer }: { sections: MenuSecti
   );
 }
 
+/** "plumqr" list body (Khana Khazana): Lunch Box-style table (SAR | ريال | CAL.)
+ *  with a small round dish photo in front of each name; tap it to see it big. */
+function PqListBody({ sections, lang, today }: { sections: MenuSection[]; lang: Lang; today: number | null }) {
+  const label = (l?: string) => (l ? ui.priceLabel[l]?.[lang] ?? l : "");
+  const [zoom, setZoom] = useState<MenuItem | null>(null);
+  useEffect(() => {
+    if (!zoom) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setZoom(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zoom]);
+
+  return (
+    <div className="rm-pqlb">
+      {sections.length === 0 && <p className="rm-empty">{ui.noResults[lang]}</p>}
+      {sections.map((s) => {
+        // dish photos → small round photo per dish; none → the category's big photo at the side (Lunch Box style)
+        const photos = s.items.some((it) => it.imageUrl);
+        const side = !photos && s.image;
+        return (
+        <section
+          key={s.id}
+          className={`rm-pqsec${s.day != null && s.day === today ? " is-today" : ""}${side ? " has-side" : ""}${photos ? "" : " no-photos"}`}
+          id={`rm-cat-${s.id}`}
+          data-cat={s.id}
+          aria-labelledby={`rm-ph-${s.id}`}
+        >
+          {side && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="rm-pqsec-img" src={s.image} alt="" loading="lazy" />
+          )}
+          <h2 className="rm-pqpill" id={`rm-ph-${s.id}`}>
+            {pick(lang, s.name, s.nameAr)}
+            {s.day != null && s.day === today && <span className="rm-pqtoday">{ui.today[lang]}</span>}
+          </h2>
+          {(s.note || s.noteAr) && <p className="rm-pqnote">{pick(lang, s.note, s.noteAr)}</p>}
+          <div className="rm-pqtable" role="table">
+            <div className="rm-pqrow rm-pqhead" role="row">
+              <span role="columnheader" />
+              <span role="columnheader" className="rm-pqc">SAR</span>
+              <span role="columnheader" className="rm-pqc rm-pqc-ar">ريال</span>
+              <span role="columnheader" className="rm-pqc rm-pqc-cal">CAL.</span>
+              <span role="columnheader" aria-hidden />
+            </div>
+            {s.items.map((it) =>
+              it.prices.map((p, i) => {
+                const first = i === 0;
+                return (
+                  <div
+                    key={`${it.id}-${i}`}
+                    className={`rm-pqrow${first ? " is-first" : " is-more"}`}
+                    role="row"
+                    id={first ? `rm-item-${it.id}` : undefined}
+                  >
+                    <span className="rm-pqname" role="cell">
+                      {!photos ? null : first ? (
+                        it.imageUrl ? (
+                          <button type="button" className="rm-pqthumb" onClick={() => setZoom(it)} aria-label={pick(lang, it.name, it.nameAr)}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={it.imageUrl} alt="" loading="lazy" width={88} height={88} />
+                          </button>
+                        ) : (
+                          <span className="rm-pqthumb is-empty" aria-hidden />
+                        )
+                      ) : (
+                        <span className="rm-pqthumb is-spacer" aria-hidden />
+                      )}
+                      <span className="rm-pqname-text">
+                        {first && pick(lang, it.name, it.nameAr)}
+                        {p.label && <span className={first ? "rm-pqlabel" : "rm-pqlabel is-alone"}>{first ? " – " : ""}{label(p.label)}</span>}
+                      </span>
+                    </span>
+                    <span className="rm-pqprice" role="cell">{p.amount}</span>
+                    <span className="rm-pqprice-ar" role="cell">{arNum(p.amount)}</span>
+                    <span className="rm-pqcal" role="cell">{p.cal ?? ""}</span>
+                    <span role="cell"><AddControl item={it} p={p} lang={lang} /></span>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </section>
+        );
+      })}
+
+      {zoom && (
+        <div className="rm-pqzoom" role="dialog" aria-modal="true" aria-label={pick(lang, zoom.name, zoom.nameAr)} onClick={() => setZoom(null)}>
+          <figure onClick={(e) => e.stopPropagation()}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={zoom.imageUrl} alt={pick(lang, zoom.name, zoom.nameAr)} />
+            <figcaption>
+              <b>{pick(lang, zoom.name, zoom.nameAr)}</b>
+              {(lang === "ar" ? zoom.name : zoom.nameAr) && <span>{lang === "ar" ? zoom.name : zoom.nameAr}</span>}
+            </figcaption>
+            <button type="button" className="rm-pqzoom-close" onClick={() => setZoom(null)} aria-label={lang === "ar" ? "إغلاق" : "Close"}>
+              ✕
+            </button>
+          </figure>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Plaque({ title, id }: { title: string; id?: string }) {
   return (
     <header className="rm-plaque">
@@ -651,6 +756,9 @@ export default function RestaurantMenu({
   const [active, setActive] = useState(sections[0]?.id ?? "");
   // "tiles" layout: null = category grid, otherwise the open category
   const tiles = restaurant.theme?.layout === "tiles";
+  // MYKSA standard menu ("standard"; "plumqr" is the old name): coloured app bar, round category photos,
+  // SAR | ريال | CAL. list with small dish photos. Only the colours change per restaurant.
+  const pq = restaurant.theme?.style === "standard" || restaurant.theme?.style === "plumqr";
   const [openCat, setOpenCat] = useState<string | null>(null);
   // day-of-week specials: today's (Riyadh time) goes first — computed on the client only
   const [today, setToday] = useState<number | null>(null);
@@ -737,7 +845,7 @@ export default function RestaurantMenu({
   // highlight the category in view
   useEffect(() => {
     if (q || !rootRef.current) return;
-    const els = Array.from(rootRef.current.querySelectorAll<HTMLElement>("section.rm-cat"));
+    const els = Array.from(rootRef.current.querySelectorAll<HTMLElement>("section.rm-cat, section.rm-pqsec"));
     const io = new IntersectionObserver(
       (entries) => {
         const vis = entries.filter((e) => e.isIntersecting);
@@ -751,7 +859,7 @@ export default function RestaurantMenu({
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, [q, lang]);
+  }, [q, lang, pq]);
 
   // keep the active chip visible
   useEffect(() => {
@@ -810,6 +918,7 @@ export default function RestaurantMenu({
     "--rm-accent": th.accent,
     "--rm-accent-soft": th.accentSoft,
     "--rm-highlight": th.highlight,
+    "--rm-on-accent": th.onAccent,
     "--rm-line": th.line,
   } as CSSProperties;
 
@@ -821,12 +930,85 @@ export default function RestaurantMenu({
     <div
       ref={rootRef}
       id="menu"
-      className={`rm ${display.variable} ${arabic.variable} ${script.variable} ${caps.variable}${lunch ? ` ${lbSans.variable} ${lbHand.variable} rm-lunch` : ""}${poster ? " rm-posterstyle" : ""}${classic ? ` ${condensed.variable} ${arabicSans.variable} rm-classic` : ""}${ornate ? " rm-ornate" : ""}${lang === "ar" ? " rm-ar" : ""}`}
+      className={`rm ${display.variable} ${arabic.variable} ${script.variable} ${caps.variable}${lunch ? ` ${lbSans.variable} ${lbHand.variable} rm-lunch` : ""}${poster ? " rm-posterstyle" : ""}${classic ? ` ${condensed.variable} ${arabicSans.variable} rm-classic` : ""}${ornate ? " rm-ornate" : ""}${pq ? " rm-pq" : ""}${lang === "ar" ? " rm-ar" : ""}`}
       style={style}
       lang={lang}
       dir={lang === "ar" ? "rtl" : "ltr"}
     >
-      {classic ? (
+      {pq ? (
+        <>
+        {fr.top && (
+          <div className="rm-pq-banner">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={fr.top} alt={restaurant.name} />
+          </div>
+        )}
+        {(() => {
+          const pills = [
+            ...(hours ? [`🕒 ${hours}`] : []),
+            ...sections
+              .filter((x) => x.day == null && (x.note || x.noteAr))
+              .slice(0, 2)
+              .map((x) => `🍲 ${pick(lang, x.name, x.nameAr)}: ${pick(lang, x.note, x.noteAr)}`),
+            ...(restaurant.whatsapp && fr.top ? [`🎉 ${ui.partyTitle[lang]}`] : []),
+          ];
+          return pills.length ? (
+            <div className="rm-pq-pills">
+              {pills.map((t) => (
+                <span key={t}>{t}</span>
+              ))}
+            </div>
+          ) : null;
+        })()}
+        <div className="rm-pq-top">
+          <header className="rm-pq-bar">
+            <div className="rm-pq-bar-text">
+              <h2>{pick(lang, restaurant.name, restaurant.nameAr)}</h2>
+              {(restaurant.tagline || restaurant.taglineAr) && <p>{pick(lang, restaurant.tagline, restaurant.taglineAr)}</p>}
+            </div>
+            <button type="button" className="rm-pq-lang" onClick={switchLang} lang={lang === "en" ? "ar" : "en"}>
+              {lang === "en" ? "AR" : "EN"}
+            </button>
+          </header>
+          <div className="rm-pq-search">
+            <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={ui.search[lang]} aria-label={ui.search[lang]} />
+            {q && (
+              <button type="button" className="rm-pq-clear" onClick={() => setQ("")} aria-label={ui.clear[lang]}>
+                ✕
+              </button>
+            )}
+          </div>
+          <nav className="rm-pq-cats" ref={chipsRef} aria-label={lang === "ar" ? "أقسام القائمة" : "Menu sections"}>
+            {tileOrder.map((s) => {
+              const img = s.image ?? s.items.find((it) => it.imageUrl)?.imageUrl;
+              return (
+              <button
+                type="button"
+                key={s.id}
+                data-chip={s.id}
+                className={`rm-pq-catbtn${!q && active === s.id ? " is-active" : ""}`}
+                aria-current={!q && active === s.id ? "true" : undefined}
+                onClick={() => goTo(s.id)}
+              >
+                <span className="rm-pq-catimg">
+                  {img ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={img} alt="" loading="lazy" width={112} height={112} />
+                  ) : (
+                    <span aria-hidden>🍽️</span>
+                  )}
+                </span>
+                <span className="rm-pq-catname">
+                  {s.day != null && s.day === today ? `${ui.today[lang]} · ` : ""}
+                  {pick(lang, s.name, s.nameAr)}
+                </span>
+              </button>
+              );
+            })}
+          </nav>
+        </div>
+        </>
+      ) : classic ? (
         <ClassicCover restaurant={restaurant} lang={lang} />
       ) : ornate ? (
         <section className="rm-page rm-intro">
@@ -898,6 +1080,7 @@ export default function RestaurantMenu({
         </div>
       )}
 
+      {!pq && (
       <nav className="rm-bar" aria-label={lang === "ar" ? "أقسام القائمة" : "Menu sections"}>
         <div className="rm-search-row">
           <div className="rm-search">
@@ -929,6 +1112,7 @@ export default function RestaurantMenu({
           </div>
         )}
       </nav>
+      )}
 
       {branches.length > 1 && (
         <div className="rm-branchbar">
@@ -979,7 +1163,13 @@ export default function RestaurantMenu({
         </div>
       )}
 
-      {lunch ? (
+      {pq ? (
+        <PqListBody
+          lang={lang}
+          today={today}
+          sections={today == null ? filtered : [...filtered.filter((x) => x.day === today), ...filtered.filter((x) => x.day !== today)]}
+        />
+      ) : lunch ? (
         <LunchBody sections={filtered} q={q} lang={lang} tagline={undefined} footer={fr.bottom} />
       ) : poster ? (
         <PosterBody sections={filtered} q={q} lang={lang} today={today} selDay={selDay ?? today ?? 0} setSelDay={setSelDay} restaurant={restaurant} />

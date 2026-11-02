@@ -45,7 +45,7 @@ export interface MenuSection extends MenuCategory {
 }
 
 export interface MenuTheme {
-  style?: "default" | "ornate" | "classic" | "poster" | "lunchbox"; // lunchbox = bright brochure look (The Lunch Box) // poster = black & gold printed-poster look with dotted price lines (Biryani Nation) // ornate = dark printed look (Quetta Grill), classic = cream printed look (Al Jalsa)
+  style?: "default" | "ornate" | "classic" | "poster" | "lunchbox" | "standard" | "plumqr"; // standard = MYKSA standard menu (coloured app bar, round category photos, SAR | ريال | CAL. list with small dish photos); only colours change per restaurant ("plumqr" = old name, same look) // lunchbox = bright brochure look (The Lunch Box) // poster = black & gold printed-poster look with dotted price lines (Biryani Nation) // ornate = dark printed look (Quetta Grill), classic = cream printed look (Al Jalsa)
   layout?: "tiles"; // tiles = opens on a grid of category photos (Nawaab's); tap a tile to see its dishes
   bg?: string;
   surface?: string;
@@ -54,6 +54,7 @@ export interface MenuTheme {
   accent?: string;
   accentSoft?: string;
   highlight?: string;
+  onAccent?: string; // text colour on the main (accent) colour — "standard" style app bar & headings
   line?: string;
 }
 

@@ -18,3 +18,5 @@
 npm-debug.log*
 .vercel
 next-env.d.ts
+
+scripts/serviceAccount.json
