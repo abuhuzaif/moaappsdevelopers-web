@@ -316,6 +316,16 @@ function TileCard({ item, lang }: { item: MenuItem; lang: Lang }) {
   );
 }
 
+/** Restaurants stay open late: until this hour (Riyadh time) it still counts as the previous day,
+ *  e.g. at 1:30 am on Tuesday the Monday specials are still the "today" ones. */
+const DAY_START_HOUR = 4;
+
+/** 0 = Sunday … 6 = Saturday, in Riyadh time, with the day changing at DAY_START_HOUR. */
+function businessDay(now = Date.now()) {
+  const wd = new Date(now - DAY_START_HOUR * 3600_000).toLocaleDateString("en-US", { weekday: "short", timeZone: "Asia/Riyadh" });
+  return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(wd);
+}
+
 const DAY_NAMES: Record<Lang, string[]> = {
   en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
   ar: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
@@ -483,11 +493,14 @@ function PqListBody({ sections, lang, today }: { sections: MenuSection[]; lang: 
       {sections.map((s) => {
         // dish photos → small round photo per dish; none → the category's big photo at the side (Lunch Box style)
         const photos = s.items.some((it) => it.imageUrl);
+        // day-of-week specials can only be ordered on their own day (Riyadh time)
+        const off = s.day != null && s.day !== today;
+        const onlyOn = off ? (lang === "ar" ? `فقط ${DAY_NAMES.ar[s.day!]}` : `Only on ${DAY_NAMES.en[s.day!]}`) : "";
         const side = !photos && s.image;
         return (
         <section
           key={s.id}
-          className={`rm-pqsec${s.day != null && s.day === today ? " is-today" : ""}${side ? " has-side" : ""}${photos ? "" : " no-photos"}`}
+          className={`rm-pqsec${s.day != null && s.day === today ? " is-today" : ""}${off ? " is-off" : ""}${side ? " has-side" : ""}${photos ? "" : " no-photos"}`}
           id={`rm-cat-${s.id}`}
           data-cat={s.id}
           aria-labelledby={`rm-ph-${s.id}`}
@@ -499,6 +512,7 @@ function PqListBody({ sections, lang, today }: { sections: MenuSection[]; lang: 
           <h2 className="rm-pqpill" id={`rm-ph-${s.id}`}>
             {pick(lang, s.name, s.nameAr)}
             {s.day != null && s.day === today && <span className="rm-pqtoday">{ui.today[lang]}</span>}
+            {off && <span className="rm-pqoffday">{onlyOn}</span>}
           </h2>
           {(s.note || s.noteAr) && <p className="rm-pqnote">{pick(lang, s.note, s.noteAr)}</p>}
           <div className="rm-pqtable" role="table">
@@ -540,7 +554,15 @@ function PqListBody({ sections, lang, today }: { sections: MenuSection[]; lang: 
                     <span className="rm-pqprice" role="cell">{p.amount}</span>
                     <span className="rm-pqprice-ar" role="cell">{arNum(p.amount)}</span>
                     <span className="rm-pqcal" role="cell">{p.cal ?? ""}</span>
-                    <span role="cell"><AddControl item={it} p={p} lang={lang} /></span>
+                    <span role="cell">
+                      {off ? (
+                        <span className="rm-pqonly" title={onlyOn}>
+                          {DAY_NAMES[lang][s.day!]}
+                        </span>
+                      ) : (
+                        <AddControl item={it} p={p} lang={lang} />
+                      )}
+                    </span>
                   </div>
                 );
               })
@@ -763,8 +785,10 @@ export default function RestaurantMenu({
   // day-of-week specials: today's (Riyadh time) goes first — computed on the client only
   const [today, setToday] = useState<number | null>(null);
   useEffect(() => {
-    const wd = new Date().toLocaleDateString("en-US", { weekday: "short", timeZone: "Asia/Riyadh" });
-    setToday(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(wd));
+    const check = () => setToday(businessDay());
+    check();
+    const t = setInterval(check, 60_000); // a page left open switches by itself at DAY_START_HOUR
+    return () => clearInterval(t);
   }, []);
   const [selDay, setSelDay] = useState<number | null>(null);
   useEffect(() => {

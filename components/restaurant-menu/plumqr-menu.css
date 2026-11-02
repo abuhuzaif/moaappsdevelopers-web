@@ -348,3 +348,31 @@
   .rm-pqsec.has-side > .rm-pqsec-img { grid-area: img; height: 220px; max-height: none; margin: 6px 0 0; }
   .rm-ar .rm-pqsec.has-side > .rm-pqpill { justify-self: start; }
 }
+
+/* other days' specials: visible but can't be ordered today */
+.rm-pqsec.is-off .rm-pqtable,
+.rm-pqsec.is-off .rm-pqsec-img { opacity: 0.55; filter: grayscale(0.4); }
+.rm-pqsec.is-off .rm-pqpill { opacity: 0.8; }
+.rm-pqoffday {
+  display: inline-block;
+  margin-inline-start: 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 0.7rem;
+  font-weight: 800;
+  vertical-align: middle;
+  text-transform: none;
+}
+.rm-pqonly {
+  display: inline-block;
+  min-width: 34px;
+  padding: 2px 4px;
+  border-radius: 6px;
+  background: var(--pq-line);
+  color: var(--pq-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+}
