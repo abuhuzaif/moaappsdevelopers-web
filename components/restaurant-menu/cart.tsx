@@ -452,6 +452,23 @@ export function CartSheet({
       preorderTime,
     });
     const waUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`;
+
+    // GA4: count every WhatsApp order per restaurant — proof for restaurants of the orders MYKSA sends them.
+    // "beacon" so the hit is still sent when the page navigates away to WhatsApp.
+    try {
+      const gtag = (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag;
+      gtag?.("event", "whatsapp_order", {
+        restaurant: window.location.pathname.split("/").filter(Boolean)[0] || "",
+        restaurant_name: restaurantName,
+        order_type: type,
+        preorder: whenFor === "preorder",
+        items: lines.reduce((n, l) => n + l.qty, 0),
+        value: Math.round(total * 100) / 100,
+        currency: "SAR",
+        transport_type: "beacon",
+      });
+    } catch {}
+
     // Inside the KSA-Connect app (WebView) new tabs don't exist — navigate instead,
     // the app catches wa.me links and opens WhatsApp.
     if (/KSAConnectApp/i.test(navigator.userAgent)) window.location.href = waUrl;
