@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { RatingBadge, RatingPrompt, hasRated, cardStyle, btnStyle, closeStyle } from "./ToolRating";
 
 const DEDICATED_TOOL_SLUGS = new Set([
   "acre-hectare-square-meter-converter",
@@ -157,90 +158,97 @@ function ToolsTopBanner() {
   );
 }
 
-// ── "Get the app" card, shown once a tool has done its job (a file was downloaded) ──
+// ── After a tool is used: ask for a rating first, then (if happy) show the app card ──
 const PLAY_URL =
   "https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect&referrer=utm_source%3Dmyksaconnect%26utm_medium%3Dtool_done%26utm_campaign%3Dapp_promo";
 const HIDE_KEY = "mk_app_promo_hidden_until";
 
-function AppPromo() {
+function track(name: string, params: Record<string, unknown>) {
+  try { (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag?.("event", name, params); } catch {}
+}
+
+function appPromoAllowed() {
+  const ua = navigator.userAgent;
+  if (/KSAConnectApp/i.test(ua)) return false;      // already inside our app
+  if (/iPhone|iPad|iPod/i.test(ua)) return false;   // Android app only (no iOS app yet)
+  try { if (Number(localStorage.getItem(HIDE_KEY) || 0) > Date.now()) return false; } catch {}
+  return true;
+}
+
+function ToolExtras() {
   const pathname = usePathname();
-  const [show, setShow] = useState(false);
+  const slug = pathname?.startsWith("/tools/") ? pathname.replace(/^\/tools\//, "").split("/")[0] : "";
+  const [phase, setPhase] = useState<null | "rate" | "app" | "thanks">(null);
+  const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
-    setShow(false);
-    if (!pathname?.startsWith("/tools/")) return;
-    const ua = navigator.userAgent;
-    if (/KSAConnectApp/i.test(ua)) return;          // already inside our app
-    if (/iPhone|iPad|iPod/i.test(ua)) return;       // Android app only (no iOS app yet)
-    try {
-      if (Number(localStorage.getItem(HIDE_KEY) || 0) > Date.now()) return;
-    } catch {}
-
+    setPhase(null);
+    if (!slug) return;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const done = () => {
       if (timer) return;
-      timer = setTimeout(() => setShow(true), 1200);  // let the download start first
+      timer = setTimeout(() => {
+        if (!hasRated(slug)) setPhase("rate");
+        else if (appPromoAllowed()) setPhase("app");
+      }, 1200); // let the download start first
     };
     // Tools download their result with <a download>…</a>.click(), so a click on a download link = tool used.
     const onClick = (e: MouseEvent) => {
-      const a = (e.target as HTMLElement | null)?.closest?.("a[download]");
-      if (a) done();
+      if ((e.target as HTMLElement | null)?.closest?.("a[download]")) done();
     };
     document.addEventListener("click", onClick, true);
     return () => {
       document.removeEventListener("click", onClick, true);
       if (timer) clearTimeout(timer);
     };
-  }, [pathname]);
+  }, [slug]);
 
-  if (!show) return null;
+  if (!slug || slug === "converters" || slug === "cad") return null;
 
-  const close = (days: number) => {
-    setShow(false);
+  const closeApp = (days: number) => {
+    setPhase(null);
     try { localStorage.setItem(HIDE_KEY, String(Date.now() + days * 86400000)); } catch {}
-  };
-  const track = (name: string) => {
-    try { (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag?.("event", name, { tool: pathname }); } catch {}
   };
 
   return (
-    <div
-      role="dialog"
-      aria-label="Get the MYKSA Connect app"
-      style={{
-        position: "fixed", left: "50%", bottom: 16, transform: "translateX(-50%)", zIndex: 1000,
-        width: "min(460px, calc(100% - 24px))", display: "flex", alignItems: "center", gap: 12,
-        padding: "12px 14px", borderRadius: 16, background: "linear-gradient(135deg,#0c1730,#005744)",
-        color: "#fff", border: "1px solid rgba(246,185,31,.6)", boxShadow: "0 14px 34px rgba(0,0,0,.28)",
-        fontFamily: "Inter, Arial, sans-serif",
-      }}
-    >
-      <span aria-hidden style={{ fontSize: 26 }}>✅</span>
-      <span style={{ flex: 1, minWidth: 0, fontSize: 13, lineHeight: 1.4 }}>
-        <strong style={{ display: "block", fontSize: 14 }}>Done! Get the MYKSA Connect app</strong>
-        Free tools, ads &amp; restaurant menus — always on your phone.
-      </span>
-      <a
-        href={PLAY_URL}
-        target="_blank"
-        rel="noopener"
-        onClick={() => { track("app_promo_click"); close(30); }}
-        style={{
-          flex: "0 0 auto", padding: "9px 12px", borderRadius: 10, background: "#f6b91f", color: "#0c1730",
-          fontWeight: 900, fontSize: 12.5, textDecoration: "none", whiteSpace: "nowrap",
-        }}
-      >
-        ▶ Google Play
-      </a>
-      <button
-        type="button"
-        aria-label="Close"
-        onClick={() => { track("app_promo_close"); close(7); }}
-        style={{ flex: "0 0 auto", background: "none", border: 0, color: "#fff", opacity: 0.75, fontSize: 18, cursor: "pointer", padding: 4 }}
-      >
-        ✕
-      </button>
-    </div>
+    <>
+      <RatingBadge slug={slug} refreshKey={refresh} onRate={() => setPhase("rate")} />
+
+      {phase === "rate" && (
+        <RatingPrompt
+          slug={slug}
+          onClose={() => setPhase(null)}
+          onDone={(stars) => {
+            setRefresh((n) => n + 1);
+            setPhase(stars >= 4 && appPromoAllowed() ? "app" : "thanks");
+            if (stars < 4) setTimeout(() => setPhase(null), 2500);
+          }}
+        />
+      )}
+
+      {phase === "thanks" && (
+        <div role="status" style={cardStyle}>
+          <span aria-hidden style={{ fontSize: 24 }}>🙏</span>
+          <strong style={{ flex: 1, fontSize: 14 }}>Thank you! Your feedback helps us improve.</strong>
+        </div>
+      )}
+
+      {phase === "app" && (
+        <div role="dialog" aria-label="Get the MYKSA Connect app" style={cardStyle}>
+          <span aria-hidden style={{ fontSize: 26 }}>📱</span>
+          <span style={{ flex: 1, minWidth: 0, fontSize: 13, lineHeight: 1.4 }}>
+            <strong style={{ display: "block", fontSize: 14 }}>Thanks! Get the MYKSA Connect app</strong>
+            Free tools, ads &amp; restaurant menus — always on your phone.
+          </span>
+          <a href={PLAY_URL} target="_blank" rel="noopener" onClick={() => { track("app_promo_click", { tool: slug }); closeApp(30); }} style={btnStyle}>
+            ▶ Google Play
+          </a>
+          <button type="button" aria-label="Close" onClick={() => { track("app_promo_close", { tool: slug }); closeApp(7); }} style={closeStyle}>
+            ✕
+          </button>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -248,7 +256,7 @@ export default function ToolsBanner() {
   return (
     <>
       <ToolsTopBanner />
-      <AppPromo />
+      <ToolExtras />
     </>
   );
 }
