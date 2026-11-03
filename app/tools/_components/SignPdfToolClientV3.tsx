@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { cleanSignature } from "@/lib/clean-signature";
 
 declare global { interface Window { pdfjsLib?: any; PDFLib?: any; } }
 
@@ -54,6 +55,8 @@ export default function SignPdfToolClientV3() {
   const [file, setFile] = useState<File|null>(null), [bytes, setBytes] = useState<ArrayBuffer|null>(null), [pages, setPages] = useState(0), [page, setPage] = useState(1);
   const [sig, setSig] = useState<string|null>(null), [mode, setMode] = useState<"upload"|"draw"|"type">("upload"), [typed, setTyped] = useState("");
   const [pos, setPos] = useState({x:70,y:90,w:220,h:70}), [drag, setDrag] = useState<any>(null), [resize, setResize] = useState<any>(null);
+  // uploaded signature photo: remove the paper background, recolour the ink
+  const [srcFile, setSrcFile] = useState<File|null>(null), [cleanBg, setCleanBg] = useState(true), [ink, setInk] = useState<string>("#1a237e"), [soft, setSoft] = useState(12);
   const [busy, setBusy] = useState(false), [status, setStatus] = useState(""), [saveMode, setSaveMode] = useState<"current"|"all">("current"), [drawing, setDrawing] = useState(false);
 
   useEffect(() => { loadPdfJs().catch(e => setStatus(e.message)); }, []);
@@ -90,14 +93,42 @@ export default function SignPdfToolClientV3() {
     return () => { cancelled = true; };
   }, [page, pages]);
 
+  async function processImage(f: File, opts: { clean: boolean; ink: string; soft: number }, keepPlace: boolean) {
+    try {
+      let url: string;
+      if (opts.clean) {
+        url = await cleanSignature(f, { ink: opts.ink, softness: opts.soft });
+      } else {
+        url = await new Promise<string>((ok, bad) => {
+          const r = new FileReader(); r.onload = () => ok(String(r.result)); r.onerror = () => bad(new Error("Could not read the signature image.")); r.readAsDataURL(f);
+        });
+      }
+      const img = new Image();
+      await new Promise<void>((ok, bad) => { img.onload = () => ok(); img.onerror = () => bad(new Error("Could not read the signature image.")); img.src = url; });
+      const ratio = img.naturalHeight / Math.max(1, img.naturalWidth);
+      setSig(url);
+      setPos(p => { const w = keepPlace ? p.w : 220; return { ...p, w, h: Math.max(35, w * ratio) }; });
+      setStatus(opts.clean ? "Signature added — background removed." : "Signature image added (original background).");
+    } catch (e) {
+      setStatus(e instanceof Error ? e.message : "Could not read the signature image.");
+    }
+  }
+
   function addImage(f: File|null) {
     if (!f) return;
-    if (!["image/png","image/jpeg"].includes(f.type)) { setStatus("Please choose a PNG or JPG signature image."); return; }
-    const url = URL.createObjectURL(f), img = new Image();
-    img.onload = () => { const c=document.createElement("canvas"); c.width=img.naturalWidth; c.height=img.naturalHeight; c.getContext("2d")!.drawImage(img,0,0); setSig(c.toDataURL("image/png")); setPos(p=>({...p,w:220,h:Math.max(45,220*(img.naturalHeight/Math.max(1,img.naturalWidth)))})); setStatus("Signature image added."); URL.revokeObjectURL(url); };
-    img.onerror = () => { URL.revokeObjectURL(url); setStatus("Could not read the signature image."); };
-    img.src = url;
+    if (!["image/png","image/jpeg","image/webp"].includes(f.type)) { setStatus("Please choose a PNG or JPG signature image."); return; }
+    setSrcFile(f);
+    setStatus("Cleaning signature…");
+    void processImage(f, { clean: cleanBg, ink, soft }, false);
   }
+
+  // re-clean the same photo when the user changes colour / strength / background option
+  useEffect(() => {
+    if (!srcFile) return;
+    const t = setTimeout(() => void processImage(srcFile, { clean: cleanBg, ink, soft }, true), 150);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cleanBg, ink, soft]);
 
   function down(e: PointerEvent<HTMLDivElement>) { if ((e.target as HTMLElement).dataset.resize) return; e.currentTarget.setPointerCapture(e.pointerId); setDrag({x:pos.x,y:pos.y,sx:e.clientX,sy:e.clientY}); }
   function move(e: PointerEvent<HTMLDivElement>) { if (!drag) return; setPos(p=>({...p,x:Math.max(0,drag.x+e.clientX-drag.sx),y:Math.max(0,drag.y+e.clientY-drag.sy)})); }
@@ -131,9 +162,19 @@ export default function SignPdfToolClientV3() {
       <aside className="card" style={{padding:10}}>{Array.from({length:pages},(_,i)=><button key={i} className="btn" style={{width:"100%",marginBottom:8,background:page===i+1?"#eef8f4":"#f8faf9"}} onClick={()=>setPage(i+1)}>Page {i+1}</button>)}</aside>
       <section className="card" style={{padding:14,background:"#eef2f0",overflow:"auto"}}><strong style={{color:"#102027"}}>PDF Preview</strong><div ref={wrap} style={{display:"flex",justifyContent:"center",padding:14}}><div className="preview"><canvas ref={canvas}/>{sig&&<div className="sig" style={{left:pos.x,top:pos.y,width:pos.w,height:pos.h}} onPointerDown={down} onPointerMove={move} onPointerUp={()=>setDrag(null)}><img src={sig} alt="Signature"/><div className="handle" data-resize="1" onPointerDown={rs} onPointerMove={rm} onPointerUp={()=>setResize(null)}/></div>}</div></div></section>
       <aside className="card" style={{padding:16}}><h3 style={{marginTop:0,color:"#102027"}}>Add Signature</h3><div style={{display:"flex",gap:7,marginBottom:12}}>{(["upload","draw","type"] as const).map(m=><button key={m} className={`btn tab ${mode===m?"active":""}`} onClick={()=>setMode(m)}>{m[0].toUpperCase()+m.slice(1)}</button>)}</div>
-        {mode==="upload"&&<><input type="file" accept="image/png,image/jpeg,.png,.jpg,.jpeg" onChange={e=>{addImage(e.target.files?.[0]||null);e.currentTarget.value=""}}/><p style={{fontSize:12,color:"#65716f"}}>PNG or JPG signature image.</p></>}
-        {mode==="draw"&&<><canvas ref={draw} width={700} height={170} className="draw" onPointerDown={drawStart} onPointerMove={drawMove} onPointerUp={()=>setDrawing(false)} onPointerCancel={()=>setDrawing(false)}/><div style={{marginTop:8,display:"flex",gap:7}}><button className="btn" onClick={()=>draw.current?.getContext("2d")?.clearRect(0,0,700,170)}>Clear</button><button className="btn primary" onClick={()=>{if(draw.current){setSig(draw.current.toDataURL("image/png"));setPos(p=>({...p,w:240,h:90}));setStatus("Drawn signature added.")}}}>Use Signature</button></div></>}
-        {mode==="type"&&<><input style={{width:"100%",padding:10,border:"1px solid #ccd8d3",borderRadius:8}} value={typed} onChange={e=>setTyped(e.target.value)} placeholder="Type your name"/><button className="btn primary" style={{marginTop:8}} onClick={()=>{if(!typed.trim()){setStatus("Type your name first.");return}setSig(makeTypedSignature(typed.trim()));setPos(p=>({...p,w:250,h:85}));setStatus("Typed signature added.")}}>Use Typed Signature</button></>}
+        {mode==="upload"&&<><input type="file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" onChange={e=>{addImage(e.target.files?.[0]||null);e.currentTarget.value=""}}/><p style={{fontSize:12,color:"#65716f"}}>Photo of your signature on white paper (PNG or JPG). The paper background is removed automatically.</p>
+          <label style={{display:"flex",alignItems:"center",gap:8,fontSize:13,fontWeight:700,color:"#17332c",margin:"6px 0 10px"}}><input type="checkbox" checked={cleanBg} onChange={e=>setCleanBg(e.target.checked)}/>Remove background</label>
+          {cleanBg&&<>
+            <div style={{fontSize:12,fontWeight:800,color:"#17332c",marginBottom:6}}>Ink colour</div>
+            <div style={{display:"flex",gap:6,marginBottom:10}}>{([["#1a237e","Blue"],["#111111","Black"],["original","Original"]] as const).map(([v,l])=><button key={v} type="button" className={`btn tab ${ink===v?"active":""}`} style={{padding:"7px 10px",fontSize:12,display:"flex",alignItems:"center",gap:6}} onClick={()=>setInk(v)}>{v!=="original"&&<span style={{width:12,height:12,borderRadius:"50%",background:v,display:"inline-block",border:"1px solid #fff8"}}/>}{l}</button>)}</div>
+            <label style={{display:"block",fontSize:12,fontWeight:800,color:"#17332c"}}>Cleaning strength <span style={{fontWeight:600,color:"#65716f"}}>(raise if strokes look broken)</span>
+              <input type="range" min={0} max={40} value={soft} onChange={e=>setSoft(Number(e.target.value))} style={{width:"100%"}}/>
+            </label>
+          </>}
+          {srcFile&&sig&&<div style={{marginTop:8,padding:8,borderRadius:10,border:"1px solid #e4ebe8",background:"repeating-conic-gradient(#f1f4f3 0% 25%, #fff 0% 50%) 50% / 16px 16px",textAlign:"center"}}><img src={sig} alt="Signature preview" style={{maxWidth:"100%",maxHeight:90}}/></div>}
+        </>}
+        {mode==="draw"&&<><canvas ref={draw} width={700} height={170} className="draw" onPointerDown={drawStart} onPointerMove={drawMove} onPointerUp={()=>setDrawing(false)} onPointerCancel={()=>setDrawing(false)}/><div style={{marginTop:8,display:"flex",gap:7}}><button className="btn" onClick={()=>draw.current?.getContext("2d")?.clearRect(0,0,700,170)}>Clear</button><button className="btn primary" onClick={()=>{if(draw.current){setSrcFile(null);setSig(draw.current.toDataURL("image/png"));setPos(p=>({...p,w:240,h:90}));setStatus("Drawn signature added.")}}}>Use Signature</button></div></>}
+        {mode==="type"&&<><input style={{width:"100%",padding:10,border:"1px solid #ccd8d3",borderRadius:8}} value={typed} onChange={e=>setTyped(e.target.value)} placeholder="Type your name"/><button className="btn primary" style={{marginTop:8}} onClick={()=>{if(!typed.trim()){setStatus("Type your name first.");return}setSrcFile(null);setSig(makeTypedSignature(typed.trim()));setPos(p=>({...p,w:250,h:85}));setStatus("Typed signature added.")}}>Use Typed Signature</button></>}
         <hr style={{border:0,borderTop:"1px solid #e4ebe8",margin:"16px 0"}}/><label style={{fontWeight:800,color:"#17332c",display:"block",marginBottom:7}}>Apply signature</label><select value={saveMode} onChange={e=>setSaveMode(e.target.value as typeof saveMode)} style={{width:"100%",padding:9,borderRadius:8,border:"1px solid #ccd8d3"}}><option value="current">Current page only</option><option value="all">All pages</option></select><button className="btn primary" style={{width:"100%",marginTop:12}} disabled={busy||!sig} onClick={save}>{busy?"Working…":"Download Signed PDF"}</button>{status&&<div className="msg">{status}</div>}
       </aside>
     </div>
