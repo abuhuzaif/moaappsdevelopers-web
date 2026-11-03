@@ -48,6 +48,7 @@ const TOOL_SLUGS = [
   "end-of-service-calculator", "gosi-calculator", "overtime-calculator", "annual-leave-calculator", "final-settlement-calculator", "vat-calculator", "fuel-cost-calculator",
   "shp-to-kml", "kml-to-shp", "shp-to-geojson", "geojson-to-kml", "csv-to-kml", "kml-to-csv", "dxf-to-kml", "kml-to-dxf", "latlon-to-utm", "utm-to-latlon",
   "dwg-to-pdf", "dwg-to-dxf", "dwg-to-svg", "dxf-to-svg", "cad", "pdf-to-dxf",
+  "screen-recorder",
 ];
 
 const CONVERTER_SLUGS = [

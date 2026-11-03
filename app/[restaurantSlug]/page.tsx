@@ -113,7 +113,7 @@ export async function generateMetadata({
     twitter: { card: "summary_large_image", title, description },
     // "Add to Home screen" — opens like an app next time (no QR scan)
     manifest: `/${restaurant.slug}/app-manifest`,
-    icons: { apple: `/${restaurant.slug}/app-icon?size=180` },
+    icons: { icon: "/icon.svg", apple: `/${restaurant.slug}/app-icon?size=180` }, // keep the MYKSA favicon in the tab; restaurant icon only for Add to Home screen
     appleWebApp: { capable: true, title: restaurant.name, statusBarStyle: "default" },
   };
 }

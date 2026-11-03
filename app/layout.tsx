@@ -26,24 +26,10 @@ const GA_MEASUREMENT_ID = "G-R9E3J40KXD";
 
 export const metadata: Metadata = isKsaConnectSite
   ? {
-      title: "MYKSA CONNECT — Saudi Arabia Classifieds, Expat Tools & Local Services",
+      title: "MYKSA Connect — Saudi Classifieds, Restaurant Menus & Free Tools",
       description:
         "MYKSA CONNECT helps expatriates and residents in Saudi Arabia find housing, cars, jobs, services, restaurants and free online tools for everyday life.",
       metadataBase: new URL("https://www.myksaconnect.com"),
-      keywords: [
-        "Saudi Arabia classifieds",
-        "Saudi Arabia expat tools",
-        "Riyadh classifieds",
-        "Jeddah classifieds",
-        "Saudi housing",
-        "rooms for rent Saudi Arabia",
-        "cars for sale Saudi Arabia",
-        "Iqama expiry calculator",
-        "Hijri Gregorian converter",
-        "Saudi salary calculator",
-        "SAR currency converter",
-        "Saudi online tools",
-      ],
       // No site-wide canonical here: a canonical in the root layout is inherited by
       // every page that doesn't set its own, telling Google they are all copies of
       // the homepage. Each page sets its own canonical instead.
@@ -195,14 +181,6 @@ export default function RootLayout({
 
         <style>{`
           .mk-page .mk-tools-showcase {
-            display: none !important;
-          }
-          .tool-page > .shell > .banner {
-            display: none !important;
-          }
-          .tool-page .banner,
-          .tool-page .hero-banner,
-          .tool-page img[src*="myksa-tools-banner.png"] {
             display: none !important;
           }
         `}</style>

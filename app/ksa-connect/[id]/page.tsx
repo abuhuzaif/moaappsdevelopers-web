@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import ListingDetailClient from "./ListingDetailClient";
+import ListingDetailClient, { type ListingPreview } from "./ListingDetailClient";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -86,6 +86,54 @@ function place(l: SeoListing): string {
   return `${l.location}, ${l.city}`;
 }
 
+/** "LARGE ROOM FOR RENT!!!" → "Large Room For Rent" (shouting titles look like spam in Google). */
+function tidy(text: string): string {
+  let t = stripPhones(text).replace(/[!?.]{2,}/g, "").replace(/\s+/g, " ").trim();
+  const letters = t.replace(/[^A-Za-z]/g, "");
+  if (letters.length > 6 && letters === letters.toUpperCase()) t = t.toLowerCase().replace(/\b[a-z]/g, (c) => c.toUpperCase());
+  return t;
+}
+
+/** Cut at a word boundary so it ends cleanly. */
+function cut(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const s = text.slice(0, max - 1);
+  const i = s.lastIndexOf(" ");
+  return (i > max * 0.6 ? s.slice(0, i) : s).replace(/[\s,;:–-]+$/, "") + "…";
+}
+
+/**
+ * Google shows ~60 characters of a title. Keep the price and the area (area also keeps
+ * similar ads — "Room for rent | Riyadh" ×11 — from all getting the same title),
+ * and add the brand only when it still fits.
+ */
+function seoTitle(l: SeoListing): string {
+  const name = tidy(l.title) || l.subCategory || l.category || "Ad";
+  const brand = " | MYKSA Connect";
+  // full area first; if that leaves too little room for the ad's own words, use just the city
+  for (const where of [place(l), l.city && l.city !== "All" ? l.city : ""]) {
+    const tail = ` – ${priceText(l)}${where ? ` | ${where}` : ""}`;
+    const room = 62 - tail.length;
+    if (name.length > room && room < 30 && where !== (l.city && l.city !== "All" ? l.city : "")) continue;
+    const t = cut(name, Math.max(24, room)) + tail;
+    return t.length + brand.length <= 64 ? t + brand : t;
+  }
+  return cut(name, 60);
+}
+
+/** ~155 characters: what, where, price, then the start of the ad text. */
+function seoDescription(l: SeoListing): string {
+  const where = place(l);
+  const lead = [l.subCategory || l.category, where && `in ${where}`].filter(Boolean).join(" ");
+  const head = `${lead}. ${priceText(l)}${l.negotiable ? " (negotiable)" : ""}. `;
+  const tail = " Contact the seller on MYKSA Connect.";
+  const body = tidy(l.description);
+  const room = 155 - head.length - tail.length;
+  let text = room > 20 && body ? cut(body, room) : "";
+  if (text && !/[.!?…]$/.test(text)) text += ".";
+  return (head + text + tail).replace(/\s+\./g, ".").replace(/\s{2,}/g, " ").trim();
+}
+
 // ── SEO: title, description, link previews (Facebook / WhatsApp / Google) ──
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
@@ -101,16 +149,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     };
   }
 
-  const where = place(l);
-  const title = `${stripPhones(l.title)} – ${priceText(l)}${l.city && l.city !== "All" ? ` | ${l.city}` : ""} | MYKSA Connect`;
-  const lead = [l.subCategory || l.category, where && `in ${where}`].filter(Boolean).join(" ");
-  const body = stripPhones(l.description).slice(0, 120).trim();
-  const description = `${lead}. ${priceText(l)}. ${body}${body.length >= 120 ? "…" : ""} Contact the seller free on MYKSA Connect.`
-    .replace(/\s+\./g, ".")
-    .slice(0, 300);
+  // absolute: the ad title already carries the brand when it fits — no site-wide template added on top
+  const title = seoTitle(l);
+  const description = seoDescription(l);
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: { canonical: url },
     robots: l.status === "active" ? { index: true, follow: true } : { index: false, follow: true },
@@ -151,7 +195,7 @@ export default async function ListingDetailPage({
           {
             "@context": "https://schema.org",
             "@type": "Product",
-            name: stripPhones(l.title),
+            name: tidy(l.title),
             description: stripPhones(l.description).slice(0, 500) || undefined,
             image: l.images.length ? l.images : undefined,
             category: [l.category, l.subCategory].filter(Boolean).join(" > "),
@@ -173,11 +217,23 @@ export default async function ListingDetailPage({
               ...(l.city && l.city !== "All"
                 ? [{ "@type": "ListItem", position: 2, name: l.city, item: `${SITE}/ksa-connect/city/${l.city.toLowerCase().replace(/\s+/g, "-")}` }]
                 : []),
-              { "@type": "ListItem", position: l.city && l.city !== "All" ? 3 : 2, name: stripPhones(l.title) },
+              { "@type": "ListItem", position: l.city && l.city !== "All" ? 3 : 2, name: tidy(l.title) },
             ],
           },
         ]
       : null;
+
+  // Same words the browser shows once the ad loads — so Google sees the H1 and text in the first HTML.
+  const preview: ListingPreview | undefined =
+    l && typeof l === "object" && l.status === "active"
+      ? {
+          title: l.title,
+          price: priceText(l) + (l.negotiable ? " (negotiable)" : ""),
+          place: place(l),
+          category: [l.category, l.subCategory].filter(Boolean).join(" · "),
+          description: stripPhones(l.description).slice(0, 600),
+        }
+      : undefined;
 
   return (
     <>
@@ -187,7 +243,7 @@ export default async function ListingDetailPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
         />
       )}
-      <ListingDetailClient />
+      <ListingDetailClient preview={preview} />
     </>
   );
 }

@@ -77,7 +77,10 @@ function BrandIcon({ name }: { name: "web" | "app" | "facebook" | "instagram" | 
   );
 }
 
-export default function ListingDetailClient() {
+/** Ad text read on the server, shown in the first HTML (for Google) until the full ad loads in the browser. */
+export type ListingPreview = { title: string; price: string; place: string; category: string; description: string };
+
+export default function ListingDetailClient({ preview }: { preview?: ListingPreview }) {
   const params = useParams();
   const router = useRouter();
   const id = params?.id as string;
@@ -207,7 +210,19 @@ export default function ListingDetailClient() {
           </div>
         )}
 
-        {loading && <p>Loading…</p>}
+        {loading &&
+          (preview ? (
+            <div style={{ border: "2px solid #0b0b0b", boxShadow: "0 0 0 1.5px #d4a017", borderRadius: 16, padding: "clamp(12px, 3vw, 22px)", background: "#fff", margin: "6px 3px 0" }}>
+              {preview.category && <span className="pill">{preview.category}</span>}
+              <h1 style={{ fontSize: 24, margin: "12px 0 4px" }}>{preview.title}</h1>
+              <p style={{ color: "var(--navy)", fontWeight: 800, fontSize: 22, margin: "0 0 8px" }}>{preview.price}</p>
+              {preview.place && <p style={{ color: "var(--text-muted)", fontSize: 14 }}>📍 {preview.place}</p>}
+              {preview.description && <p style={{ whiteSpace: "pre-line", lineHeight: 1.6 }}>{preview.description}</p>}
+              <p style={{ color: "var(--text-muted)", fontSize: 13 }}>Loading photos and contact…</p>
+            </div>
+          ) : (
+            <p>Loading…</p>
+          ))}
         {error && (error.includes("doesn't exist") ? <ExpiredAd /> : <div className="empty-state">{error}</div>)}
 
         {listing && (

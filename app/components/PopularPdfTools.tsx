@@ -1,18 +1,18 @@
 "use client";
 
 const TOOLS = [
-  ["📄", "PDF to Word", "Convert PDF files to editable Word documents.", "/tools/pdf-to-word/"],
-  ["🔗", "Merge PDF", "Combine multiple PDF files into one document.", "/tools/merge-pdf/"],
-  ["🗜️", "Compress PDF", "Reduce PDF size for easy sharing and upload.", "/tools/compress-pdf/"],
-  ["📐", "PDF to DXF", "Convert vector PDF drawings to DXF format online.", "/tools/pdf-to-dxf/"],
-  ["📑", "PDF to JPG", "Convert PDF pages into high-quality JPG images.", "/tools/pdf-to-jpg/"],
-  ["✂️", "Split PDF", "Split a PDF and extract only the pages you need.", "/tools/split-pdf/"],
-  ["✍️", "Sign PDF", "Add, move and resize your signature on a PDF.", "/tools/sign-pdf/", "NEW"],
-  ["🎥", "Screen Recorder", "Record your screen, voice and webcam free.", "/tools/screen-recorder/", "NEW"],
-  ["🪪", "Iqama Expiry Calculator", "Check your Iqama expiry date quickly.", "/tools/iqama-expiry-calculator/"],
-  ["🔄", "Hijri / Gregorian Converter", "Convert Hijri and Gregorian dates instantly.", "/tools/hijri-gregorian-converter/"],
-  ["💰", "Salary Calculator", "Calculate monthly and yearly salary.", "/tools/salary-calculator/"],
-  ["💱", "SAR Currency Converter", "Convert SAR to INR, PKR and more.", "/tools/sar-currency-converter/"],
+  ["📄", "PDF to Word", "Convert PDF files to editable Word documents.", "/tools/pdf-to-word"],
+  ["🔗", "Merge PDF", "Combine multiple PDF files into one document.", "/tools/merge-pdf"],
+  ["🗜️", "Compress PDF", "Reduce PDF size for easy sharing and upload.", "/tools/compress-pdf"],
+  ["📐", "PDF to DXF", "Convert vector PDF drawings to DXF format online.", "/tools/pdf-to-dxf"],
+  ["📑", "PDF to JPG", "Convert PDF pages into high-quality JPG images.", "/tools/pdf-to-jpg"],
+  ["✂️", "Split PDF", "Split a PDF and extract only the pages you need.", "/tools/split-pdf"],
+  ["✍️", "Sign PDF", "Add, move and resize your signature on a PDF.", "/tools/sign-pdf", "NEW"],
+  ["🎥", "Screen Recorder", "Record your screen, voice and webcam free.", "/tools/screen-recorder", "NEW"],
+  ["🪪", "Iqama Expiry Calculator", "Check your Iqama expiry date quickly.", "/tools/iqama-expiry-calculator"],
+  ["🔄", "Hijri / Gregorian Converter", "Convert Hijri and Gregorian dates instantly.", "/tools/hijri-gregorian-converter"],
+  ["💰", "Salary Calculator", "Calculate monthly and yearly salary.", "/tools/salary-calculator"],
+  ["💱", "Currency Converter", "Convert SAR to INR, PKR, USD and more.", "/tools/sar-currency-converter"],
 ] as const;
 
 const COLORS = [
@@ -175,7 +175,14 @@ export default function PopularPdfTools() {
         .mk-pdf-card.emerald { background:#ecfdf7; border-color:#a7f3d0; border-top-color:#10b981; }.mk-pdf-card.emerald .mk-pdf-icon{background:#d1fae5}.mk-pdf-card.emerald .mk-pdf-arrow{color:#059669}
         .mk-pdf-card.gold { background:#fff8df; border-color:#fcd34d; border-top-color:#f59e0b; }.mk-pdf-card.gold .mk-pdf-icon{background:#fef3c7}.mk-pdf-card.gold .mk-pdf-arrow{color:#d97706}
         .mk-pdf-card.indigo { background:#eef2ff; border-color:#c7d2fe; border-top-color:#6366f1; }.mk-pdf-card.indigo .mk-pdf-icon{background:#e0e7ff}.mk-pdf-card.indigo .mk-pdf-arrow{color:#4f46e5}
-        .mk-pdf-new { position: absolute; right: 9px; top: 8px; padding: 3px 7px; border-radius: 999px; background: #f6b91f; color: #4e3900; font-size: 7.5px; font-weight: 900; letter-spacing: .55px; }
+        .mk-pdf-popular .mk-pdf-card .mk-pdf-new {
+          position: absolute !important; right: 10px !important; top: -9px !important; left: auto !important; bottom: auto !important;
+          width: auto !important; height: auto !important; min-width: 0 !important; margin: 0 !important;
+          padding: 2px 8px !important; border-radius: 999px !important; line-height: 1.4 !important;
+          background: #f6b91f !important; color: #4e3900 !important; border: 2px solid #fff !important;
+          font-size: 9.5px !important; font-weight: 900 !important; letter-spacing: .6px !important;
+          box-shadow: 0 2px 6px rgba(0,0,0,.12) !important; z-index: 2; pointer-events: none;
+        }
         @media (max-width: 1000px) { .mk-pdf-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
         @media (max-width: 650px) { .mk-pdf-popular { width: 92vw; padding: 20px; border-radius: 19px; } .mk-pdf-head { align-items: flex-start; flex-direction: column; gap: 13px; } .mk-pdf-all { align-self: flex-start; } }
         @media (max-width: 520px) { .mk-pdf-grid { grid-template-columns: 1fr; } .mk-pdf-card { min-height: 80px; } }
@@ -184,15 +191,15 @@ export default function PopularPdfTools() {
       <div className="mk-pdf-head">
         <div className="mk-pdf-heading-wrap">
           <p className="mk-pdf-kicker">🔥 Most Popular Tools</p>
-          <h2 id="popular-pdf-tools-title">Free Online PDF &amp; Expat Tools</h2>
-          <p>Fast, simple browser-based tools for PDFs plus the essential calculators Saudi Arabia expats use every day.</p>
+          <h2 id="popular-pdf-tools-title">Free Online Tools — PDF, Screen Recorder &amp; Everyday Calculators</h2>
+          <p>Fast, private tools that run right in your browser — plus handy calculators for life in Saudi Arabia.</p>
           <div className="mk-pdf-trust" aria-label="Tool benefits">
             <span>✓ Free to use</span>
             <span>✓ No desktop software</span>
             <span>✓ Browser based</span>
           </div>
         </div>
-        <a className="mk-pdf-all" href="/tools/">Explore All Tools <span aria-hidden="true">→</span></a>
+        <a className="mk-pdf-all" href="/tools">Explore All Tools <span aria-hidden="true">→</span></a>
       </div>
 
       <div className="mk-pdf-grid">
