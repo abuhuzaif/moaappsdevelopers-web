@@ -323,6 +323,76 @@
   font-weight: 700;
 }
 
+/* categories without dish photos: no empty circles, the category photo sits beside the list
+   (Lunch Box style) — on phones too */
+.rm-pqsec.no-photos .rm-pqrow.is-more .rm-pqname { padding-inline-start: 14px; }
+.rm-pqsec.has-side {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  grid-template-areas: "pill pill" "note note" "table img";
+  column-gap: 18px;
+  align-items: start;
+}
+.rm-pqsec.has-side > .rm-pqpill { grid-area: pill; justify-self: start; }
+.rm-pqsec.has-side > .rm-pqnote { grid-area: note; }
+.rm-pqsec.has-side > .rm-pqtable { grid-area: table; }
+.rm-pqsec-img {
+  grid-area: img;
+  display: block;
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 14px;
+  margin-top: 30px; /* line up with the first dish, below the SAR | ريال | CAL. titles */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  position: sticky;
+  top: 230px; /* stays beside a long list while scrolling (below the sticky bar) */
+}
+@media (max-width: 639px) {
+  .rm-pqsec.has-side { grid-template-columns: minmax(0, 1fr) 96px; column-gap: 10px; }
+  .rm-pqsec-img { height: 118px; border-radius: 12px; margin-top: 28px; top: 215px; }
+  /* tighter number columns so dish names keep room next to the photo */
+  .rm-pqsec.has-side .rm-pqrow { grid-template-columns: minmax(0, 1fr) 30px 34px 34px 34px; column-gap: 4px; }
+  .rm-pqsec.has-side .rm-pqname { font-size: 0.86rem; }
+  .rm-pqsec.has-side .rm-pqprice, .rm-pqsec.has-side .rm-pqprice-ar { font-size: 0.85rem; }
+  .rm-pqsec.has-side .rm-pqcal { font-size: 0.78rem; }
+  .rm-pqsec.has-side .rm-pqc { font-size: 0.66rem; }
+}
+
+/* day-of-week special: "Today" badge on its heading */
+.rm-pqtoday {
+  display: inline-block;
+  margin-inline-start: 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--pq-hi);
+  color: var(--pq-on);
+  font-size: 0.72rem;
+  font-weight: 800;
+  vertical-align: middle;
+  text-transform: uppercase;
+}
+
+/* restaurant banner (menuFrame.top) above the app bar, e.g. Biryani Nation */
+.rm-pq-banner { background: var(--pq-red); line-height: 0; }
+.rm-pq-banner img { display: block; width: 100%; height: auto; }
+.rm-pq-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--pq-red);
+}
+.rm-pq-pills span {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pq-hi) 70%, transparent);
+  color: var(--pq-on);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
 /* categories without dish photos: no empty circles, the category photo sits at the side */
 .rm-pqsec.no-photos .rm-pqrow.is-more .rm-pqname { padding-inline-start: 14px; }
 .rm-pqsec-img {

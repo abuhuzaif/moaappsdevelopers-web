@@ -1,0 +1,1820 @@
+{
+  "restaurant": {
+    "slug": "kings",
+    "name": "Kings Restaurant",
+    "nameAr": "مطعم كينغز",
+    "tagline": "Hyderabadi Biryani · BBQ · Chaat",
+    "taglineAr": "برياني حيدرآبادي · مشاوي · تشات",
+    "isActive": false,
+    "hidden": true,
+    "menuTheme": {
+      "style": "standard",
+      "accent": "#0f3d2e",
+      "highlight": "#c9a227",
+      "onAccent": "#f5d77a",
+      "bg": "#f7f5ee",
+      "surface": "#ffffff",
+      "text": "#14231c",
+      "muted": "#5d6b63",
+      "line": "#e6e0cc",
+      "accentSoft": "#e8f0ec"
+    },
+    "ordering": {
+      "enabled": false,
+      "types": [
+        "takeaway",
+        "dinein"
+      ]
+    },
+    "menuCategories": [
+      {
+        "id": "soup",
+        "name": "Soups",
+        "nameAr": "شوربة",
+        "sort": 10,
+        "imageFile": "soup.jpg"
+      },
+      {
+        "id": "salad",
+        "name": "Salads",
+        "nameAr": "سلطات",
+        "sort": 20
+      },
+      {
+        "id": "bbq",
+        "name": "BBQ Special",
+        "nameAr": "المشويات",
+        "sort": 30,
+        "imageFile": "bbq.jpg"
+      },
+      {
+        "id": "veg",
+        "name": "Vegetable Special",
+        "nameAr": "أطباق نباتية",
+        "sort": 40,
+        "imageFile": "veg.jpg"
+      },
+      {
+        "id": "chinese",
+        "name": "Chinese Special",
+        "nameAr": "أطباق صينية",
+        "sort": 50
+      },
+      {
+        "id": "mutton",
+        "name": "Mutton Special",
+        "nameAr": "أطباق لحم الضأن",
+        "sort": 60,
+        "imageFile": "mutton.jpg"
+      },
+      {
+        "id": "chicken",
+        "name": "Chicken Special",
+        "nameAr": "أطباق الدجاج",
+        "sort": 70,
+        "imageFile": "chicken.jpg"
+      },
+      {
+        "id": "biryani",
+        "name": "Biryani Special",
+        "nameAr": "برياني",
+        "sort": 80,
+        "imageFile": "biryani.jpg"
+      },
+      {
+        "id": "rice",
+        "name": "Rice",
+        "nameAr": "أرز",
+        "sort": 90
+      },
+      {
+        "id": "chaat",
+        "name": "Kings Special Chaat",
+        "nameAr": "تشات كينغز المميز",
+        "sort": 100,
+        "imageFile": "chaat.jpg"
+      },
+      {
+        "id": "juice",
+        "name": "Kings Fresh Juices",
+        "nameAr": "عصائر كينغز الطازجة",
+        "sort": 110,
+        "imageFile": "juice.jpg"
+      },
+      {
+        "id": "dessert",
+        "name": "Desserts Special",
+        "nameAr": "حلويات",
+        "sort": 120,
+        "imageFile": "dessert.jpg"
+      }
+    ]
+  },
+  "menuItems": [
+    {
+      "id": "soup-chicken-corn-soup",
+      "categoryId": "soup",
+      "sort": 10,
+      "name": "Chicken Corn Soup",
+      "nameAr": "شوربة الدجاج بالذرة",
+      "prices": [
+        {
+          "amount": 10,
+          "cal": 150
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "soup-chicken-hot-sour-soup",
+      "categoryId": "soup",
+      "sort": 20,
+      "name": "Chicken Hot & Sour Soup",
+      "nameAr": "شوربة الدجاج الحارة",
+      "prices": [
+        {
+          "amount": 10,
+          "cal": 150
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "soup-chicken-manchow-soup",
+      "categoryId": "soup",
+      "sort": 30,
+      "name": "Chicken Manchow Soup",
+      "nameAr": "شوربة الدجاج مانشو",
+      "prices": [
+        {
+          "amount": 10,
+          "cal": 150
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "soup-seafood-soup",
+      "categoryId": "soup",
+      "sort": 40,
+      "name": "Seafood Soup",
+      "nameAr": "شوربة المأكولات البحرية",
+      "prices": [
+        {
+          "amount": 12,
+          "cal": 150
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "soup-lentil-soup",
+      "categoryId": "soup",
+      "sort": 50,
+      "name": "Lentil Soup",
+      "nameAr": "شوربة العدس",
+      "prices": [
+        {
+          "amount": 10,
+          "cal": 150
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "soup-creamy-soup",
+      "categoryId": "soup",
+      "sort": 60,
+      "name": "Creamy Soup",
+      "nameAr": "شوربة كريمي",
+      "prices": [
+        {
+          "amount": 10,
+          "cal": 250
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "salad-green-salad",
+      "categoryId": "salad",
+      "sort": 10,
+      "name": "Green Salad",
+      "nameAr": "سلطة خضراء",
+      "prices": [
+        {
+          "amount": 10,
+          "cal": 180
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "salad-russian-salad",
+      "categoryId": "salad",
+      "sort": 20,
+      "name": "Russian Salad",
+      "nameAr": "سلطة روسية",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 180
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "salad-mix-salad",
+      "categoryId": "salad",
+      "sort": 30,
+      "name": "Mix Salad",
+      "nameAr": "سلطة مشكلة",
+      "prices": [
+        {
+          "amount": 10,
+          "cal": 180
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "salad-caesar-salad",
+      "categoryId": "salad",
+      "sort": 40,
+      "name": "Caesar Salad",
+      "nameAr": "سلطة سيزر",
+      "prices": [
+        {
+          "amount": 22,
+          "cal": 180
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "salad-fruit-salad",
+      "categoryId": "salad",
+      "sort": 50,
+      "name": "Fruit Salad",
+      "nameAr": "سلطة الفاكهة",
+      "prices": [
+        {
+          "amount": 15,
+          "cal": 180
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-chicken-tikka-1-pc",
+      "categoryId": "bbq",
+      "sort": 10,
+      "name": "Chicken Tikka (1 pc)",
+      "nameAr": "دجاج تيكا قطعة واحدة",
+      "prices": [
+        {
+          "amount": 12,
+          "cal": 250
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-chicken-angara-kabab",
+      "categoryId": "bbq",
+      "sort": 20,
+      "name": "Chicken Angara Kabab",
+      "nameAr": "كباب دجاج أنغارا",
+      "prices": [
+        {
+          "amount": 22,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-chicken-afghani-kabab",
+      "categoryId": "bbq",
+      "sort": 30,
+      "name": "Chicken Afghani Kabab",
+      "nameAr": "كباب دجاج أفغاني",
+      "prices": [
+        {
+          "amount": 22,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-chicken-lasuni-kabab",
+      "categoryId": "bbq",
+      "sort": 40,
+      "name": "Chicken Lasuni Kabab",
+      "nameAr": "كباب دجاج لاسوني",
+      "prices": [
+        {
+          "amount": 24,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-chicken-kabab",
+      "categoryId": "bbq",
+      "sort": 50,
+      "name": "Chicken Kabab",
+      "nameAr": "كباب دجاج",
+      "prices": [
+        {
+          "amount": 24,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-chicken-seekh-kabab",
+      "categoryId": "bbq",
+      "sort": 60,
+      "name": "Chicken Seekh Kabab",
+      "nameAr": "كباب شيش الدجاج",
+      "prices": [
+        {
+          "amount": 24,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-mutton-seekh-kabab",
+      "categoryId": "bbq",
+      "sort": 70,
+      "name": "Mutton Seekh Kabab",
+      "nameAr": "كباب شيش لحم الضأن",
+      "prices": [
+        {
+          "amount": 22,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-haryali-boti-kabab",
+      "categoryId": "bbq",
+      "sort": 80,
+      "name": "Haryali Boti Kabab",
+      "nameAr": "كباب هاريالي بوتي",
+      "prices": [
+        {
+          "amount": 22,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-banjara-kabab",
+      "categoryId": "bbq",
+      "sort": 90,
+      "name": "Banjara Kabab",
+      "nameAr": "كباب بانجارا",
+      "prices": [
+        {
+          "amount": 22,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-mutton-chops",
+      "categoryId": "bbq",
+      "sort": 100,
+      "name": "Mutton Chops",
+      "nameAr": "ريش لحم الضأن",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-bihari-kabab",
+      "categoryId": "bbq",
+      "sort": 110,
+      "name": "Bihari Kabab",
+      "nameAr": "كباب بيهاري",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-chicken-tangdi-kabab",
+      "categoryId": "bbq",
+      "sort": 120,
+      "name": "Chicken Tangdi Kabab",
+      "nameAr": "كباب دجاج تانغدي",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-mix-bbq-platter",
+      "categoryId": "bbq",
+      "sort": 130,
+      "name": "Mix BBQ Platter",
+      "nameAr": "طبق مشاوي مشكلة",
+      "prices": [
+        {
+          "amount": 90,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-grilled-prawns",
+      "categoryId": "bbq",
+      "sort": 140,
+      "name": "Grilled Prawns",
+      "nameAr": "روبيان مشوي",
+      "prices": [
+        {
+          "amount": 35,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "bbq-paneer-tikka",
+      "categoryId": "bbq",
+      "sort": 150,
+      "name": "Paneer Tikka",
+      "nameAr": "بانير تيكا",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-paneer-butter-masala",
+      "categoryId": "veg",
+      "sort": 10,
+      "name": "Paneer Butter Masala",
+      "nameAr": "بانير بالزبدة ماسالا",
+      "prices": [
+        {
+          "amount": 24,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-palak-paneer",
+      "categoryId": "veg",
+      "sort": 20,
+      "name": "Palak Paneer",
+      "nameAr": "بالاك بانير",
+      "prices": [
+        {
+          "amount": 24,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-paneer-dewani-handi",
+      "categoryId": "veg",
+      "sort": 30,
+      "name": "Paneer Dewani Handi",
+      "nameAr": "بانير ديواني هاندي",
+      "prices": [
+        {
+          "amount": 24,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-vegetable-kadai",
+      "categoryId": "veg",
+      "sort": 40,
+      "name": "Vegetable Kadai",
+      "nameAr": "كاداي الخضار",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-vegetable-makhani",
+      "categoryId": "veg",
+      "sort": 50,
+      "name": "Vegetable Makhani",
+      "nameAr": "خضار ماخاني",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-aalu-methi-matar",
+      "categoryId": "veg",
+      "sort": 60,
+      "name": "Aalu Methi Matar",
+      "nameAr": "ألو ميثي ماتار",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-vegetable-kolhapuri",
+      "categoryId": "veg",
+      "sort": 70,
+      "name": "Vegetable Kolhapuri",
+      "nameAr": "خضار كولهابوري",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-dal-tadka",
+      "categoryId": "veg",
+      "sort": 80,
+      "name": "Dal Tadka",
+      "nameAr": "دال تادكا",
+      "prices": [
+        {
+          "amount": 15,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-dal-makhani",
+      "categoryId": "veg",
+      "sort": 90,
+      "name": "Dal Makhani",
+      "nameAr": "دال ماخاني",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 12,
+          "cal": 450
+        },
+        {
+          "label": "full",
+          "amount": 20,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-veg-manchurian-dry-gravy",
+      "categoryId": "veg",
+      "sort": 100,
+      "name": "Veg Manchurian (Dry / Gravy)",
+      "nameAr": "مانشوريا الخضار جاف/مرق",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-chilli-paneer-dry-gravy",
+      "categoryId": "veg",
+      "sort": 110,
+      "name": "Chilli Paneer (Dry / Gravy)",
+      "nameAr": "بانير تشيلي جاف/مرق",
+      "prices": [
+        {
+          "amount": 24,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-crispy-veg",
+      "categoryId": "veg",
+      "sort": 120,
+      "name": "Crispy Veg",
+      "nameAr": "خضار مقرمشة",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-paneer-65",
+      "categoryId": "veg",
+      "sort": 130,
+      "name": "Paneer 65",
+      "nameAr": "بانير ٦٥",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "veg-french-fries",
+      "categoryId": "veg",
+      "sort": 140,
+      "name": "French Fries",
+      "nameAr": "بطاطس مقلية",
+      "prices": [
+        {
+          "amount": 10,
+          "cal": 500
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-chicken-soft-noodles",
+      "categoryId": "chinese",
+      "sort": 10,
+      "name": "Chicken Soft Noodles",
+      "nameAr": "نودلز دجاج طرية",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 15,
+          "cal": 450
+        },
+        {
+          "label": "full",
+          "amount": 24,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-schezwan-noodles",
+      "categoryId": "chinese",
+      "sort": 20,
+      "name": "Schezwan Noodles",
+      "nameAr": "نودلز سيشوان",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 15,
+          "cal": 580
+        },
+        {
+          "label": "full",
+          "amount": 25,
+          "cal": 580
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-egg-noodles",
+      "categoryId": "chinese",
+      "sort": 30,
+      "name": "Egg Noodles",
+      "nameAr": "نودلز بالبيض",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 12,
+          "cal": 520
+        },
+        {
+          "label": "full",
+          "amount": 20,
+          "cal": 520
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-chicken-singapore-noodles",
+      "categoryId": "chinese",
+      "sort": 40,
+      "name": "Chicken Singapore Noodles",
+      "nameAr": "نودلز دجاج سنغافوري",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 15,
+          "cal": 580
+        },
+        {
+          "label": "full",
+          "amount": 25,
+          "cal": 580
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-vegetable-soft-noodles",
+      "categoryId": "chinese",
+      "sort": 50,
+      "name": "Vegetable Soft Noodles",
+      "nameAr": "نودلز طرية بالخضار",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 14,
+          "cal": 450
+        },
+        {
+          "label": "full",
+          "amount": 22,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-italian-noodles",
+      "categoryId": "chinese",
+      "sort": 60,
+      "name": "Italian Noodles",
+      "nameAr": "المعكرونة الإيطالية",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 15,
+          "cal": 480
+        },
+        {
+          "label": "full",
+          "amount": 25,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-butter-garlic-chicken",
+      "categoryId": "chinese",
+      "sort": 70,
+      "name": "Butter Garlic Chicken",
+      "nameAr": "دجاج بالزبدة والثوم",
+      "prices": [
+        {
+          "amount": 22,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-chilli-chicken",
+      "categoryId": "chinese",
+      "sort": 80,
+      "name": "Chilli Chicken",
+      "nameAr": "دجاج بالفلفل الحار",
+      "prices": [
+        {
+          "amount": 22,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-chicken-65-pro",
+      "categoryId": "chinese",
+      "sort": 90,
+      "name": "Chicken 65 Pro",
+      "nameAr": "تشيكن ٦٥ برو",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-dragon-chicken",
+      "categoryId": "chinese",
+      "sort": 100,
+      "name": "Dragon Chicken",
+      "nameAr": "دجاج التنين",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-chicken-lollipop",
+      "categoryId": "chinese",
+      "sort": 110,
+      "name": "Chicken Lollipop",
+      "nameAr": "مصاصات الدجاج",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 460
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-pepper-chicken",
+      "categoryId": "chinese",
+      "sort": 120,
+      "name": "Pepper Chicken",
+      "nameAr": "دجاج بالفلفل",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 460
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-kaju-chicken",
+      "categoryId": "chinese",
+      "sort": 130,
+      "name": "Kaju Chicken",
+      "nameAr": "دجاج كاجو",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 460
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-kings-special-chicken-dry",
+      "categoryId": "chinese",
+      "sort": 140,
+      "name": "Kings Special Chicken (Dry)",
+      "nameAr": "دجاج \"كينغز\" المميز",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chinese-napoleon-chicken",
+      "categoryId": "chinese",
+      "sort": 150,
+      "name": "Napoleon Chicken",
+      "nameAr": "دجاج نابليون",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-mutton-matka",
+      "categoryId": "mutton",
+      "sort": 10,
+      "name": "Mutton Matka",
+      "nameAr": "لحم ضأن ماتكا",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 550
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-mutton-hyderabadi",
+      "categoryId": "mutton",
+      "sort": 20,
+      "name": "Mutton Hyderabadi",
+      "nameAr": "لحم ضأن حيدرآبادي",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 580
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-mutton-chatpata",
+      "categoryId": "mutton",
+      "sort": 30,
+      "name": "Mutton Chatpata",
+      "nameAr": "لحم ضأن تشاتباتا",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-mutton-hara-masala",
+      "categoryId": "mutton",
+      "sort": 40,
+      "name": "Mutton Hara Masala",
+      "nameAr": "لحم ضأن هارا ماسالا",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 350
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-mutton-roghan-gosh",
+      "categoryId": "mutton",
+      "sort": 50,
+      "name": "Mutton Roghan Gosh",
+      "nameAr": "لحم ضأن روغن جوش",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 520
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-mutton-angara",
+      "categoryId": "mutton",
+      "sort": 60,
+      "name": "Mutton Angara",
+      "nameAr": "لحم ضأن أنغارا",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-mutton-kadai",
+      "categoryId": "mutton",
+      "sort": 70,
+      "name": "Mutton Kadai",
+      "nameAr": "لحم ضأن كاداي",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-mutton-changezi-masala",
+      "categoryId": "mutton",
+      "sort": 80,
+      "name": "Mutton Changezi Masala",
+      "nameAr": "لحم ضأن تشانغزاي ماسالا",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 650
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-mutton-changezi",
+      "categoryId": "mutton",
+      "sort": 90,
+      "name": "Mutton Changezi",
+      "nameAr": "لحم ضأن تشانغازي",
+      "prices": [
+        {
+          "amount": 35,
+          "cal": 550
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-mutton-pepper",
+      "categoryId": "mutton",
+      "sort": 100,
+      "name": "Mutton Pepper",
+      "nameAr": "لحم ضأن بالفلفل",
+      "prices": [
+        {
+          "amount": 32,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-mutton-roast",
+      "categoryId": "mutton",
+      "sort": 110,
+      "name": "Mutton Roast",
+      "nameAr": "لحم ضأن مشوي",
+      "prices": [
+        {
+          "amount": 32,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-mutton-fry",
+      "categoryId": "mutton",
+      "sort": 120,
+      "name": "Mutton Fry",
+      "nameAr": "لحم ضأن مقلي",
+      "prices": [
+        {
+          "amount": 32,
+          "cal": 550
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-mutton-bhuna",
+      "categoryId": "mutton",
+      "sort": 130,
+      "name": "Mutton Bhuna",
+      "nameAr": "لحم ضأن بهونا",
+      "prices": [
+        {
+          "amount": 32,
+          "cal": 350
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "mutton-kings-special-mutton-rara",
+      "categoryId": "mutton",
+      "sort": 140,
+      "name": "Kings Special Mutton Rara",
+      "nameAr": "\"كينغز\" سبيشال لحم ضأن \"رارا\"",
+      "prices": [
+        {
+          "amount": 32,
+          "cal": 550
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chicken-chicken-zafrani",
+      "categoryId": "chicken",
+      "sort": 10,
+      "name": "Chicken Zafrani",
+      "nameAr": "دجاج زعفراني",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 512
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chicken-chicken-achari-handi",
+      "categoryId": "chicken",
+      "sort": 20,
+      "name": "Chicken Achari Handi",
+      "nameAr": "دجاج أتشاري هاندي",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chicken-chicken-pepper-masala",
+      "categoryId": "chicken",
+      "sort": 30,
+      "name": "Chicken Pepper Masala",
+      "nameAr": "دجاج ماسالا بالفلفل",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 550
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chicken-butter-chicken",
+      "categoryId": "chicken",
+      "sort": 40,
+      "name": "Butter Chicken",
+      "nameAr": "دجاج بالزبدة",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chicken-chicken-tikka-masala",
+      "categoryId": "chicken",
+      "sort": 50,
+      "name": "Chicken Tikka Masala",
+      "nameAr": "دجاج تيكا ماسالا",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chicken-chicken-bbq-masala",
+      "categoryId": "chicken",
+      "sort": 60,
+      "name": "Chicken BBQ Masala",
+      "nameAr": "دجاج ماسالا باربكيو",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chicken-chicken-nawabi",
+      "categoryId": "chicken",
+      "sort": 70,
+      "name": "Chicken Nawabi",
+      "nameAr": "دجاج نوابي",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chicken-chicken-ginger-masala",
+      "categoryId": "chicken",
+      "sort": 80,
+      "name": "Chicken Ginger Masala",
+      "nameAr": "دجاج ماسالا بالزنجبيل",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chicken-chicken-jalfrezi",
+      "categoryId": "chicken",
+      "sort": 90,
+      "name": "Chicken Jalfrezi",
+      "nameAr": "دجاج جالفريزي",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chicken-chicken-dragon",
+      "categoryId": "chicken",
+      "sort": 100,
+      "name": "Chicken Dragon",
+      "nameAr": "دجاج التنين",
+      "prices": [
+        {
+          "amount": 28,
+          "cal": 500
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chicken-chicken-handi",
+      "categoryId": "chicken",
+      "sort": 110,
+      "name": "Chicken Handi",
+      "nameAr": "دجاج هاندي",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chicken-kings-special-chicken",
+      "categoryId": "chicken",
+      "sort": 120,
+      "name": "Kings Special Chicken",
+      "nameAr": "دجاج \"كينغز\" المميز",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chicken-chicken-hara-masala",
+      "categoryId": "chicken",
+      "sort": 130,
+      "name": "Chicken Hara Masala",
+      "nameAr": "دجاج هارا ماسالا",
+      "prices": [
+        {
+          "amount": 25,
+          "cal": 480
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "biryani-mutton-dum-biryani",
+      "categoryId": "biryani",
+      "sort": 10,
+      "name": "Mutton Dum Biryani",
+      "nameAr": "برياني لحم الضأن دم",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 20,
+          "cal": 450
+        },
+        {
+          "label": "full",
+          "amount": 30,
+          "cal": 650
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "biryani-chicken-dum-biryani",
+      "categoryId": "biryani",
+      "sort": 20,
+      "name": "Chicken Dum Biryani",
+      "nameAr": "برياني دجاج دم",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 16,
+          "cal": 350
+        },
+        {
+          "label": "full",
+          "amount": 22,
+          "cal": 650
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "biryani-prawns-biryani",
+      "categoryId": "biryani",
+      "sort": 30,
+      "name": "Prawns Biryani",
+      "nameAr": "برياني الروبيان",
+      "prices": [
+        {
+          "amount": 30,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "biryani-egg-biryani",
+      "categoryId": "biryani",
+      "sort": 40,
+      "name": "Egg Biryani",
+      "nameAr": "برياني البيض",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 350
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "biryani-extra-biryani-rice",
+      "categoryId": "biryani",
+      "sort": 50,
+      "name": "Extra Biryani Rice",
+      "nameAr": "أرز برياني إضافي",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 7,
+          "cal": 450
+        },
+        {
+          "label": "full",
+          "amount": 12,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "rice-zeera-rice",
+      "categoryId": "rice",
+      "sort": 10,
+      "name": "Zeera Rice",
+      "nameAr": "أرز بالكمون",
+      "prices": [
+        {
+          "amount": 12,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "rice-ghee-rice",
+      "categoryId": "rice",
+      "sort": 20,
+      "name": "Ghee Rice",
+      "nameAr": "أرز بالسمن",
+      "prices": [
+        {
+          "amount": 12,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "rice-veg-fried-rice",
+      "categoryId": "rice",
+      "sort": 30,
+      "name": "Veg Fried Rice",
+      "nameAr": "أرز مقلي بالخضار",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "rice-veg-pulao",
+      "categoryId": "rice",
+      "sort": 40,
+      "name": "Veg Pulao",
+      "nameAr": "بولاو الخضار",
+      "prices": [
+        {
+          "amount": 20,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "rice-chicken-fried-rice",
+      "categoryId": "rice",
+      "sort": 50,
+      "name": "Chicken Fried Rice",
+      "nameAr": "أرز مقلي بالدجاج",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 15,
+          "cal": 450
+        },
+        {
+          "label": "full",
+          "amount": 25,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "rice-schezwan-fried-rice",
+      "categoryId": "rice",
+      "sort": 60,
+      "name": "Schezwan Fried Rice",
+      "nameAr": "أرز مقلي سيشوان",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 20,
+          "cal": 450
+        },
+        {
+          "label": "full",
+          "amount": 25,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "rice-mix-fried-rice",
+      "categoryId": "rice",
+      "sort": 70,
+      "name": "Mix Fried Rice",
+      "nameAr": "أرز مقلي مشكل",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 18,
+          "cal": 450
+        },
+        {
+          "label": "full",
+          "amount": 25,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "rice-curd-rice",
+      "categoryId": "rice",
+      "sort": 80,
+      "name": "Curd Rice",
+      "nameAr": "أرز باللبن",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 10,
+          "cal": 450
+        },
+        {
+          "label": "full",
+          "amount": 20,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chaat-paani-puri-8-pcs",
+      "categoryId": "chaat",
+      "sort": 10,
+      "name": "Paani Puri (8 pcs)",
+      "nameAr": "باني بوري",
+      "prices": [
+        {
+          "amount": 8
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chaat-dahi-puri",
+      "categoryId": "chaat",
+      "sort": 20,
+      "name": "Dahi Puri",
+      "nameAr": "داهي بوري",
+      "prices": [
+        {
+          "amount": 8
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chaat-sev-puri",
+      "categoryId": "chaat",
+      "sort": 30,
+      "name": "Sev Puri",
+      "nameAr": "سيف بوري",
+      "prices": [
+        {
+          "amount": 8
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chaat-bhel-puri",
+      "categoryId": "chaat",
+      "sort": 40,
+      "name": "Bhel Puri",
+      "nameAr": "بيل بوري",
+      "prices": [
+        {
+          "amount": 8
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chaat-samosa-chaat",
+      "categoryId": "chaat",
+      "sort": 50,
+      "name": "Samosa Chaat",
+      "nameAr": "ساموسا شات",
+      "prices": [
+        {
+          "amount": 8
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chaat-aloo-chaat",
+      "categoryId": "chaat",
+      "sort": 60,
+      "name": "Aloo Chaat",
+      "nameAr": "آلو شات",
+      "prices": [
+        {
+          "amount": 8
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "chaat-mix-samosa-chaat",
+      "categoryId": "chaat",
+      "sort": 70,
+      "name": "Mix Samosa Chaat",
+      "nameAr": "تشات مشكل",
+      "prices": [
+        {
+          "amount": 10
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "juice-cocktail-special",
+      "categoryId": "juice",
+      "sort": 10,
+      "name": "Cocktail Special",
+      "nameAr": "كوكتيل خاص",
+      "prices": [
+        {
+          "amount": 8
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "juice-avocado",
+      "categoryId": "juice",
+      "sort": 20,
+      "name": "Avocado",
+      "nameAr": "أفوكادو",
+      "prices": [
+        {
+          "amount": 8
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "juice-orange",
+      "categoryId": "juice",
+      "sort": 30,
+      "name": "Orange",
+      "nameAr": "برتقال",
+      "prices": [
+        {
+          "amount": 8
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "juice-pineapple",
+      "categoryId": "juice",
+      "sort": 40,
+      "name": "Pineapple",
+      "nameAr": "أناناس",
+      "prices": [
+        {
+          "amount": 8
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "juice-saudi-champagne",
+      "categoryId": "juice",
+      "sort": 50,
+      "name": "Saudi Champagne",
+      "nameAr": "شمبانيا سعودية",
+      "prices": [
+        {
+          "amount": 10
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "dessert-gajar-ka-halwa",
+      "categoryId": "dessert",
+      "sort": 10,
+      "name": "Gajar ka Halwa",
+      "nameAr": "حلوى الجزر",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 8,
+          "cal": 650
+        },
+        {
+          "label": "full",
+          "amount": 15,
+          "cal": 650
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "dessert-double-ka-meetha",
+      "categoryId": "dessert",
+      "sort": 20,
+      "name": "Double ka Meetha",
+      "nameAr": "دبل كا ميتا",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 6,
+          "cal": 450
+        },
+        {
+          "label": "full",
+          "amount": 15,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "dessert-qubani-ka-meetha",
+      "categoryId": "dessert",
+      "sort": 30,
+      "name": "Qubani ka Meetha",
+      "nameAr": "حلوى المشمش",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 8,
+          "cal": 650
+        },
+        {
+          "label": "full",
+          "amount": 15,
+          "cal": 650
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "dessert-kaddu-ki-kheer",
+      "categoryId": "dessert",
+      "sort": 40,
+      "name": "Kaddu ki Kheer",
+      "nameAr": "خير اليقطين",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 8,
+          "cal": 350
+        },
+        {
+          "label": "full",
+          "amount": 15,
+          "cal": 350
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "dessert-fruit-custard",
+      "categoryId": "dessert",
+      "sort": 50,
+      "name": "Fruit Custard",
+      "nameAr": "كاسترد الفواكه",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 8,
+          "cal": 450
+        },
+        {
+          "label": "full",
+          "amount": 15,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "dessert-badam-ki-kheer",
+      "categoryId": "dessert",
+      "sort": 60,
+      "name": "Badam ki Kheer",
+      "nameAr": "خير اللوز",
+      "prices": [
+        {
+          "label": "half",
+          "amount": 10,
+          "cal": 350
+        },
+        {
+          "label": "full",
+          "amount": 20,
+          "cal": 350
+        }
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": "dessert-gulab-jamun",
+      "categoryId": "dessert",
+      "sort": 70,
+      "name": "Gulab Jamun",
+      "nameAr": "غلاب جامون",
+      "prices": [
+        {
+          "label": "per pc",
+          "amount": 2,
+          "cal": 450
+        }
+      ],
+      "isAvailable": true
+    }
+  ]
+}
