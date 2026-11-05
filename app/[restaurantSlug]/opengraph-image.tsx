@@ -11,7 +11,7 @@ export const size = { width: 800, height: 420 };
 export const contentType = "image/png";
 export const revalidate = 3600;
 
-type R = { name?: string; tagline?: string; cuisine?: string; city?: string; coverImageUrl?: string; logoUrl?: string };
+type R = { name?: string; tagline?: string; cuisine?: string; city?: string; coverImageUrl?: string; logoUrl?: string; ogImageUrl?: string };
 
 async function getRestaurant(slug: string): Promise<R | null> {
   try {
@@ -51,6 +51,24 @@ async function asDataUrl(url?: string): Promise<string | null> {
 export default async function Image({ params }: { params: Promise<{ restaurantSlug: string }> }) {
   const { restaurantSlug } = await params;
   const r = (await getRestaurant(restaurantSlug)) ?? { name: "Digital Menu" };
+
+  // A ready-made share image (small JPEG, set with scripts/set-image.mjs <slug> og <file>) wins:
+  // WhatsApp shows it reliably — no on-the-fly drawing, no waiting for cover/logo downloads.
+  if (r.ogImageUrl) {
+    try {
+      const res = await fetch(r.ogImageUrl);
+      if (res.ok) {
+        const buf = await res.arrayBuffer();
+        if (buf.byteLength > 1000 && buf.byteLength < 600_000) {
+          return new Response(buf, {
+            headers: { "Content-Type": res.headers.get("content-type") || "image/jpeg", "Cache-Control": "public, max-age=86400, s-maxage=86400" },
+          });
+        }
+      }
+    } catch {
+      /* fall back to the drawn card below */
+    }
+  }
   const [cover, logo] = await Promise.all([asDataUrl(r.coverImageUrl), asDataUrl(r.logoUrl)]);
   const name = r.name ?? "Digital Menu";
   const subtitle = r.tagline || r.cuisine || "Restaurant";

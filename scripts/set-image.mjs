@@ -2,6 +2,7 @@
 //
 //   node scripts/set-image.mjs kings logo  scripts/kings-images/logo.jpg
 //   node scripts/set-image.mjs kings cover scripts/kings-images/cover.jpg top
+//   node scripts/set-image.mjs kings og    scripts/kings-images/og.jpg        (WhatsApp/Facebook share image, 800x420 JPEG)
 //
 // cover: optional 4th value = which part the 220px header shows (top | center | bottom).
 
@@ -12,8 +13,8 @@ import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 
 const [slug, kind, file, position] = process.argv.slice(2);
-if (!slug || !["logo", "cover"].includes(kind) || !file || !existsSync(file)) {
-  console.error("Usage: node scripts/set-image.mjs <slug> <logo|cover> <image file> [top|center|bottom]");
+if (!slug || !["logo", "cover", "og"].includes(kind) || !file || !existsSync(file)) {
+  console.error("Usage: node scripts/set-image.mjs <slug> <logo|cover|og> <image file> [top|center|bottom]");
   process.exit(1);
 }
 initializeApp({
@@ -38,6 +39,7 @@ const url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${enco
 
 const update = { updatedAt: FieldValue.serverTimestamp() };
 if (kind === "logo") update.logoUrl = url;
+else if (kind === "og") update.ogImageUrl = url;
 else {
   update.coverImageUrl = url;
   if (position) update.coverPosition = position === "top" ? "50% 0%" : position === "bottom" ? "50% 100%" : position === "center" ? FieldValue.delete() : position;
