@@ -51,6 +51,9 @@ type Draft = {
   photoCount: number;
 };
 
+/** An ad can be reposted once every 24 hours (keeps the list and our Facebook page free of spam). */
+const REPOST_GAP_MS = 24 * 60 * 60 * 1000;
+
 function readStorage(key: string): string | null {
   try {
     return localStorage.getItem(key);
@@ -107,14 +110,18 @@ function PostListingForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
+  // Repost: same form, prefilled from an existing ad; publishing creates a NEW ad
+  // (top of the list + posted again to Facebook/Instagram) and closes the old one.
+  const repostId = editId ? null : searchParams.get("repost");
+  const loadId = editId ?? repostId;
   const adminPosting = !!user && isAdmin(user);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [step, setStep] = useState(0);
-  const [city, setCity] = useState(editId ? CITIES[0] : "");
+  const [city, setCity] = useState(loadId ? CITIES[0] : "");
   const [category, setCategory] = useState(CATEGORIES[0].key);
   const [subCategory, setSubCategory] = useState(SUB_CATEGORIES[CATEGORIES[0].key][0]);
-  const [categoryChosen, setCategoryChosen] = useState(!!editId);
+  const [categoryChosen, setCategoryChosen] = useState(!!loadId);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
@@ -133,9 +140,9 @@ function PostListingForm() {
   const [pendingPublish, setPendingPublish] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [editLoading, setEditLoading] = useState(!!editId);
+  const [editLoading, setEditLoading] = useState(!!loadId);
   const [notAuthorized, setNotAuthorized] = useState(false);
-  const [draftReady, setDraftReady] = useState(!!editId);
+  const [draftReady, setDraftReady] = useState(!!loadId);
 
   // Tracks whether Title/Description currently came from our own draft
   // template (so switching sub-category keeps updating it) vs. the user
@@ -146,7 +153,7 @@ function PostListingForm() {
   // New ad: restore an unfinished draft, remembered city/phone, and a
   // ?category= preset (Facebook "post for free" CTA). Remember utm_source.
   useEffect(() => {
-    if (editId) return;
+    if (loadId) return;
     let restored: Partial<Draft> | null = null;
     try {
       const raw = readStorage(DRAFT_KEY);
@@ -207,7 +214,7 @@ function PostListingForm() {
 
   // Autosave the text fields of a new ad (photos can't be stored in the browser).
   useEffect(() => {
-    if (editId || !draftReady) return;
+    if (loadId || !draftReady) return;
     const draft: Draft = {
       category,
       subCategory,
@@ -223,19 +230,19 @@ function PostListingForm() {
       photoCount: files.length,
     };
     writeStorage(DRAFT_KEY, JSON.stringify(draft));
-  }, [editId, draftReady, category, subCategory, title, description, price, priceNote, negotiable, city, location, phone, showEmail, files.length]);
+  }, [loadId, draftReady, category, subCategory, title, description, price, priceNote, negotiable, city, location, phone, showEmail, files.length]);
 
   // Edit mode: load the existing listing and prefill the form. Runs once
   // the signed-in user is known, so we can check owner/admin authorization.
   useEffect(() => {
-    if (!editId || loading) return;
+    if (!loadId || loading) return;
     if (!user) {
       setEditLoading(false);
       return;
     }
     (async () => {
       try {
-        const snap = await getDoc(doc(db, "listings", editId));
+        const snap = await getDoc(doc(db, "listings", loadId));
         if (!snap.exists()) {
           setError("This listing no longer exists.");
           setEditLoading(false);
@@ -246,6 +253,24 @@ function PostListingForm() {
           setNotAuthorized(true);
           setEditLoading(false);
           return;
+        }
+        if (repostId && data.userId !== user.uid) {
+          // A repost creates a new ad under the signed-in account, so only the owner may do it.
+          setError("Only the person who posted this ad can repost it.");
+          setNotAuthorized(true);
+          setEditLoading(false);
+          return;
+        }
+        if (repostId) {
+          const created = data.createdAt?.toDate ? data.createdAt.toDate().getTime() : 0;
+          const wait = created + REPOST_GAP_MS - Date.now();
+          if (wait > 0) {
+            const h = Math.ceil(wait / 3600000);
+            setError(`You can repost this ad once every 24 hours. Please try again in about ${h} hour${h === 1 ? "" : "s"}.`);
+            setNotAuthorized(true);
+            setEditLoading(false);
+            return;
+          }
         }
         setCity(data.city ?? CITIES[0]);
         setCategory(data.category ?? CATEGORIES[0].key);
@@ -265,6 +290,7 @@ function PostListingForm() {
         setDescriptionItalic(!!data.descriptionItalic);
         setShowFormatting(!!(data.descriptionColor || data.descriptionBold || data.descriptionItalic));
         setIsDraftAutoFilled(false);
+        if (repostId) setStep(STEPS.length - 1); // straight to the preview: just tap "Repost ad"
       } catch (err: any) {
         setError(err.message ?? "Couldn't load this listing for editing.");
       } finally {
@@ -272,7 +298,7 @@ function PostListingForm() {
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editId, user, loading]);
+  }, [loadId, user, loading]);
 
   // After the Google sign-in popup finishes, publish automatically.
   useEffect(() => {
@@ -499,12 +525,20 @@ function PostListingForm() {
             throw e;
           }
         }
+        if (repostId) {
+          // Close the old ad so the same item isn't listed twice.
+          try {
+            await updateDoc(doc(db, "listings", repostId), { status: "expired" });
+          } catch {
+            /* new ad is live anyway; the old one expires on its own */
+          }
+        }
         writeStorage(DRAFT_KEY, null);
         writeStorage(LAST_CITY_KEY, city);
         if (!adminPosting) writeStorage(LAST_PHONE_KEY, phone.trim());
       }
 
-      track(editId ? "edit_ad_success" : "post_ad_success", {
+      track(editId ? "edit_ad_success" : repostId ? "repost_ad_success" : "post_ad_success", {
         category,
         sub_category: subCategory,
         city,
@@ -543,7 +577,7 @@ function PostListingForm() {
   const coverPhoto = existingImageUrls[0] ?? filePreviews[0] ?? null;
   const isJob = category === "Classifieds" && subCategory === "Jobs";
   const categoryInfo = CATEGORIES.find((c) => c.key === category);
-  const showForm = !loading && !editLoading && !notAuthorized && (!editId || !!user);
+  const showForm = !loading && !editLoading && !notAuthorized && (!loadId || !!user);
 
   return (
     <div className="mk-page">
@@ -595,10 +629,10 @@ function PostListingForm() {
             color: "var(--mk-navy, #06172a)",
           }}
         >
-          {editId ? "Edit your ad" : "Post a free ad"}
+          {editId ? "Edit your ad" : repostId ? "Repost your ad" : "Post a free ad"}
         </h1>
         <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 14.5 }}>
-          {editId ? "Change anything and save." : "Three quick steps. Takes about a minute."}
+          {editId ? "Change anything and save." : repostId ? "Everything is filled in from your ad — check it and tap Repost. It goes back to the top." : "Three quick steps. Takes about a minute."}
         </p>
       </div>
 
@@ -617,9 +651,9 @@ function PostListingForm() {
           {(loading || editLoading) && <p style={{ margin: 0, color: "var(--text-muted)" }}>Loading…</p>}
 
           {/* Editing needs sign-in up front (we load the owner's listing). New ads don't. */}
-          {!loading && !editLoading && editId && !user && (
+          {!loading && !editLoading && loadId && !user && (
             <div style={{ textAlign: "center", padding: "20px 0" }}>
-              <p style={{ marginBottom: 18, color: "var(--text-muted)", fontSize: 15 }}>Sign in with Google to edit this listing.</p>
+              <p style={{ marginBottom: 18, color: "var(--text-muted)", fontSize: 15 }}>{repostId ? "Sign in with Google to repost your ad." : "Sign in with Google to edit this listing."}</p>
               <button className="mk-btn mk-btn-gold" onClick={() => signInWithGoogle()}>
                 Sign in with Google
               </button>
@@ -627,7 +661,7 @@ function PostListingForm() {
           )}
 
           {!loading && !editLoading && user && notAuthorized && (
-            <div className="empty-state">You don&apos;t have permission to edit this listing.</div>
+            <div className="empty-state">{error && repostId ? error : "You don't have permission to edit this listing."}</div>
           )}
 
           {showForm && (
@@ -637,7 +671,7 @@ function PostListingForm() {
                 {STEPS.map((label, i) => {
                   const done = i < step;
                   const current = i === step;
-                  const canJump = i < step || !!editId;
+                  const canJump = i < step || !!loadId;
                   return (
                     <li key={label} style={{ flex: 1 }}>
                       <button
@@ -1031,12 +1065,16 @@ function PostListingForm() {
                     : submitting
                       ? editId
                         ? "Saving…"
-                        : "Publishing…"
+                        : repostId
+                          ? "Reposting…"
+                          : "Publishing…"
                       : pendingPublish
                         ? "Signing in…"
                         : editId
                           ? "Save changes"
-                          : user
+                          : repostId
+                            ? "🔁 Repost ad"
+                            : user
                             ? "Publish ad"
                             : "Sign in with Google and publish"}
                 </button>

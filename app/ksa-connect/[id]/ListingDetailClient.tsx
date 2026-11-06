@@ -199,10 +199,36 @@ export default function ListingDetailClient({ preview }: { preview?: ListingPrev
         </a>
 
         {canManage && (
-          <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+          <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
             <a href={`/ksa-connect/post?edit=${listing!.id}`} className="btn btn-outline" style={{ fontSize: 13, padding: "8px 16px" }}>
               ✏️ Edit Listing
             </a>
+            {user?.uid === listing!.userId && (() => {
+              // Repost (owner only): once every 24 h (admins any time). Opens the post form prefilled.
+              const c = listing!.createdAt as unknown;
+              const ms =
+                c && typeof (c as { toDate?: () => Date }).toDate === "function"
+                  ? (c as { toDate: () => Date }).toDate().getTime()
+                  : c instanceof Date
+                    ? c.getTime()
+                    : typeof c === "number"
+                      ? c
+                      : typeof c === "string"
+                        ? Date.parse(c)
+                        : 0;
+              const wait = ms ? ms + 24 * 3600000 - Date.now() : 0;
+              const ready = wait <= 0;
+              const hours = Math.ceil(wait / 3600000);
+              return ready ? (
+                <a href={`/ksa-connect/post?repost=${listing!.id}`} className="btn btn-outline" style={{ fontSize: 13, padding: "8px 16px", borderColor: "#16a34a", color: "#15803d" }}>
+                  🔁 Repost
+                </a>
+              ) : (
+                <span className="btn" title={`You can repost this ad once every 24 hours`} style={{ fontSize: 13, padding: "8px 16px", background: "#f1f5f4", color: "#7b8a86", cursor: "default" }}>
+                  🔁 Repost in {hours}h
+                </span>
+              );
+            })()}
             <button onClick={handleDelete} disabled={deleting} className="btn" style={{ fontSize: 13, padding: "8px 16px", background: "#fee2e2", color: "#b91c1c", border: "1px solid #fecaca" }}>
               {deleting ? "Deleting…" : "🗑️ Delete"}
             </button>
