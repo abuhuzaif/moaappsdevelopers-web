@@ -1,4 +1,4 @@
-// Uploads a cover photo for a restaurant and sets `coverImageUrl` on its Firestore doc.
+﻿// Uploads a cover photo for a restaurant and sets `coverImageUrl` on its Firestore doc.
 //
 //   node scripts/set-cover.mjs khana-khazana scripts/khana-khazana-cover.jpg top
 //
@@ -16,7 +16,7 @@ if (!slug || !file || !existsSync(file)) {
   console.error("Usage: node scripts/set-cover.mjs <slug> <image file>");
   process.exit(1);
 }
-const BUCKET = process.env.BUCKET || "riyadhconnect-9520a.appspot.com";
+const BUCKET = process.env.BUCKET || "riyadhconnect-9520a.firebasestorage.app";
 
 initializeApp({
   credential: cert(JSON.parse(readFileSync(new URL("./serviceAccount.json", import.meta.url), "utf8"))),

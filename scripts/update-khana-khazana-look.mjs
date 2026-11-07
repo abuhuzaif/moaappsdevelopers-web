@@ -1,9 +1,9 @@
-// Khana Khazana: PlumQR-style colours + category photos, and (optionally) WhatsApp ordering.
+﻿// Khana Khazana: PlumQR-style colours + category photos, and (optionally) WhatsApp ordering.
 //
-//   node scripts/update-khana-khazana-look.mjs                      → colours + category photos only
-//   node scripts/update-khana-khazana-look.mjs --whatsapp 9665...   → also turns on WhatsApp ordering
+//   node scripts/update-khana-khazana-look.mjs                      â†’ colours + category photos only
+//   node scripts/update-khana-khazana-look.mjs --whatsapp 9665...   â†’ also turns on WhatsApp ordering
 //
-// WhatsApp number: digits only, with 966 in front (05xxxxxxxx → 9665xxxxxxxx).
+// WhatsApp number: digits only, with 966 in front (05xxxxxxxx â†’ 9665xxxxxxxx).
 
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -11,7 +11,7 @@ import { initializeApp, cert } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 
-const BUCKET = process.env.BUCKET || "riyadhconnect-9520a.appspot.com";
+const BUCKET = process.env.BUCKET || "riyadhconnect-9520a.firebasestorage.app";
 const DOC_ID = "khana-khazana";
 const PQR = "https://pqr-items-images-v2.s3.amazonaws.com/";
 
@@ -43,23 +43,23 @@ async function copyImage(srcUrl, destPath) {
 
 // Same names, order and photos as their PlumQR menu
 const CATS = [
-  ["soup", "SOUP", "شوربة", "6a194f1a"],
-  ["bbq", "BBQ", "المشويات", "840c4496"],
-  ["chicken", "CHICKEN", "أطباق الدجاج", "0a2c9538"],
-  ["mutton", "MUTTON", "أطباق اللحم", "7ec26617"],
-  ["rice", "RICE", "أطباق الأرز", "06aed35f"],
-  ["fish", "FISH", "أطباق السمك", "3abe795a"],
-  ["prawn", "PRAWN", "أطباق الروبيان", "1b1c28bd"],
-  ["veg", "VEGETABLE", "أطباق الخضار", "13744136"],
-  ["bread", "BREAD", "خبز", "7f32f8ab"],
-  ["dessert", "DESSERT", "حلويات", "8d38f93b"],
+  ["soup", "SOUP", "Ø´ÙˆØ±Ø¨Ø©", "6a194f1a"],
+  ["bbq", "BBQ", "Ø§Ù„Ù…Ø´ÙˆÙŠØ§Øª", "840c4496"],
+  ["chicken", "CHICKEN", "Ø£Ø·Ø¨Ø§Ù‚ Ø§Ù„Ø¯Ø¬Ø§Ø¬", "0a2c9538"],
+  ["mutton", "MUTTON", "Ø£Ø·Ø¨Ø§Ù‚ Ø§Ù„Ù„Ø­Ù…", "7ec26617"],
+  ["rice", "RICE", "Ø£Ø·Ø¨Ø§Ù‚ Ø§Ù„Ø£Ø±Ø²", "06aed35f"],
+  ["fish", "FISH", "Ø£Ø·Ø¨Ø§Ù‚ Ø§Ù„Ø³Ù…Ùƒ", "3abe795a"],
+  ["prawn", "PRAWN", "Ø£Ø·Ø¨Ø§Ù‚ Ø§Ù„Ø±ÙˆØ¨ÙŠØ§Ù†", "1b1c28bd"],
+  ["veg", "VEGETABLE", "Ø£Ø·Ø¨Ø§Ù‚ Ø§Ù„Ø®Ø¶Ø§Ø±", "13744136"],
+  ["bread", "BREAD", "Ø®Ø¨Ø²", "7f32f8ab"],
+  ["dessert", "DESSERT", "Ø­Ù„ÙˆÙŠØ§Øª", "8d38f93b"],
 ];
 
 const menuCategories = [];
 for (const [n, [id, name, nameAr, img]] of CATS.entries()) {
   const image = await copyImage(`${PQR}${img}.jpeg`, `restaurants/${DOC_ID}/categories/${id}.jpg`);
   menuCategories.push({ id, name, nameAr, sort: (n + 1) * 10, image });
-  console.log(`  category ${name} ✓`);
+  console.log(`  category ${name} âœ“`);
 }
 
 const update = {
@@ -84,5 +84,5 @@ if (whatsapp) {
 }
 
 await db.collection("restaurants").doc(DOC_ID).set(update, { merge: true });
-console.log(whatsapp ? `Done. Ordering ON → WhatsApp ${whatsapp}` : "Done. Ordering still OFF (no --whatsapp given).");
+console.log(whatsapp ? `Done. Ordering ON â†’ WhatsApp ${whatsapp}` : "Done. Ordering still OFF (no --whatsapp given).");
 process.exit(0);

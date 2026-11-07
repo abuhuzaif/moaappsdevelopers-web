@@ -13,15 +13,28 @@ import { track } from "@/lib/analytics";
  */
 
 type Phase = "idle" | "countdown" | "recording" | "paused" | "done";
-type Quality = "720p" | "1080p";
+type Quality = "sharp" | "1080p" | "720p";
 
+// "sharp" records at the screen's real size (no downscaling, up to 4K) — best for tutorials,
+// where small text (menus, file names, URLs) must stay readable. Its bitrate is worked out
+// from the captured size when recording starts.
 const QUALITY: Record<Quality, { width: number; height: number; bitrate: number }> = {
-  "720p": { width: 1280, height: 720, bitrate: 2_500_000 },
-  "1080p": { width: 1920, height: 1080, bitrate: 5_000_000 },
+  sharp: { width: 3840, height: 2160, bitrate: 12_000_000 },
+  "1080p": { width: 1920, height: 1080, bitrate: 8_000_000 },
+  "720p": { width: 1280, height: 720, bitrate: 4_000_000 },
 };
+
+/** Bits per second for a captured size: ~0.15 bit per pixel per frame keeps screen text crisp. */
+function bitrateFor(width: number, height: number, fps: number, cap: number): number {
+  const b = Math.round(width * height * Math.max(15, fps) * 0.15);
+  return Math.max(4_000_000, Math.min(cap, b));
+}
 
 function pickFormat(): { mime: string; ext: "mp4" | "webm" } {
   const candidates: { mime: string; ext: "mp4" | "webm" }[] = [
+    { mime: "video/mp4;codecs=avc1.640033,mp4a.40.2", ext: "mp4" }, // H.264 High — sharper than Baseline, up to 4K
+    { mime: "video/mp4;codecs=avc1.640028,mp4a.40.2", ext: "mp4" }, // H.264 High, up to 1080p
+    { mime: "video/webm;codecs=vp9,opus", ext: "webm" },            // VP9 — very good for screen text
     { mime: "video/mp4;codecs=avc1.42E01E,mp4a.40.2", ext: "mp4" },
     { mime: "video/mp4", ext: "mp4" },
     { mime: "video/webm;codecs=vp9,opus", ext: "webm" },
@@ -55,7 +68,8 @@ export default function ScreenRecorder() {
   const [useMic, setUseMic] = useState(true);
   const [useSystemAudio, setUseSystemAudio] = useState(true);
   const [useWebcam, setUseWebcam] = useState(false);
-  const [quality, setQuality] = useState<Quality>("1080p");
+  const [quality, setQuality] = useState<Quality>("sharp");
+  const bitrateRef = useRef<number | null>(null);
   const [countdown, setCountdown] = useState(3);
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -195,7 +209,10 @@ export default function ScreenRecorder() {
     try {
       const q = QUALITY[quality];
       const options: any = {
-        video: { width: { ideal: q.width }, height: { ideal: q.height }, frameRate: { ideal: 30 } },
+        video:
+          quality === "sharp"
+            ? { width: { max: q.width }, height: { max: q.height }, frameRate: { ideal: 30 } } // the screen's own size
+            : { width: { ideal: q.width }, height: { ideal: q.height }, frameRate: { ideal: 30 } },
         audio: useSystemAudio ? { echoCancellation: false, noiseSuppression: false, autoGainControl: false } : false,
         systemAudio: useSystemAudio ? "include" : "exclude",
         selfBrowserSurface: "exclude",
@@ -208,6 +225,19 @@ export default function ScreenRecorder() {
       return;
     }
     streamsRef.current.push(display);
+
+    // Tell the encoder this is screen content: it keeps text sharp instead of smoothing motion.
+    const screenTrack = display.getVideoTracks()[0];
+    try {
+      if (screenTrack) screenTrack.contentHint = "detail";
+    } catch {}
+    const st = screenTrack?.getSettings?.() ?? {};
+    bitrateRef.current = bitrateFor(
+      Number(st.width) || QUALITY[quality].width,
+      Number(st.height) || QUALITY[quality].height,
+      Number(st.frameRate) || 30,
+      quality === "sharp" ? 16_000_000 : QUALITY[quality].bitrate
+    );
 
     // 3) Microphone (optional; recording continues without it if refused).
     let mic: MediaStream | null = null;
@@ -266,7 +296,7 @@ export default function ScreenRecorder() {
 
   function beginRecording(stream: MediaStream) {
     const { mime, ext } = formatRef.current;
-    const bitrate = QUALITY[quality].bitrate;
+    const bitrate = bitrateRef.current ?? QUALITY[quality].bitrate;
     let rec: MediaRecorder;
     try {
       rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: bitrate } : { videoBitsPerSecond: bitrate });
@@ -435,10 +465,16 @@ export default function ScreenRecorder() {
                 <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--mk-navy, #06172a)" }}>Quality</span>
                 {(Object.keys(QUALITY) as Quality[]).map((q) => (
                   <button key={q} type="button" onClick={() => setQuality(q)} style={chip(quality === q)} aria-pressed={quality === q}>
-                    {q === "1080p" ? "Full HD 1080p" : "HD 720p (smaller file)"}
+                    {q === "sharp" ? "✨ Sharp — screen size (best for tutorials)" : q === "1080p" ? "Full HD 1080p" : "HD 720p (smaller file)"}
                   </button>
                 ))}
               </div>
+              {quality === "sharp" && (
+                <p style={{ margin: "8px 0 0", fontSize: 12.5, color: "#5d6a68", lineHeight: 1.5 }}>
+                  Records your whole screen at full size so small text stays readable. Files are bigger — for long videos choose 1080p.
+                  Tip: zoom the page to 125% (Ctrl +) before recording so text is easier to read on phones.
+                </p>
+              )}
 
               <button type="button" className="mk-btn mk-btn-gold" onClick={start} style={bigBtn}>
                 <span style={{ display: "inline-block", width: 12, height: 12, borderRadius: "50%", background: "#d61f1f", marginRight: 10 }} />

@@ -1,16 +1,16 @@
-// Imports the Khana Khazana menu (taken from their PlumQR page) into Firestore.
+﻿// Imports the Khana Khazana menu (taken from their PlumQR page) into Firestore.
 //
-//   restaurants/khana-khazana                 → restaurant doc (draft: isActive false, hidden true)
-//   restaurants/khana-khazana/menuItems/{id}  → one doc per dish (106 dishes)
-//   Storage: restaurants/khana-khazana/menu/  → dish photos, copied from PlumQR
+//   restaurants/khana-khazana                 â†’ restaurant doc (draft: isActive false, hidden true)
+//   restaurants/khana-khazana/menuItems/{id}  â†’ one doc per dish (106 dishes)
+//   Storage: restaurants/khana-khazana/menu/  â†’ dish photos, copied from PlumQR
 //
 // Run from the repo root:
 //   npm i -D firebase-admin
 //   node scripts/seed-khana-khazana.mjs --dry      (only prints, writes nothing)
 //   node scripts/seed-khana-khazana.mjs            (writes to Firestore + Storage)
 //
-// Needs scripts/serviceAccount.json (Firebase Console → Project settings →
-// Service accounts → Generate new private key). Never commit that file.
+// Needs scripts/serviceAccount.json (Firebase Console â†’ Project settings â†’
+// Service accounts â†’ Generate new private key). Never commit that file.
 
 import { readFileSync, existsSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -19,7 +19,7 @@ import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 
 const DRY = process.argv.includes("--dry");
-const BUCKET = process.env.BUCKET || "riyadhconnect-9520a.appspot.com"; // or riyadhconnect-9520a.firebasestorage.app
+const BUCKET = process.env.BUCKET || "riyadhconnect-9520a.firebasestorage.app"; // or riyadhconnect-9520a.firebasestorage.app
 const DOC_ID = "khana-khazana";
 
 const data = JSON.parse(readFileSync(new URL("./khana-khazana-menu.json", import.meta.url), "utf8"));
@@ -55,7 +55,7 @@ async function copyImage(srcUrl, destPath) {
 const r = data.restaurant;
 console.log(`${r.name}: ${r.menuCategories.length} categories, ${data.menuItems.length} dishes${DRY ? " (dry run)" : ""}`);
 
-// ── Restaurant doc (merge, so fields you already filled in by hand are kept) ──
+// â”€â”€ Restaurant doc (merge, so fields you already filled in by hand are kept) â”€â”€
 let logoUrl;
 if (!DRY && r.logoSource) {
   try { logoUrl = await copyImage(r.logoSource, `restaurants/${DOC_ID}/logo.jpg`); }
@@ -69,7 +69,7 @@ if (!DRY) {
   );
 }
 
-// ── Dishes ──
+// â”€â”€ Dishes â”€â”€
 let ok = 0, noPhoto = 0;
 for (const item of data.menuItems) {
   const { sourceImage, plumqrIds, ...fields } = item;
@@ -81,7 +81,7 @@ for (const item of data.menuItems) {
   if (!sourceImage) noPhoto++;
   if (DRY) {
     const price = item.prices.map((p) => (p.label ? `${p.label} ${p.amount}` : p.amount)).join(" / ");
-    console.log(`  [${item.categoryId}] ${item.name} — SAR ${price}${sourceImage ? "" : "  (no photo)"}`);
+    console.log(`  [${item.categoryId}] ${item.name} â€” SAR ${price}${sourceImage ? "" : "  (no photo)"}`);
     continue;
   }
   await db.collection("restaurants").doc(DOC_ID).collection("menuItems").doc(item.id).set(
