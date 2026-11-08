@@ -20,7 +20,43 @@ type DailyVideo = {
   sizeBytes?: number;
   caption?: string;
   trigger?: string;
+  tool?: { status: "working" | "ready" | "failed"; name?: string; slug?: string; url?: string; sizeBytes?: number; caption?: string };
 };
+
+/** One downloadable video with its caption. */
+function VideoBlock({ label, date, name, status, url, sizeBytes, caption, copied, onCopy, empty }: {
+  label: string; date: string; name: string; status?: string; url?: string; sizeBytes?: number; caption?: string;
+  copied: boolean; onCopy: () => void; empty: string;
+}) {
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 180px) minmax(0, 1fr)", gap: 14 }}>
+      {status === "ready" && url ? (
+        <video src={url} controls preload="metadata" style={{ width: "100%", aspectRatio: "9 / 16", borderRadius: 12, background: "#000" }} />
+      ) : (
+        <div style={{ aspectRatio: "9 / 16", borderRadius: 12, background: "#eef2f1", display: "grid", placeItems: "center", color: "#5d6a68", fontSize: 13, textAlign: "center", padding: 10 }}>
+          {status === "working" ? "⏳ Being made…" : status === "failed" ? "⚠️ Failed" : empty}
+        </div>
+      )}
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, color: "#005744" }}>{label}</div>
+        <div style={{ fontWeight: 800, margin: "2px 0 8px" }}>{name}{sizeBytes ? <span style={{ fontWeight: 500, color: "#5d6a68", fontSize: 13 }}> · {(sizeBytes / 1e6).toFixed(1)} MB</span> : null}</div>
+        {status === "ready" && url && (
+          <a href={url} download={`myksa-${label.toLowerCase().replace(/\W+/g, "-")}-${date}.mp4`} style={{ display: "inline-block", padding: "9px 14px", borderRadius: 10, background: "#f6b91f", color: "#0c1730", fontWeight: 800, textDecoration: "none", marginBottom: 10 }}>
+            ⬇ Download
+          </a>
+        )}
+        {caption && (
+          <>
+            <textarea readOnly value={caption} rows={7} style={{ width: "100%", fontSize: 13, padding: 10, borderRadius: 10, border: "1px solid #dfe7e3", fontFamily: "inherit", resize: "vertical" }} />
+            <button onClick={onCopy} style={{ marginTop: 6, padding: "7px 13px", borderRadius: 10, border: "1px solid #005744", background: "#fff", color: "#005744", fontWeight: 800, cursor: "pointer" }}>
+              {copied ? "✓ Copied" : "Copy caption"}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function AdminVideosPage() {
   const { user, loading } = useAuth();
@@ -47,7 +83,7 @@ export default function AdminVideosPage() {
     try {
       const fn = httpsCallable(getFunctions(getApp(), "us-central1"), "makeDailyAdsVideoNow", { timeout: 540_000 });
       const res = (await fn()) as { data: { status: string; count: number } };
-      setMsg(res.data.status === "no-ads" ? "No new ads with photos in the last 24 hours." : `Done — ${res.data.count} ads in the video.`);
+      setMsg(res.data.status === "no-ads" ? "Tool video done. No new ads with photos in the last 24 hours." : `Done — ${res.data.count} ads + tool of the day.`);
     } catch (e) {
       setMsg(`Failed: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
@@ -91,41 +127,24 @@ export default function AdminVideosPage() {
         </button>
       </div>
       <p style={{ margin: "0 0 18px", color: "#5d6a68", fontSize: 14 }}>
-        A new video is made every day at 8:00 PM (Riyadh) from the last 24 hours of ads with photos. Download it, copy the caption, and schedule it in Metricool.
+        Every day at 8:00 PM (Riyadh) two videos are made: the new ads of the last 24 hours, and a "Free tool of the day". Download them, copy the captions, and schedule them in Metricool.
       </p>
       {msg && <p style={{ padding: "10px 12px", borderRadius: 10, background: "#fff8df", color: "#665300", fontSize: 14 }}>{msg}</p>}
       {videos.length === 0 && <p style={{ color: "#5d6a68" }}>No videos yet. The first one arrives tonight at 8 PM, or press “Make today's video now”.</p>}
 
       <div style={{ display: "grid", gap: 18 }}>
         {videos.map((v) => (
-          <section key={v.id} style={{ display: "grid", gridTemplateColumns: "minmax(0, 220px) minmax(0, 1fr)", gap: 16, padding: 14, borderRadius: 16, border: "1px solid #dfe7e3", background: "#fff" }}>
-            <div>
-              {v.status === "ready" && v.url ? (
-                <video src={v.url} controls preload="metadata" style={{ width: "100%", aspectRatio: "9 / 16", borderRadius: 12, background: "#000" }} />
-              ) : (
-                <div style={{ aspectRatio: "9 / 16", borderRadius: 12, background: "#eef2f1", display: "grid", placeItems: "center", color: "#5d6a68", fontSize: 13, textAlign: "center", padding: 10 }}>
-                  {v.status === "working" ? "⏳ Being made…" : "No new ads with photos"}
-                </div>
-              )}
-            </div>
-            <div style={{ minWidth: 0 }}>
-              <h2 style={{ margin: "0 0 4px", fontSize: 18 }}>{v.date}</h2>
-              <p style={{ margin: "0 0 12px", color: "#5d6a68", fontSize: 13 }}>
-                {v.count ?? 0} ads{v.sizeBytes ? ` · ${(v.sizeBytes / 1e6).toFixed(1)} MB` : ""}{v.trigger === "manual" ? " · made manually" : ""}
-              </p>
-              {v.status === "ready" && v.url && (
-                <a href={v.url} download={`myksa-new-ads-${v.date}.mp4`} style={{ display: "inline-block", padding: "10px 16px", borderRadius: 10, background: "#f6b91f", color: "#0c1730", fontWeight: 800, textDecoration: "none", marginBottom: 12 }}>
-                  ⬇ Download video
-                </a>
-              )}
-              {v.caption && (
-                <>
-                  <textarea readOnly value={v.caption} rows={9} style={{ width: "100%", fontSize: 13, padding: 10, borderRadius: 10, border: "1px solid #dfe7e3", fontFamily: "inherit", resize: "vertical" }} />
-                  <button onClick={() => copy(v.caption!, v.id)} style={{ marginTop: 8, padding: "8px 14px", borderRadius: 10, border: "1px solid #005744", background: "#fff", color: "#005744", fontWeight: 800, cursor: "pointer" }}>
-                    {copied === v.id ? "✓ Copied" : "Copy caption"}
-                  </button>
-                </>
-              )}
+          <section key={v.id} style={{ padding: 16, borderRadius: 16, border: "1px solid #dfe7e3", background: "#fff" }}>
+            <h2 style={{ margin: "0 0 12px", fontSize: 18 }}>📅 {v.date}{v.trigger === "manual" ? <span style={{ fontSize: 12, fontWeight: 600, color: "#5d6a68" }}> · made manually</span> : null}</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(380px, 100%), 1fr))", gap: 18 }}>
+              <VideoBlock
+                label="NEW ADS" date={v.date} name={`${v.count ?? 0} new ads`} status={v.status} url={v.url} sizeBytes={v.sizeBytes} caption={v.caption}
+                copied={copied === `${v.id}-ads`} onCopy={() => copy(v.caption ?? "", `${v.id}-ads`)} empty="No new ads with photos"
+              />
+              <VideoBlock
+                label="TOOL OF THE DAY" date={v.date} name={v.tool?.name ?? "—"} status={v.tool?.status} url={v.tool?.url} sizeBytes={v.tool?.sizeBytes} caption={v.tool?.caption}
+                copied={copied === `${v.id}-tool`} onCopy={() => copy(v.tool?.caption ?? "", `${v.id}-tool`)} empty="Not made yet"
+              />
             </div>
           </section>
         ))}
