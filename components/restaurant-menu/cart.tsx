@@ -48,6 +48,15 @@ const t = {
   sentTitle: { en: "Did your order go through on WhatsApp?", ar: "هل تم إرسال طلبك عبر واتساب؟" },
   sentYes: { en: "Yes, clear my order", ar: "نعم، امسح الطلب" },
   sentNo: { en: "No, keep it", ar: "لا، احتفظ به" },
+  adsTitle: { en: "Waiting for your food? Browse free ads 👀", ar: "بانتظار طلبك؟ تصفّح الإعلانات المجانية 👀" },
+  adsSub: {
+    en: "Rooms, jobs, cars & services across Saudi Arabia — new ads every day.",
+    ar: "سكن ووظائف وسيارات وخدمات في جميع أنحاء المملكة — إعلانات جديدة يومياً.",
+  },
+  adsHousing: { en: "Rooms & flats", ar: "سكن" },
+  adsJobs: { en: "Jobs", ar: "وظائف" },
+  adsCars: { en: "Cars", ar: "سيارات" },
+  adsServices: { en: "Services", ar: "خدمات" },
   confirmNote: {
     en: "The restaurant will confirm your order on WhatsApp. Pay at the restaurant.",
     ar: "سيؤكد المطعم طلبك عبر واتساب. الدفع في المطعم.",
@@ -329,6 +338,66 @@ export function CartBar({
 }
 
 // ── Order sheet ─────────────────────────────────────────────
+// Shown after the order is sent to WhatsApp — the customer is now waiting for the food,
+// so this is the best moment to show them the MYKSA Connect ads. utm tags → GA4.
+function AfterOrderAds({ lang }: { lang: Lang }) {
+  const slug = typeof window !== "undefined" ? window.location.pathname.split("/").filter(Boolean)[0] || "" : "";
+  const link = (category?: string) => {
+    const p = new URLSearchParams();
+    if (category) p.set("category", category);
+    p.set("utm_source", `menu_${slug}`);
+    p.set("utm_medium", "restaurant_menu");
+    p.set("utm_campaign", "after_order");
+    return `/ksa-connect?${p.toString()}`;
+  };
+  const chips: { icon: string; label: T; category: string }[] = [
+    { icon: "🏠", label: t.adsHousing, category: "Housing" },
+    { icon: "💼", label: t.adsJobs, category: "Jobs" },
+    { icon: "🚗", label: t.adsCars, category: "Car" },
+    { icon: "🛠️", label: t.adsServices, category: "Services" },
+  ];
+  return (
+    <div
+      style={{
+        marginTop: 18,
+        padding: "16px 14px",
+        borderRadius: 14,
+        background: "#0C1730",
+        color: "#fff",
+        borderTop: "4px solid #E8B84B",
+        textAlign: "start",
+      }}
+    >
+      <p style={{ margin: 0, fontSize: 16, fontWeight: 800, lineHeight: 1.35, color: "#E8B84B" }}>{t.adsTitle[lang]}</p>
+      <p style={{ margin: "4px 0 12px", fontSize: 13, lineHeight: 1.5, color: "rgba(255,255,255,0.78)" }}>{t.adsSub[lang]}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        {chips.map((c) => (
+          <a
+            key={c.category}
+            href={link(c.category)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "10px 12px",
+              borderRadius: 10,
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(232,184,75,0.35)",
+              color: "#fff",
+              fontSize: 13.5,
+              fontWeight: 700,
+              textDecoration: "none",
+            }}
+          >
+            <span aria-hidden style={{ fontSize: 18 }}>{c.icon}</span>
+            {c.label[lang]}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function CartSheet({
   open,
   onClose,
@@ -451,7 +520,12 @@ export function CartSheet({
       preorderDate,
       preorderTime,
     });
-    const waUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`;
+    // Inside the KSA-Connect app (WebView) the app only catches wa.me links, so keep wa.me there.
+    // In browsers use api.whatsapp.com/send: the wa.me landing page shows newer emojis (🧾 🥡) as "�".
+    const inApp = /KSAConnectApp/i.test(navigator.userAgent);
+    const waUrl = inApp
+      ? `https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`
+      : `https://api.whatsapp.com/send?phone=${whatsapp}&text=${encodeURIComponent(msg)}`;
 
     // GA4: count every WhatsApp order per restaurant — proof for restaurants of the orders MYKSA sends them.
     // "beacon" so the hit is still sent when the page navigates away to WhatsApp.
@@ -471,7 +545,7 @@ export function CartSheet({
 
     // Inside the KSA-Connect app (WebView) new tabs don't exist — navigate instead,
     // the app catches wa.me links and opens WhatsApp.
-    if (/KSAConnectApp/i.test(navigator.userAgent)) window.location.href = waUrl;
+    if (inApp) window.location.href = waUrl;
     else window.open(waUrl, "_blank", "noopener");
     setSent(true);
   };
@@ -511,6 +585,7 @@ export function CartSheet({
                 {t.sentNo[lang]}
               </button>
             </div>
+            <AfterOrderAds lang={lang} />
           </div>
         ) : (
           <>
