@@ -148,9 +148,106 @@ export const DRAFT_TEMPLATES: Record<string, Record<string, { title: string; des
       title: "Relocation service available",
       description: "Professional relocation/moving service, safe and timely handling.",
     },
+    "Movers & Packers": {
+      title: "Movers & packers service available",
+      description:
+        "Professional packing and moving service for houses and offices, careful handling of furniture, fair rates.",
+    },
     Cargo: {
       title: "Cargo service available",
       description: "Reliable cargo shipping service, competitive rates.",
+    },
+  },
+  Jobs: {
+    Driver: {
+      title: "Driver job opportunity available",
+      description:
+        "Driver position available, valid Saudi driving license required. Please contact for requirements and details.",
+    },
+    Labour: {
+      title: "Labour job opportunity available",
+      description:
+        "Labour position available, please contact for requirements and details.",
+    },
+    "Domestic Help": {
+      title: "Domestic help needed",
+      description:
+        "Domestic help position available, please contact for requirements and details.",
+    },
+    "Office Staff": {
+      title: "Office staff job opportunity available",
+      description:
+        "Office staff position available, please contact for requirements and details.",
+    },
+    "Delivery Rider": {
+      title: "Delivery rider job opportunity available",
+      description:
+        "Delivery rider position available, please contact for requirements and details.",
+    },
+    Technician: {
+      title: "Technician job opportunity available",
+      description:
+        "Technician position available, please contact for requirements and details.",
+    },
+    Engineer: {
+      title: "Engineer job opportunity available",
+      description:
+        "Engineer position available. Saudi Council of Engineers (SCE) membership preferred. Please contact for requirements and details.",
+    },
+    Doctor: {
+      title: "Doctor job opportunity available",
+      description:
+        "Doctor position available. Valid SCFHS license preferred. Please contact for requirements and details.",
+    },
+    Nurse: {
+      title: "Nurse job opportunity available",
+      description:
+        "Nurse position available. Valid SCFHS license preferred. Please contact for requirements and details.",
+    },
+    Pharmacist: {
+      title: "Pharmacist job opportunity available",
+      description:
+        "Pharmacist position available. Valid SCFHS license preferred. Please contact for requirements and details.",
+    },
+    "Lab Technician": {
+      title: "Lab technician job opportunity available",
+      description:
+        "Lab technician position available. Valid SCFHS license preferred. Please contact for requirements and details.",
+    },
+    Accountant: {
+      title: "Accountant job opportunity available",
+      description:
+        "Accountant position available, please contact for requirements and details.",
+    },
+    "IT Professional": {
+      title: "IT job opportunity available",
+      description:
+        "IT position available, please contact for requirements and details.",
+    },
+    Teacher: {
+      title: "Teacher job opportunity available",
+      description:
+        "Teacher position available, please contact for requirements and details.",
+    },
+    Sales: {
+      title: "Sales job opportunity available",
+      description:
+        "Sales position available, please contact for requirements and details.",
+    },
+    Chef: {
+      title: "Chef / cook job opportunity available",
+      description:
+        "Chef / cook position available, please contact for requirements and details.",
+    },
+    "Security Guard": {
+      title: "Security guard job opportunity available",
+      description:
+        "Security guard position available, please contact for requirements and details.",
+    },
+    Other: {
+      title: "Job opportunity available",
+      description:
+        "Job opening available, please contact for requirements and details.",
     },
   },
   Classifieds: {
