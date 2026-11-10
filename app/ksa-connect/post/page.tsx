@@ -78,6 +78,19 @@ function fixAllCaps(s: string): string {
     .replace(/\b(\d*)(bhk|br|sar|ac|ksa|tv|wifi|suv)\b/gi, (_, d, w) => d + w.toUpperCase());
 }
 
+/**
+ * Saudi mobile → "5XXXXXXXX" (9 digits, the way ads store it; the site/app add +966).
+ * Accepts 05XXXXXXXX, 5XXXXXXXX, +9665XXXXXXXX, 009665XXXXXXXX (spaces/dashes ok).
+ * Anything else (e.g. +91 Indian numbers) → null. Stops spam posted from outside KSA.
+ */
+function saudiMobile(raw: string): string | null {
+  let d = raw.replace(/\D/g, "");
+  if (d.startsWith("00966")) d = d.slice(5);
+  else if (d.startsWith("966")) d = d.slice(3);
+  if (d.startsWith("0")) d = d.slice(1);
+  return /^5\d{8}$/.test(d) ? d : null;
+}
+
 /** Phone numbers belong in the contact field, not the title (also keeps titles clean on FB/IG). */
 function hasPhoneNumber(s: string): boolean {
   return /\d[\d\s-]{7,}\d/.test(s);
@@ -148,6 +161,15 @@ function PostListingForm() {
   // template (so switching sub-category keeps updating it) vs. the user
   // manually editing it (in which case we stop auto-filling).
   const [isDraftAutoFilled, setIsDraftAutoFilled] = useState(false);
+
+  // GA4 funnel for brand-new ads by regular users only — edits, reposts and
+  // the admin's own posting are left out, so the numbers show real new posters.
+  function funnel(event: string, params: Record<string, unknown> = {}) {
+    if (loadId || adminPosting) return;
+    track(event, { category, ...params });
+  }
+  const openTracked = useRef(false);
+  const resumedFromLogin = useRef(false);
   const [lastDraft, setLastDraft] = useState({ title: "", description: "" });
 
   // New ad: restore an unfinished draft, remembered city/phone, and a
@@ -191,6 +213,7 @@ function PostListingForm() {
       sessionStorage.removeItem(RESUME_KEY);
     } catch {}
     if (resuming && restored) {
+      resumedFromLogin.current = true;
       setStep(2);
       setNotice(
         restored.photoCount
@@ -211,6 +234,16 @@ function PostListingForm() {
     setDraftReady(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Funnel: form opened (once, after auth is known so the admin is skipped).
+  // A return from the Google sign-in redirect counts as a finished login, not a new open.
+  useEffect(() => {
+    if (loading || loadId || openTracked.current) return;
+    openTracked.current = true;
+    if (resumedFromLogin.current) funnel("post_ad_login_success", { method: "redirect" });
+    else funnel("post_ad_open", { signed_in: !!user });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
 
   // Autosave the text fields of a new ad (photos can't be stored in the browser).
   useEffect(() => {
@@ -385,7 +418,11 @@ function PostListingForm() {
     }
     if (!city) return "Choose your city.";
     if (!location.trim()) return "Enter your area or district.";
-    if (phone.replace(/\D/g, "").length < 9) return "Enter a valid contact number.";
+    // Only Saudi mobile numbers (admin may still post a landline copied from an ad)
+    if (!saudiMobile(phone)) {
+      if (!adminPosting) return "Please enter a Saudi mobile number, e.g. 05XXXXXXXX.";
+      if (phone.replace(/\D/g, "").length < 9) return "Enter a valid contact number.";
+    }
     return null;
   }
 
@@ -396,7 +433,6 @@ function PostListingForm() {
   function goToStep(next: number) {
     setError(null);
     setStep(next);
-    track("post_ad_step", { step: next + 1, category });
     scrollToCard();
   }
 
@@ -404,9 +440,11 @@ function PostListingForm() {
     const msg = validateStep(step);
     if (msg) {
       setError(msg);
+      funnel("post_ad_error", { step: step + 1, message: msg.slice(0, 100) });
       return;
     }
     if (step === 1) setTitle((t) => fixAllCaps(t.trim()));
+    funnel("post_ad_step", { step: step + 2 });
     goToStep(step + 1);
   }
 
@@ -417,6 +455,7 @@ function PostListingForm() {
       if (msg) {
         setStep(s);
         setError(msg);
+        funnel("post_ad_error", { step: s + 1, message: msg.slice(0, 100) });
         scrollToCard();
         return;
       }
@@ -425,15 +464,18 @@ function PostListingForm() {
       // Sign in only now, after the form is filled. The draft is already
       // saved, so even a redirect-based sign-in brings the user back here.
       setPendingPublish(true);
+      funnel("post_ad_login_prompt");
       try {
         sessionStorage.setItem(RESUME_KEY, "1");
       } catch {}
       try {
         await signInWithGoogle();
+        funnel("post_ad_login_success", { method: "popup" });
         try {
           sessionStorage.removeItem(RESUME_KEY);
         } catch {}
       } catch {
+        funnel("post_ad_login_failed");
         setPendingPublish(false);
         setError("Sign-in didn't finish. Tap Publish to try again.");
       }
@@ -478,7 +520,7 @@ function PostListingForm() {
         priceNote: negotiable ? null : priceNote.trim() || null,
         negotiable,
         location: location.trim(),
-        phone: phone.trim(),
+        phone: saudiMobile(phone) ?? phone.trim(),
         showEmail: adminPosting ? false : showEmail,
         imageUrls,
         descriptionColor: descriptionColor || null,
@@ -543,9 +585,11 @@ function PostListingForm() {
         sub_category: subCategory,
         city,
         photos: existingImageUrls.length + files.length,
+        by_admin: adminPosting,
       });
       router.push(editId ? `/ksa-connect/${editId}` : "/ksa-connect");
     } catch (err: any) {
+      funnel("post_ad_submit_error", { message: String(err?.code ?? err?.message ?? "unknown").slice(0, 100) });
       setError(err.message ?? "Something went wrong while posting. Please try again.");
     } finally {
       setSubmitting(false);
@@ -1006,7 +1050,7 @@ function PostListingForm() {
                     placeholder="e.g. 05XXXXXXXX"
                     autoComplete="tel"
                   />
-                  <p style={fieldHint}>People can call you or message you on WhatsApp.</p>
+                  <p style={fieldHint}>Saudi mobile number only. People can call you or message you on WhatsApp.</p>
 
                   {!adminPosting && (
                     <label style={checkRow}>
