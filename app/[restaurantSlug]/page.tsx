@@ -10,6 +10,7 @@ const descFont = Playfair_Display({ subsets: ["latin"], weight: ["500", "600"], 
 import RestaurantMenu from "@/components/restaurant-menu/RestaurantMenu";
 import StickyRestaurantBar from "@/components/restaurant-menu/StickyRestaurantBar";
 import AddToHomeScreen from "@/components/restaurant-menu/AddToHomeScreen";
+import ExploreAdsCard from "@/components/restaurant-menu/ExploreAdsCard";
 import {
   getMenuSections,
   parseCategories,
@@ -252,6 +253,9 @@ export default async function RestaurantMenuPage({
         )}
       </div>
 
+      {/* ── Door into the MYKSA Connect ads (slim line) ── */}
+      <ExploreAdsCard slug={restaurant.slug} city={restaurant.city} variant="strip" />
+
       <AddToHomeScreen name={restaurant.name} logoUrl={restaurant.logoUrl} slug={restaurant.slug} />
 
       <StickyRestaurantBar
@@ -344,6 +348,9 @@ export default async function RestaurantMenuPage({
           )}
         </div>
       )}
+
+      {/* ── Door into the MYKSA Connect ads (full card after the menu) ── */}
+      <ExploreAdsCard slug={restaurant.slug} city={restaurant.city} />
 
       <div style={{ textAlign: "center", padding: "20px", borderTop: "1px solid var(--border)" }}>
         <a href="/restaurants" style={{ fontSize: 13, color: "var(--text-muted)" }}>
