@@ -11,6 +11,7 @@ import { Listing, formattedPrice } from "@/lib/types";
 import { timeAgo } from "@/lib/timeago";
 import { useAuth } from "@/lib/useAuth";
 import { ADMIN_EMAILS, isAdmin } from "@/lib/admin";
+import { safetyTipFor } from "@/lib/safetyTips";
 
 const IS_KSA_CONNECT_SITE = process.env.NEXT_PUBLIC_SITE_MODE === "ksaconnect";
 
@@ -300,6 +301,21 @@ export default function ListingDetailClient({ preview }: { preview?: ListingPrev
               <h1 style={{ fontSize: 24, margin: "12px 0 4px" }}>{listing.title}</h1>
               <p style={{ color: "var(--navy)", fontWeight: 800, fontSize: 22, margin: "0 0 8px" }}>{formattedPrice(listing)}</p>
               <p style={{ color: "var(--text-muted)", fontSize: 14 }}>📍 {listing.city} · {listing.location}</p>
+
+              {/* Category-specific safety line, near the top where everyone sees it */}
+              {(() => {
+                const tip = safetyTipFor(listing.category, listing.subCategory);
+                const style = {
+                  display: "block", margin: "10px 0 6px", padding: "8px 12px", borderRadius: 10,
+                  background: "#FEF2F2", border: "1px solid #FCA5A5", color: "#DC2626",
+                  fontWeight: 800, fontSize: 14, lineHeight: 1.45, textAlign: "center",
+                } as const;
+                return tip.href ? (
+                  <a href={tip.href} style={{ ...style, textDecoration: "underline" }}>⚠️ {tip.text}</a>
+                ) : (
+                  <p role="note" style={{ ...style }}>⚠️ {tip.text}</p>
+                );
+              })()}
 
               {/* Share this ad */}
               {(() => {
