@@ -9,6 +9,8 @@ export type CategoryPage = {
   emoji: string;
   title: (city: string) => string; // <title> and H1
   intro: (city: string) => string; // short paragraph under the H1
+  // Ads filed somewhere else that also belong here (e.g. Classifieds › Jobs → Jobs page)
+  extra?: { category: string; subCategory: string }[];
 };
 
 export const CATEGORY_PAGES: CategoryPage[] = [
@@ -24,6 +26,7 @@ export const CATEGORY_PAGES: CategoryPage[] = [
     slug: "jobs",
     key: "Jobs",
     emoji: "💼",
+    extra: [{ category: "Classifieds", subCategory: "Jobs" }],
     title: (c) => `Jobs in ${c}`,
     intro: (c) =>
       `New job openings in ${c}: drivers, technicians, engineers, nurses, office staff, sales and more. Contact employers directly. Never pay any fee for a job or visa.`,
@@ -91,4 +94,11 @@ export function categoryPageBySlug(slug: string): CategoryPage | undefined {
 
 export function categoryPageByKey(key: string): CategoryPage | undefined {
   return CATEGORY_PAGES.find((p) => p.key === key);
+}
+
+/** Every landing page an ad belongs to (its own category, plus e.g. Jobs for Classifieds › Jobs). */
+export function categoryPagesForAd(category?: string, subCategory?: string): CategoryPage[] {
+  return CATEGORY_PAGES.filter(
+    (p) => p.key === category || (p.extra ?? []).some((e) => e.category === category && e.subCategory === subCategory),
+  );
 }

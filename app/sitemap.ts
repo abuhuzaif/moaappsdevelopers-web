@@ -3,7 +3,7 @@ import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { SEO_POSTS } from "@/lib/seoContent";
 import { CITIES, citySlug } from "@/lib/categories";
-import { categoryPageByKey } from "@/lib/categoryPages";
+import { categoryPagesForAd } from "@/lib/categoryPages";
 
 async function getBlogSlugs(): Promise<string[]> {
   try {
@@ -16,14 +16,14 @@ async function getBlogSlugs(): Promise<string[]> {
 
 // Active listings (newest first is not guaranteed without an index, so we sort here),
 // with their date so Google knows what's new.
-async function getActiveListings(): Promise<{ id: string; date?: Date; city?: string; category?: string }[]> {
+async function getActiveListings(): Promise<{ id: string; date?: Date; city?: string; category?: string; subCategory?: string }[]> {
   try {
     const q = query(collection(db, "listings"), where("status", "==", "active"), limit(500));
     const snap = await getDocs(q);
     return snap.docs.map((d) => {
       const c = d.get("createdAt");
       const date = c && typeof c.toDate === "function" ? (c.toDate() as Date) : undefined;
-      return { id: d.id, date, city: d.get("city") as string | undefined, category: d.get("category") as string | undefined };
+      return { id: d.id, date, city: d.get("city") as string | undefined, category: d.get("category") as string | undefined, subCategory: d.get("subCategory") as string | undefined };
     });
   } catch {
     return [];
@@ -79,15 +79,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const cityCategoryUrls = new Map<string, Date | undefined>();
     for (const l of listings) {
       if (!l.city || !l.category || !CITIES.includes(l.city)) continue;
-      const page = categoryPageByKey(l.category);
-      if (!page) continue;
-      const url = `${base}/ksa-connect/city/${citySlug(l.city)}/${page.slug}`;
-      const prev = cityCategoryUrls.get(url);
-      if (!prev || (l.date && l.date > prev)) cityCategoryUrls.set(url, l.date ?? prev);
-      // All-Saudi category page (/ksa-connect/category/jobs)
-      const catUrl = `${base}/ksa-connect/category/${page.slug}`;
-      const prevCat = cityCategoryUrls.get(catUrl);
-      if (!prevCat || (l.date && l.date > prevCat)) cityCategoryUrls.set(catUrl, l.date ?? prevCat);
+      for (const page of categoryPagesForAd(l.category, l.subCategory)) {
+        // City page (/ksa-connect/city/riyadh/jobs) and all-Saudi page (/ksa-connect/category/jobs)
+        for (const url of [`${base}/ksa-connect/city/${citySlug(l.city)}/${page.slug}`, `${base}/ksa-connect/category/${page.slug}`]) {
+          const prev = cityCategoryUrls.get(url);
+          if (!prev || (l.date && l.date > prev)) cityCategoryUrls.set(url, l.date ?? prev);
+        }
+      }
     }
 
     // No trailing slashes: the site serves /tools/pdf-to-word (a "/" at the end
