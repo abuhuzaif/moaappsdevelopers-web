@@ -8,7 +8,8 @@ import { collection, getDocs, limit, onSnapshot, orderBy, query, where } from "f
 import { db, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
 import { Listing, formattedPrice } from "@/lib/types";
-import { REGIONS } from "@/lib/categories";
+import { REGIONS, citySlug } from "@/lib/categories";
+import { categoryPageByKey } from "@/lib/categoryPages";
 import { timeAgo } from "@/lib/timeago";
 
 const CITY_OPTIONS = [
@@ -742,20 +743,21 @@ export default function KsaConnectPage() {
               const countText = count > 0 ? `${count} ad${count === 1 ? "" : "s"}` : "Be the first to post →";
               const selected = cities.has(city.value) || (city.value === "Madinah" && cities.has("Madina"));
               return (
-                <button
+                // Real link to the city page (/ksa-connect/city/riyadh): own URL for Google,
+                // shareable on WhatsApp, and the Back button returns here.
+                <a
                   key={city.value}
-                  type="button"
+                  href={`/ksa-connect/city/${citySlug(city.value)}`}
                   className="mk-city-card"
-                  aria-pressed={selected}
-                  onClick={() => {
-                    setCities(new Set([city.value]));
-                    document.getElementById("listings")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }}
+                  aria-current={selected ? "page" : undefined}
+                  title={`${city.label} ads`}
                   style={{
                     backgroundImage: `linear-gradient(180deg, rgba(2,24,34,.02) 35%, rgba(2,12,20,.9) 100%), url('/images/cities/${city.image}.jpg')`,
                     border: selected ? "2px solid #f6b91f" : undefined,
                     cursor: "pointer",
                     textAlign: "left",
+                    display: "block",
+                    textDecoration: "none",
                   }}
                 >
                   <span aria-hidden="true" style={{ position: "absolute", top: 8, left: 8, width: 23, height: 23, display: "grid", placeItems: "center", borderRadius: "50%", background: "#005744", color: "#fff", fontSize: 12, fontWeight: 800 }}>{index + 1}</span>
@@ -763,7 +765,7 @@ export default function KsaConnectPage() {
                     ● &nbsp;{city.label}
                     <small style={{ display: "block", fontSize: 12, fontWeight: 600, opacity: 0.9, marginTop: 2 }}>{countText}</small>
                   </span>
-                </button>
+                </a>
               );
             })}
           </div>
@@ -797,20 +799,17 @@ export default function KsaConnectPage() {
                     const count = cityCounts[city] ?? 0;
                     const selected = cities.has(city);
                     return (
-                      <button
+                      <a
                         key={city}
-                        type="button"
-                        aria-pressed={selected}
+                        href={`/ksa-connect/city/${citySlug(city)}`}
+                        aria-current={selected ? "page" : undefined}
                         title={`View ${city} listings`}
-                        onClick={() => {
-                          setCities(new Set([city]));
-                          document.getElementById("listings")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                        }}
+                        style={{ textDecoration: "none" }}
                       >
                         <span aria-hidden="true">{region.emoji}</span>
                         <span>{city}</span>
                         {count > 0 && <small>{count}</small>}
-                      </button>
+                      </a>
                     );
                   });
                 })()}
@@ -833,10 +832,11 @@ export default function KsaConnectPage() {
                   : selectedSubcategories.size === 0
               );
               return (
-                <button
+                // Real link to the all-Saudi category page (/ksa-connect/category/jobs)
+                <a
                   key={card.title}
-                  type="button"
-                  aria-pressed={selected}
+                  href={`/ksa-connect/category/${categoryPageByKey(card.category)?.slug ?? ""}`}
+                  aria-current={selected ? "page" : undefined}
                   title={`Browse ${card.title} listings`}
                   className={`mk-category-card${selected ? " mk-category-card-active" : ""}`}
                   style={{
@@ -850,11 +850,7 @@ export default function KsaConnectPage() {
                     borderColor: CATEGORY_CARD_STYLES[card.category].border,
                     borderTop: `4px solid ${CATEGORY_CARD_STYLES[card.category].border}`,
                     color: CATEGORY_CARD_STYLES[card.category].accent,
-                  }}
-                  onClick={() => {
-                    setCategories(new Set([card.category]));
-                    setSelectedSubcategories(new Set("subcategories" in card ? card.subcategories : []));
-                    document.getElementById("listings")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    textDecoration: "none",
                   }}
                 >
                   <span
@@ -864,7 +860,7 @@ export default function KsaConnectPage() {
                   >{card.icon}</span>
                   <strong>{card.title}</strong>
                   <small>{card.subtitle}</small>
-                </button>
+                </a>
               );
             })}
           </div>

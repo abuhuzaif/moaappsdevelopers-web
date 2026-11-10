@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CITIES, citySlug } from "@/lib/categories";
+import { CATEGORY_PAGES } from "@/lib/categoryPages";
 import CityListingsClient from "./CityListingsClient";
 
 type Props = {
@@ -42,5 +43,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CityPage({ params }: Props) {
   const { city } = await params;
   const cityValue = slugToCityValue(city);
-  return <CityListingsClient citySlug={city} cityValue={cityValue} />;
+  if (!cityValue) return <CityListingsClient citySlug={city} cityValue={cityValue} />;
+  const cSlug = citySlug(cityValue);
+  return (
+    <>
+      {/* Links to the category pages of this city (server-rendered, so Google follows them) */}
+      <nav
+        aria-label={`Browse ${cityValue} by category`}
+        style={{ maxWidth: 1000, margin: "0 auto", padding: "14px 16px 0", display: "flex", gap: 8, flexWrap: "wrap" }}
+      >
+        {CATEGORY_PAGES.map((p) => (
+          <a key={p.slug} href={`/ksa-connect/city/${cSlug}/${p.slug}`} className="pill" style={{ textDecoration: "none" }}>
+            {p.emoji} {p.key} in {cityValue}
+          </a>
+        ))}
+      </nav>
+      <CityListingsClient citySlug={city} cityValue={cityValue} />
+    </>
+  );
 }

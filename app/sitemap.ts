@@ -3,6 +3,7 @@ import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { SEO_POSTS } from "@/lib/seoContent";
 import { CITIES, citySlug } from "@/lib/categories";
+import { categoryPageByKey } from "@/lib/categoryPages";
 
 async function getBlogSlugs(): Promise<string[]> {
   try {
@@ -15,14 +16,14 @@ async function getBlogSlugs(): Promise<string[]> {
 
 // Active listings (newest first is not guaranteed without an index, so we sort here),
 // with their date so Google knows what's new.
-async function getActiveListings(): Promise<{ id: string; date?: Date }[]> {
+async function getActiveListings(): Promise<{ id: string; date?: Date; city?: string; category?: string }[]> {
   try {
     const q = query(collection(db, "listings"), where("status", "==", "active"), limit(500));
     const snap = await getDocs(q);
     return snap.docs.map((d) => {
       const c = d.get("createdAt");
       const date = c && typeof c.toDate === "function" ? (c.toDate() as Date) : undefined;
-      return { id: d.id, date };
+      return { id: d.id, date, city: d.get("city") as string | undefined, category: d.get("category") as string | undefined };
     });
   } catch {
     return [];
@@ -73,6 +74,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const allBlogSlugs = [...new Set([...seoSlugs, ...blogSlugs])];
     const now = new Date();
 
+    // City × category landing pages — only the ones that have live ads right now
+    // (empty pages are noindex, so they shouldn't be in the sitemap either).
+    const cityCategoryUrls = new Map<string, Date | undefined>();
+    for (const l of listings) {
+      if (!l.city || !l.category || !CITIES.includes(l.city)) continue;
+      const page = categoryPageByKey(l.category);
+      if (!page) continue;
+      const url = `${base}/ksa-connect/city/${citySlug(l.city)}/${page.slug}`;
+      const prev = cityCategoryUrls.get(url);
+      if (!prev || (l.date && l.date > prev)) cityCategoryUrls.set(url, l.date ?? prev);
+      // All-Saudi category page (/ksa-connect/category/jobs)
+      const catUrl = `${base}/ksa-connect/category/${page.slug}`;
+      const prevCat = cityCategoryUrls.get(catUrl);
+      if (!prevCat || (l.date && l.date > prevCat)) cityCategoryUrls.set(catUrl, l.date ?? prevCat);
+    }
+
     // No trailing slashes: the site serves /tools/pdf-to-word (a "/" at the end
     // only redirects), and Google reports redirecting sitemap URLs as not indexed.
     return [
@@ -86,6 +103,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { url: `${base}/restaurants`, changeFrequency: "daily" as const, priority: 0.8 },
       ...restaurantSlugs.map((slug) => ({ url: `${base}/${slug}`, changeFrequency: "weekly" as const, priority: 0.75 })),
       ...CITIES.map((c) => ({ url: `${base}/ksa-connect/city/${citySlug(c)}`, lastModified: now, changeFrequency: "daily" as const, priority: 0.8 })),
+      ...[...cityCategoryUrls].map(([url, date]) => ({
+        url,
+        ...(date ? { lastModified: date } : {}),
+        changeFrequency: "daily" as const,
+        priority: 0.85,
+      })),
       ...listings.map((l) => ({
         url: `${base}/ksa-connect/${l.id}`,
         ...(l.date ? { lastModified: l.date } : {}),
