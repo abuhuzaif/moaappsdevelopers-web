@@ -13,7 +13,9 @@ import { DRAFT_TEMPLATES } from "@/lib/draftTemplates";
 import { track } from "@/lib/analytics";
 
 const MAX_PHOTOS = 6;
-const LISTING_LIFESPAN_DAYS = 8;
+// How long an ad stays live before the Firestore TTL policy deletes it.
+// Keep the same number in the Flutter app (ListingService).
+const LISTING_LIFESPAN_DAYS = 30;
 const IS_KSA_CONNECT_SITE = process.env.NEXT_PUBLIC_SITE_MODE === "ksaconnect";
 const ADMIN_PUBLIC_NAME = "MYKSA CONNECT";
 const DESCRIPTION_COLORS = [
