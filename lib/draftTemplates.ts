@@ -244,6 +244,11 @@ export const DRAFT_TEMPLATES: Record<string, Record<string, { title: string; des
       description:
         "Security guard position available, please contact for requirements and details.",
     },
+    "Multiple Positions": {
+      title: "Multiple job positions available",
+      description:
+        "Hiring for multiple positions. Please see the list of positions, salary and requirements below, and contact us for details.",
+    },
     Other: {
       title: "Job opportunity available",
       description:

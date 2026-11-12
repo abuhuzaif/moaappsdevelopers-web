@@ -100,6 +100,7 @@ export const SUB_CATEGORIES: Record<string, string[]> = {
     "Sales",
     "Chef",
     "Security Guard",
+    "Multiple Positions",
     "Other",
   ],
   Community: [
