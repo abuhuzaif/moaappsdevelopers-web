@@ -267,7 +267,17 @@ export default function ListingDetailClient({ preview }: { preview?: ListingPrev
           >
             {listing.imageUrls?.length > 0 ? (
               <div>
-                <div style={{ position: "relative", width: "100%", height: 420, background: "#e5e7eb", borderRadius: 14, overflow: "hidden" }}>
+                <div style={{ position: "relative", width: "100%", height: 420, background: "#0C1730", borderRadius: 14, overflow: "hidden" }}>
+                  {/* Auto-fit: the same photo, blurred, fills the whole box behind it — so a tall
+                      poster or a wide photo never leaves grey bars, and nothing is cropped. */}
+                  <Image
+                    src={listing.imageUrls[activeImage]}
+                    alt=""
+                    aria-hidden
+                    fill
+                    sizes="(max-width: 760px) 100vw, 760px"
+                    style={{ objectFit: "cover", filter: "blur(22px) brightness(0.75)", transform: "scale(1.15)" }}
+                  />
                   <Image src={listing.imageUrls[activeImage]} alt={listing.title} fill sizes="(max-width: 760px) 100vw, 760px" style={{ objectFit: "contain" }} priority />
                 </div>
                 {listing.imageUrls.length > 1 && (
