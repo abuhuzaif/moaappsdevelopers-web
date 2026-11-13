@@ -51,7 +51,44 @@ type Draft = {
   phone: string;
   showEmail: boolean;
   photoCount: number;
+  cityOther?: boolean;
+  customJob?: string;
 };
+
+// "Other city" / "Other job" — free text the user types when the list doesn't have it.
+const OTHER_CITY = "__other__";
+const CITY_ALIASES: Record<string, string> = {
+  "al khobar": "Khobar", "al-khobar": "Khobar", alkhobar: "Khobar",
+  "al jubail": "Jubail", "al-jubail": "Jubail",
+  mecca: "Makkah", makka: "Makkah", "makkah al mukarramah": "Makkah",
+  medina: "Madinah", madina: "Madinah", "al madinah": "Madinah",
+  jiddah: "Jeddah", jedda: "Jeddah", "ar riyadh": "Riyadh",
+  hofuf: "Al Ahsa", "al-ahsa": "Al Ahsa", "al hasa": "Al Ahsa", alkharj: "Al Kharj",
+};
+const TEXT_ONLY_RE = /^[\p{L} .'-]{2,30}$/u;
+const JOB_TEXT_RE = /^[\p{L}\p{N} .&/()'-]{2,40}$/u;
+
+function tidy(raw: string): string {
+  return raw.trim().replace(/\s+/g, " ");
+}
+
+/** "riyadh" → "Riyadh", "al khobar" → "Khobar", "dawadmi" → "Dawadmi" (new city kept as typed, nicely cased). */
+function normalizeCity(raw: string): string {
+  const t = tidy(raw);
+  if (!t) return "";
+  const low = t.toLowerCase();
+  return (
+    CITIES.find((c) => c.toLowerCase() === low) ??
+    CITY_ALIASES[low] ??
+    low.replace(/(^|[\s-])\p{L}/gu, (m) => m.toUpperCase())
+  );
+}
+
+/** Job typed under Jobs › Other: keep the user's words, just tidy + capital first letter. */
+function jobLabel(raw: string): string {
+  const t = tidy(raw);
+  return t ? t[0].toUpperCase() + t.slice(1) : "";
+}
 
 /** An ad can be reposted once every 24 hours (keeps the list and our Facebook page free of spam). */
 const REPOST_GAP_MS = 24 * 60 * 60 * 1000;
@@ -145,6 +182,8 @@ function PostListingForm() {
   const [location, setLocation] = useState("");
   const [phone, setPhone] = useState("");
   const [showEmail, setShowEmail] = useState(false);
+  const [cityOther, setCityOther] = useState(false); // city typed by hand
+  const [customJob, setCustomJob] = useState(""); // job typed under Jobs › Other
   const [files, setFiles] = useState<File[]>([]);
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
   const [descriptionColor, setDescriptionColor] = useState("");
@@ -199,12 +238,20 @@ function PostListingForm() {
       setLocation(restored.location ?? "");
       setShowEmail(!!restored.showEmail);
       if (restored.city && CITIES.includes(restored.city)) setCity(restored.city);
+      else if (restored.city) {
+        setCityOther(true);
+        setCity(restored.city);
+      }
+      if (restored.customJob) setCustomJob(restored.customJob);
       if (restored.phone) setPhone(restored.phone);
       setNotice("Your unfinished ad was restored.");
     }
 
     const lastCity = readStorage(LAST_CITY_KEY);
-    if (!restored?.city && lastCity && CITIES.includes(lastCity)) setCity(lastCity);
+    if (!restored?.city && lastCity) {
+      if (!CITIES.includes(lastCity)) setCityOther(true);
+      setCity(lastCity);
+    }
     const lastPhone = readStorage(LAST_PHONE_KEY);
     if (!restored?.phone && lastPhone) setPhone(lastPhone);
 
@@ -263,9 +310,11 @@ function PostListingForm() {
       phone,
       showEmail,
       photoCount: files.length,
+      cityOther,
+      customJob,
     };
     writeStorage(DRAFT_KEY, JSON.stringify(draft));
-  }, [loadId, draftReady, category, subCategory, title, description, price, priceNote, negotiable, city, location, phone, showEmail, files.length]);
+  }, [loadId, draftReady, category, subCategory, title, description, price, priceNote, negotiable, city, location, phone, showEmail, files.length, cityOther, customJob]);
 
   // Edit mode: load the existing listing and prefill the form. Runs once
   // the signed-in user is known, so we can check owner/admin authorization.
@@ -307,9 +356,19 @@ function PostListingForm() {
             return;
           }
         }
-        setCity(data.city ?? CITIES[0]);
-        setCategory(data.category ?? CATEGORIES[0].key);
-        setSubCategory(data.subCategory ?? SUB_CATEGORIES[data.category ?? CATEGORIES[0].key][0]);
+        const loadedCity = data.city ?? CITIES[0];
+        setCity(loadedCity);
+        setCityOther(!CITIES.includes(loadedCity));
+        const loadedCat = data.category ?? CATEGORIES[0].key;
+        setCategory(loadedCat);
+        const loadedSub = data.subCategory ?? SUB_CATEGORIES[loadedCat]?.[0] ?? "";
+        if (loadedCat === "Jobs" && loadedSub && !SUB_CATEGORIES.Jobs.includes(loadedSub)) {
+          // a job typed by hand earlier
+          setSubCategory("Other");
+          setCustomJob(loadedSub);
+        } else {
+          setSubCategory(loadedSub);
+        }
         setCategoryChosen(true);
         setTitle(data.title ?? "");
         setDescription(data.description ?? "");
@@ -401,9 +460,16 @@ function PostListingForm() {
   }
 
   /** Returns an error message for the given step, or null when it's complete. */
+  // What actually gets saved: typed city (tidied / matched to our list) and typed job title.
+  const isOtherJob = category === "Jobs" && subCategory === "Other";
+  const finalCity = cityOther ? normalizeCity(city) : city;
+  const finalSub = isOtherJob && jobLabel(customJob) ? jobLabel(customJob) : subCategory;
+
   function validateStep(s: number): string | null {
     if (s === 0) {
       if (!categoryChosen) return "Choose what you're posting.";
+      if (isOtherJob && customJob.trim() && !JOB_TEXT_RE.test(tidy(customJob)))
+        return "Write the job title in words only, e.g. Welder or CCTV Technician.";
       return null;
     }
     if (s === 1) {
@@ -418,7 +484,9 @@ function PostListingForm() {
       }
       return null;
     }
-    if (!city) return "Choose your city.";
+    if (cityOther) {
+      if (!TEXT_ONLY_RE.test(tidy(city))) return "Type your city name (letters only), e.g. Dawadmi.";
+    } else if (!city) return "Choose your city.";
     if (!location.trim()) return "Enter your area or district.";
     // Only Saudi mobile numbers (admin may still post a landline copied from an ad)
     if (!saudiMobile(phone)) {
@@ -514,8 +582,8 @@ function PostListingForm() {
 
       const commonFields = {
         category,
-        subCategory,
-        city,
+        subCategory: finalSub,
+        city: finalCity,
         title: finalTitle,
         description: description.trim(),
         price: priceNum,
@@ -578,14 +646,14 @@ function PostListingForm() {
           }
         }
         writeStorage(DRAFT_KEY, null);
-        writeStorage(LAST_CITY_KEY, city);
+        writeStorage(LAST_CITY_KEY, finalCity);
         if (!adminPosting) writeStorage(LAST_PHONE_KEY, phone.trim());
       }
 
       track(editId ? "edit_ad_success" : repostId ? "repost_ad_success" : "post_ad_success", {
         category,
-        sub_category: subCategory,
-        city,
+        sub_category: finalSub,
+        city: finalCity,
         photos: existingImageUrls.length + files.length,
         by_admin: adminPosting,
       });
@@ -821,10 +889,26 @@ function PostListingForm() {
                             onClick={() => onSubCategoryChange(s)}
                             aria-pressed={subCategory === s}
                           >
-                            {s}
+                            {s === "Other" && category === "Jobs" ? "✏️ Other (type it)" : s}
                           </button>
                         ))}
                       </div>
+                      {isOtherJob && (
+                        <>
+                          <label style={fieldLabel} htmlFor="post-custom-job">
+                            Job title <span style={optional}>(not in the list? type it here)</span>
+                          </label>
+                          <input
+                            id="post-custom-job"
+                            style={inputStyle}
+                            type="text"
+                            maxLength={40}
+                            placeholder="e.g. Welder, CCTV Technician, Barber"
+                            value={customJob}
+                            onChange={(e) => setCustomJob(e.target.value)}
+                          />
+                        </>
+                      )}
                     </>
                   )}
                 </section>
@@ -836,7 +920,7 @@ function PostListingForm() {
                   <h2 style={stepHeading}>
                     Tell people about it
                     <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-muted)", marginTop: 4 }}>
-                      {categoryInfo?.emoji} {categoryInfo?.label} / {subCategory}
+                      {categoryInfo?.emoji} {categoryInfo?.label} / {finalSub}
                     </span>
                   </h2>
 
@@ -1011,7 +1095,20 @@ function PostListingForm() {
                   <label style={fieldLabel} htmlFor="post-city">
                     City
                   </label>
-                  <select id="post-city" style={{ ...inputStyle, background: "#fff" }} value={city} onChange={(e) => setCity(e.target.value)}>
+                  <select
+                    id="post-city"
+                    style={{ ...inputStyle, background: "#fff" }}
+                    value={cityOther ? OTHER_CITY : city}
+                    onChange={(e) => {
+                      if (e.target.value === OTHER_CITY) {
+                        setCityOther(true);
+                        setCity("");
+                      } else {
+                        setCityOther(false);
+                        setCity(e.target.value);
+                      }
+                    }}
+                  >
                     <option value="" disabled>
                       Choose your city
                     </option>
@@ -1024,7 +1121,20 @@ function PostListingForm() {
                         ))}
                       </optgroup>
                     ))}
+                    <option value={OTHER_CITY}>✏️ Other city (type it)</option>
                   </select>
+                  {cityOther && (
+                    <input
+                      id="post-city-other"
+                      style={{ ...inputStyle, marginTop: 8 }}
+                      type="text"
+                      maxLength={30}
+                      placeholder="Type your city, e.g. Dawadmi"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      autoFocus
+                    />
+                  )}
 
                   <label style={fieldLabel} htmlFor="post-location">
                     Area or district
@@ -1080,7 +1190,7 @@ function PostListingForm() {
                         {negotiable ? "Negotiable" : price ? `SAR ${price}${priceNote ? ` ${priceNote}` : ""}` : "Price not given"}
                       </div>
                       <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 2 }}>
-                        {[location, city].filter(Boolean).join(", ") || "Your area"}
+                        {[location, finalCity].filter(Boolean).join(", ") || "Your area"}
                       </div>
                     </div>
                   </div>
