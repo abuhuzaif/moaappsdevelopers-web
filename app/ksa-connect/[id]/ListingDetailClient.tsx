@@ -12,6 +12,7 @@ import { timeAgo } from "@/lib/timeago";
 import { useAuth } from "@/lib/useAuth";
 import { ADMIN_EMAILS, isAdmin } from "@/lib/admin";
 import { safetyTipFor } from "@/lib/safetyTips";
+import { phoneDisplay, phoneDigits } from "@/lib/contactPhone";
 
 const IS_KSA_CONNECT_SITE = process.env.NEXT_PUBLIC_SITE_MODE === "ksaconnect";
 
@@ -391,13 +392,26 @@ export default function ListingDetailClient({ preview }: { preview?: ListingPrev
                 // post form) and this isn't an admin listing, which never shows
                 // contact details beyond the phone number.
                 const showEmail = !isAdminListing && !!(listing as any).showEmail && !!listing.userEmail;
+                // Optional business name set by the admin in Firestore (e.g. "PATEL INTERNATIONAL TOURISM")
+                const sellerName = String((listing as any).sellerName ?? "").trim();
+
+                if (sellerName) {
+                  return (
+                    <div style={{ marginTop: 10 }}>
+                      <p style={{ margin: 0, fontWeight: 800 }}>🏢 {sellerName}</p>
+                      <p style={{ margin: "2px 0 0", color: "var(--text-muted)", fontSize: 14 }} dir="ltr">
+                        {phoneDisplay(listing.phone)}
+                      </p>
+                    </div>
+                  );
+                }
 
                 if (isAdminListing) {
                   // Admin-posted listings show only the phone number — no name,
                   // no "KSA-Connect Team" label, no avatar.
                   return (
                     <div style={{ marginTop: 10 }}>
-                      <p style={{ margin: 0, fontWeight: 700 }}>+966{listing.phone}</p>
+                      <p style={{ margin: 0, fontWeight: 700 }} dir="ltr">{phoneDisplay(listing.phone)}</p>
                     </div>
                   );
                 }
@@ -415,7 +429,7 @@ export default function ListingDetailClient({ preview }: { preview?: ListingPrev
                     )}
                     <div>
                       <p style={{ margin: 0, fontWeight: 700 }}>{listing.userName}</p>
-                      <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 13 }}>+966{listing.phone}</p>
+                      <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 13 }} dir="ltr">{phoneDisplay(listing.phone)}</p>
                       {showEmail && (
                         <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 13 }}>{listing.userEmail}</p>
                       )}
@@ -426,7 +440,7 @@ export default function ListingDetailClient({ preview }: { preview?: ListingPrev
 
               <div style={{ display: "flex", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
                 <a
-                  href={`tel:+966${listing.phone}`}
+                  href={`tel:+${phoneDigits(listing.phone)}`}
                   onClick={() => track("contact_call", { listing_id: id, category: listing.category, city: listing.city })}
                   style={{
                     flex: "1 1 140px", textAlign: "center", padding: "12px 18px", borderRadius: 12,
@@ -437,7 +451,7 @@ export default function ListingDetailClient({ preview }: { preview?: ListingPrev
                   📞 Call
                 </a>
                 <a
-                  href={`https://wa.me/966${listing.phone.replace(/[^0-9]/g, "")}`}
+                  href={`https://wa.me/${phoneDigits(listing.phone)}`}
                   onClick={() => track("contact_whatsapp", { listing_id: id, category: listing.category, city: listing.city })}
                   target="_blank"
                   rel="noopener noreferrer"
