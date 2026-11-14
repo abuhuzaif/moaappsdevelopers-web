@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 declare global {
   interface Window {
@@ -124,15 +124,26 @@ async function imageToBlob(file: File, mime: string, quality?: number, width?: n
 // PNG (screenshots, documents) stays PNG = lossless; photos use high-quality JPEG.
 // Drawing through a canvas also applies the phone's photo rotation (EXIF).
 const PDF_PAGE_MAX_PT = 595;
-const PDF_IMAGE_MAX_PX = 3000;
+const A4: [number, number] = [595.28, 841.89];
+const A4_MARGIN = 24;
 
-async function imagesToPdf(files: File[], PDFLib: any) {
+// Output clarity choices (Images → PDF / JPG → PDF)
+type PdfQuality = "standard" | "high" | "max";
+const PDF_QUALITY: Record<PdfQuality, { maxPx: number; jpeg: number; keepPng: boolean; label: string; hint: string }> = {
+  standard: { maxPx: 1600, jpeg: 0.85, keepPng: false, label: "Standard", hint: "Smaller file — good for WhatsApp and email" },
+  high: { maxPx: 3000, jpeg: 0.95, keepPng: true, label: "High", hint: "Recommended — sharp text, normal size" },
+  max: { maxPx: 6000, jpeg: 0.98, keepPng: true, label: "Maximum", hint: "Original sharpness — best for printing, bigger file" },
+};
+type PdfPage = "fit" | "a4";
+
+async function imagesToPdf(files: File[], PDFLib: any, quality: PdfQuality = "high", pageMode: PdfPage = "fit") {
+  const q = PDF_QUALITY[quality];
   const pdf = await PDFLib.PDFDocument.create();
   for (const file of files) {
     const img = await fileToImage(file);
 
-    // Pixels kept in the PDF (full size, capped so huge camera photos don't freeze the browser)
-    const pxScale = Math.min(1, PDF_IMAGE_MAX_PX / Math.max(img.naturalWidth, img.naturalHeight));
+    // Pixels kept in the PDF (capped by the chosen quality so huge camera photos don't freeze the browser)
+    const pxScale = Math.min(1, q.maxPx / Math.max(img.naturalWidth, img.naturalHeight));
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(img.naturalWidth * pxScale));
     canvas.height = Math.max(1, Math.round(img.naturalHeight * pxScale));
@@ -143,19 +154,29 @@ async function imagesToPdf(files: File[], PDFLib: any) {
     ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    const isPng = file.type === "image/png" || /\.png$/i.test(file.name);
+    const isPng = q.keepPng && (file.type === "image/png" || /\.png$/i.test(file.name));
     const mime = isPng ? "image/png" : "image/jpeg";
     const blob = await new Promise<Blob>((resolve, reject) =>
-      canvas.toBlob((b) => b ? resolve(b) : reject(new Error("Could not prepare image")), mime, isPng ? undefined : 0.95));
+      canvas.toBlob((b) => b ? resolve(b) : reject(new Error("Could not prepare image")), mime, isPng ? undefined : q.jpeg));
     const bytes = new Uint8Array(await blob.arrayBuffer());
     const embedded = isPng ? await pdf.embedPng(bytes) : await pdf.embedJpg(bytes);
 
-    // Page size in PDF points (~A4 on the long side), same shape as the image
-    const ptScale = PDF_PAGE_MAX_PT / Math.max(canvas.width, canvas.height);
-    const width = Math.max(1, canvas.width * ptScale);
-    const height = Math.max(1, canvas.height * ptScale);
-    const page = pdf.addPage([width, height]);
-    page.drawImage(embedded, { x: 0, y: 0, width, height });
+    if (pageMode === "a4") {
+      // A4 page (portrait for tall images, landscape for wide ones), image centred with a margin
+      const [pw, ph] = canvas.width > canvas.height ? [A4[1], A4[0]] : A4;
+      const fit = Math.min((pw - A4_MARGIN * 2) / canvas.width, (ph - A4_MARGIN * 2) / canvas.height);
+      const w = canvas.width * fit;
+      const h = canvas.height * fit;
+      const page = pdf.addPage([pw, ph]);
+      page.drawImage(embedded, { x: (pw - w) / 2, y: (ph - h) / 2, width: w, height: h });
+    } else {
+      // Page the same shape as the image (~A4 on the long side)
+      const ptScale = PDF_PAGE_MAX_PT / Math.max(canvas.width, canvas.height);
+      const width = Math.max(1, canvas.width * ptScale);
+      const height = Math.max(1, canvas.height * ptScale);
+      const page = pdf.addPage([width, height]);
+      page.drawImage(embedded, { x: 0, y: 0, width, height });
+    }
   }
   return pdf.save();
 }
@@ -238,6 +259,26 @@ function matchesKind(file: File, kind: FileKind): boolean {
   return FILE_KINDS[kind].exts.includes(ext);
 }
 
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function iconBtn(disabled: boolean): CSSProperties {
+  return {
+    width: 34, height: 34, flexShrink: 0, borderRadius: 8, border: "1px solid #d6dfdc", background: "#fff",
+    color: "#0c1730", fontWeight: 800, cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.35 : 1,
+  };
+}
+
+function choiceBtn(on: boolean): CSSProperties {
+  return {
+    border: `2px solid ${on ? "#005744" : "#d6dfdc"}`, background: on ? "#e8f3ef" : "#fff", color: "#0c1730",
+    borderRadius: 10, padding: "7px 14px", fontWeight: 800, cursor: "pointer",
+  };
+}
+
 export default function ConverterClient({ slug, input, output }: { slug: string; input: string; output: string }) {
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
@@ -247,6 +288,10 @@ export default function ConverterClient({ slug, input, output }: { slug: string;
   const [height, setHeight] = useState(800);
   const [quality, setQuality] = useState(82);
   const [text, setText] = useState("");
+  // Images → PDF: one PDF with all pages, or a separate PDF for each image
+  const [pdfMode, setPdfMode] = useState<"single" | "separate">("single");
+  const [pdfQuality, setPdfQuality] = useState<PdfQuality>("high");
+  const [pdfPage, setPdfPage] = useState<PdfPage>("fit");
 
   // Which files the picker shows, based on what the tool takes IN (not what it makes).
   // e.g. "jpg-to-pdf" takes images — before, it matched "pdf" and only showed PDFs.
@@ -337,7 +382,21 @@ export default function ConverterClient({ slug, input, output }: { slug: string;
           downloadBytes(await buildTextPdf(source, PDFLib), "converted.pdf", "application/pdf");
         } else if (slug === "jpg-to-pdf" || slug === "images-to-pdf") {
           if (!files.length) throw new Error("Select one or more images.");
-          downloadBytes(await imagesToPdf(files, PDFLib), "images.pdf", "application/pdf");
+          if (pdfMode === "separate" && files.length > 1) {
+            // One PDF per image, named after the image (e.g. passport.jpg → passport.pdf).
+            // Downloaded one after another — the browser may ask once to allow multiple downloads.
+            const used = new Set<string>();
+            for (const f of files) {
+              const base = (f.name.replace(/\.[^.]+$/, "") || "image").slice(0, 80);
+              let name = `${base}.pdf`;
+              for (let n = 2; used.has(name); n++) name = `${base} (${n}).pdf`;
+              used.add(name);
+              downloadBytes(await imagesToPdf([f], PDFLib, pdfQuality, pdfPage), name, "application/pdf");
+              await new Promise((r) => setTimeout(r, 400));
+            }
+          } else {
+            downloadBytes(await imagesToPdf(files, PDFLib, pdfQuality, pdfPage), "images.pdf", "application/pdf");
+          }
         } else if (slug === "merge-pdf") {
           if (files.length < 2) throw new Error("Select at least two PDF files.");
           const out = await PDFLib.PDFDocument.create();
@@ -369,33 +428,175 @@ export default function ConverterClient({ slug, input, output }: { slug: string;
   }
 
   const needsText = slug === "txt-to-pdf";
-  const multi = ["image-merger", "images-to-pdf", "merge-pdf"].includes(slug);
+  const isImagePdf = slug === "images-to-pdf" || slug === "jpg-to-pdf";
+  const inputId = `converter-input-${slug}`;
+
+  // Small previews of the chosen images (revoked when the list changes)
+  const thumbs = useMemo(
+    () => files.map((f) => (f.type.startsWith("image/") ? URL.createObjectURL(f) : null)),
+    [files],
+  );
+  useEffect(() => () => thumbs.forEach((u) => u && URL.revokeObjectURL(u)), [thumbs]);
+
+  function moveFile(i: number, dir: -1 | 1) {
+    setFiles((prev) => {
+      const next = [...prev];
+      const j = i + dir;
+      if (j < 0 || j >= next.length) return prev;
+      [next[i], next[j]] = [next[j], next[i]];
+      return next;
+    });
+  }
+  const multi = ["image-merger", "images-to-pdf", "jpg-to-pdf", "merge-pdf"].includes(slug);
 
   return (
     <div style={{ marginTop: 28, padding: 22, borderRadius: 18, background: "#f7faf8", border: "1px solid #d9e6e0" }}>
       <div style={{ display: "grid", gap: 14 }}>
         {needsText && <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Or paste text here…" rows={7} style={{ width: "100%", border: "1px solid #cbd8d3", borderRadius: 12, padding: 12, font: "inherit" }} />}
-        <input
-          type="file"
-          accept={accept}
-          multiple={multi}
-          onChange={(e) => {
-            const chosen = Array.from(e.target.files || []);
-            const wrong = chosen.filter((f) => !matchesKind(f, inputKind));
-            if (wrong.length) {
-              setFiles(chosen.filter((f) => matchesKind(f, inputKind)));
-              setMessage(`"${wrong[0].name}" can't be used here. Please choose ${FILE_KINDS[inputKind].label}.`);
-              e.currentTarget.value = "";
-            } else {
-              setFiles(chosen);
-              setMessage("");
-            }
-          }}
-        />
+        {/* File picker — our own button + list, so files can be removed, re-ordered and added */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", padding: 14, border: "2px dashed #b9cfc7", borderRadius: 14, background: "#fff" }}>
+          <label
+            htmlFor={inputId}
+            style={{ background: "#005744", color: "#fff", fontWeight: 800, padding: "10px 18px", borderRadius: 10, cursor: "pointer" }}
+          >
+            {files.length ? (multi ? "＋ Add more" : "Change file") : multi ? "Choose files" : "Choose file"}
+          </label>
+          <span style={{ color: "#52615e", fontSize: 14 }}>
+            {files.length ? `${files.length} file${files.length === 1 ? "" : "s"} selected` : "No file chosen"}
+          </span>
+          {files.length > 0 && (
+            <button
+              type="button"
+              onClick={() => { setFiles([]); setMessage(""); }}
+              style={{ marginLeft: "auto", border: 0, background: "transparent", color: "#b42318", fontWeight: 700, cursor: "pointer" }}
+            >
+              Clear all
+            </button>
+          )}
+          <input
+            id={inputId}
+            type="file"
+            accept={accept}
+            multiple={multi}
+            style={{ display: "none" }}
+            onChange={(e) => {
+              const chosen = Array.from(e.target.files || []);
+              e.currentTarget.value = ""; // lets the same file be picked again
+              const good = chosen.filter((f) => matchesKind(f, inputKind));
+              const wrong = chosen.filter((f) => !matchesKind(f, inputKind));
+              setMessage(wrong.length ? `"${wrong[0].name}" can't be used here. Please choose ${FILE_KINDS[inputKind].label}.` : "");
+              if (!good.length) return;
+              if (!multi) { setFiles(good.slice(0, 1)); return; }
+              setFiles((prev) => {
+                const key = (f: File) => `${f.name}|${f.size}|${f.lastModified}`;
+                const seen = new Set(prev.map(key));
+                return [...prev, ...good.filter((f) => !seen.has(key(f)))];
+              });
+            }}
+          />
+        </div>
         <small style={{ color: "#52615e", marginTop: -8 }}>
           Accepted: {FILE_KINDS[inputKind].exts.map((x) => x.toUpperCase()).join(", ")}{multi ? " · you can select several files" : ""}
         </small>
-        {files.length > 0 && <small style={{ color: "#52615e" }}>{files.length} file(s) selected: {files.map((f) => f.name).join(", ")}</small>}
+
+        {files.length > 0 && (
+          <div style={{ display: "grid", gap: 8 }}>
+            {files.map((f, i) => (
+              <div
+                key={`${f.name}-${f.size}-${f.lastModified}`}
+                style={{ display: "flex", alignItems: "center", gap: 10, padding: 8, borderRadius: 12, background: "#fff", border: "1px solid #dfe8e4" }}
+              >
+                {thumbs[i] ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={thumbs[i]!} alt="" style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 8, background: "#eef2f1", flexShrink: 0 }} />
+                ) : (
+                  <span style={{ width: 48, height: 48, display: "grid", placeItems: "center", borderRadius: 8, background: "#eef2f1", flexShrink: 0 }}>📄</span>
+                )}
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#0c1730", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {multi && files.length > 1 ? `${i + 1}. ` : ""}{f.name}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#65716f" }}>{formatSize(f.size)}</div>
+                </div>
+                {multi && files.length > 1 && (
+                  <>
+                    <button type="button" title="Move up" disabled={i === 0} onClick={() => moveFile(i, -1)} style={iconBtn(i === 0)}>↑</button>
+                    <button type="button" title="Move down" disabled={i === files.length - 1} onClick={() => moveFile(i, 1)} style={iconBtn(i === files.length - 1)}>↓</button>
+                  </>
+                )}
+                <button
+                  type="button"
+                  title="Remove"
+                  aria-label={`Remove ${f.name}`}
+                  onClick={() => setFiles((prev) => prev.filter((_, j) => j !== i))}
+                  style={{ ...iconBtn(false), color: "#b42318", borderColor: "#f3c4bf" }}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Output clarity + page size (Images → PDF / JPG → PDF) */}
+        {isImagePdf && files.length > 0 && (
+          <div style={{ display: "grid", gap: 10, padding: 12, borderRadius: 12, background: "#fff", border: "1px solid #dfe8e4" }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#0c1730", marginBottom: 6 }}>🔍 Output clarity</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {(Object.keys(PDF_QUALITY) as PdfQuality[]).map((k) => (
+                  <button key={k} type="button" onClick={() => setPdfQuality(k)} style={choiceBtn(pdfQuality === k)}>
+                    {PDF_QUALITY[k].label}
+                  </button>
+                ))}
+              </div>
+              <small style={{ color: "#52615e" }}>{PDF_QUALITY[pdfQuality].hint}</small>
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#0c1730", marginBottom: 6 }}>📐 Page size</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button type="button" onClick={() => setPdfPage("fit")} style={choiceBtn(pdfPage === "fit")}>Fit to image</button>
+                <button type="button" onClick={() => setPdfPage("a4")} style={choiceBtn(pdfPage === "a4")}>A4 (with margin)</button>
+              </div>
+              <small style={{ color: "#52615e" }}>
+                {pdfPage === "a4" ? "Every page is A4 — best for offices, printing and online forms." : "Each page takes the shape of its image — no white borders."}
+              </small>
+            </div>
+          </div>
+        )}
+
+        {(slug === "images-to-pdf" || slug === "jpg-to-pdf") && files.length > 1 && (
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} role="radiogroup" aria-label="PDF output">
+            {([
+              ["single", `📄 One PDF (${files.length} pages)`],
+              ["separate", `📑 ${files.length} separate PDFs`],
+            ] as const).map(([val, label]) => (
+              <button
+                key={val}
+                type="button"
+                role="radio"
+                aria-checked={pdfMode === val}
+                onClick={() => setPdfMode(val)}
+                style={{
+                  border: `2px solid ${pdfMode === val ? "#005744" : "#d6dfdc"}`,
+                  background: pdfMode === val ? "#e8f3ef" : "#fff",
+                  color: "#0c1730",
+                  borderRadius: 10,
+                  padding: "8px 14px",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                }}
+              >
+                {label}
+              </button>
+            ))}
+            {pdfMode === "separate" && (
+              <small style={{ color: "#52615e", width: "100%" }}>
+                Each image becomes its own PDF with the same name. If your browser asks, tap “Allow” for multiple downloads.
+              </small>
+            )}
+          </div>
+        )}
         {slug === "image-merger" && <label>Direction: <select value={direction} onChange={(e) => setDirection(e.target.value as any)}><option value="vertical">Vertical</option><option value="horizontal">Horizontal</option></select></label>}
         {slug === "image-resizer" && <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}><label>Width <input type="number" min="1" value={width} onChange={(e) => setWidth(Number(e.target.value))} /></label><label>Height <input type="number" min="1" value={height} onChange={(e) => setHeight(Number(e.target.value))} /></label></div>}
         {["image-merger", "image-compressor", "jpg-to-webp", "png-to-webp", "webp-to-jpg", "webp-to-png"].includes(slug) && <label>Quality: {quality}% <input type="range" min="30" max="100" value={quality} onChange={(e) => setQuality(Number(e.target.value))} /></label>}
