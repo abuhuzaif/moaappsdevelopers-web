@@ -116,23 +116,44 @@ async function imageToBlob(file: File, mime: string, quality?: number, width?: n
   return new Promise<Blob>((resolve, reject) => canvas.toBlob((b) => b ? resolve(b) : reject(new Error("Image conversion failed.")), mime, quality));
 }
 
+// Images → PDF in full quality.
+// Before: every image was shrunk to 595 px and re-saved as JPEG, so text in
+// screenshots/documents came out blurry. Now the PAGE is still ~A4-sized
+// (595 pt on the long side), but the picture inside keeps its real pixels
+// (up to 3000 px), so it stays sharp when zoomed or printed.
+// PNG (screenshots, documents) stays PNG = lossless; photos use high-quality JPEG.
+// Drawing through a canvas also applies the phone's photo rotation (EXIF).
+const PDF_PAGE_MAX_PT = 595;
+const PDF_IMAGE_MAX_PX = 3000;
+
 async function imagesToPdf(files: File[], PDFLib: any) {
   const pdf = await PDFLib.PDFDocument.create();
   for (const file of files) {
     const img = await fileToImage(file);
-    const max = 595;
-    const scale = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
-    const width = Math.max(1, img.naturalWidth * scale);
-    const height = Math.max(1, img.naturalHeight * scale);
+
+    // Pixels kept in the PDF (full size, capped so huge camera photos don't freeze the browser)
+    const pxScale = Math.min(1, PDF_IMAGE_MAX_PX / Math.max(img.naturalWidth, img.naturalHeight));
     const canvas = document.createElement("canvas");
-    canvas.width = Math.round(width); canvas.height = Math.round(height);
+    canvas.width = Math.max(1, Math.round(img.naturalWidth * pxScale));
+    canvas.height = Math.max(1, Math.round(img.naturalHeight * pxScale));
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("Canvas unavailable");
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
     ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    const jpg = await new Promise<Blob>((resolve, reject) => canvas.toBlob((b) => b ? resolve(b) : reject(new Error("Could not prepare image")), "image/jpeg", 0.92));
-    const bytes = new Uint8Array(await jpg.arrayBuffer());
-    const embedded = await pdf.embedJpg(bytes);
+
+    const isPng = file.type === "image/png" || /\.png$/i.test(file.name);
+    const mime = isPng ? "image/png" : "image/jpeg";
+    const blob = await new Promise<Blob>((resolve, reject) =>
+      canvas.toBlob((b) => b ? resolve(b) : reject(new Error("Could not prepare image")), mime, isPng ? undefined : 0.95));
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    const embedded = isPng ? await pdf.embedPng(bytes) : await pdf.embedJpg(bytes);
+
+    // Page size in PDF points (~A4 on the long side), same shape as the image
+    const ptScale = PDF_PAGE_MAX_PT / Math.max(canvas.width, canvas.height);
+    const width = Math.max(1, canvas.width * ptScale);
+    const height = Math.max(1, canvas.height * ptScale);
     const page = pdf.addPage([width, height]);
     page.drawImage(embedded, { x: 0, y: 0, width, height });
   }
