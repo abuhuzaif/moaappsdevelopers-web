@@ -266,14 +266,14 @@ export default function AdminVideosPage() {
           disabled={busy}
           style={{ padding: "11px 18px", borderRadius: 12, border: 0, background: busy ? "#9ab7ad" : "#005744", color: "#fff", fontWeight: 800, cursor: busy ? "wait" : "pointer" }}
         >
-          {busy ? "Making video…" : "⚡ Make today's video now"}
+          {busy ? "Making video…" : videos.some((v) => v.date === new Date(Date.now() + 3 * 3600e3).toISOString().slice(0, 10)) ? "🔄 Make today's video again" : "🎬 Make today's video"}
         </button>
       </div>
       <p style={{ margin: "0 0 18px", color: "#5d6a68", fontSize: 14 }}>
-        Every day at 8:00 PM (Riyadh) two videos are made: the new ads of the last 24 hours, and a "Free tool of the day". Download them, copy the captions, and schedule them in Metricool.
+        Press the button when you want them: two videos are made — the new ads of the last 24 hours, and a "Free tool of the day". Making it again the same day replaces that day's videos. Download them, copy the captions, and schedule them in Metricool.
       </p>
       {msg && <p style={{ padding: "10px 12px", borderRadius: 10, background: "#fff8df", color: "#665300", fontSize: 14 }}>{msg}</p>}
-      {videos.length === 0 && <p style={{ color: "#5d6a68" }}>No videos yet. The first one arrives tonight at 8 PM, or press “Make today's video now”.</p>}
+      {videos.length === 0 && <p style={{ color: "#5d6a68" }}>No videos yet. Press “Make today's video” to make the first one.</p>}
 
       {/* ── Restaurant promo videos ── */}
       <section style={{ padding: 16, borderRadius: 16, border: "1px solid #dfe7e3", background: "#fff", marginBottom: 18 }}>
