@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ListingDetailClient, { type ListingPreview } from "./ListingDetailClient";
+import { priceTag } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -74,10 +75,14 @@ function stripPhones(text: string): string {
   return text.replace(/\+?\d[\d\s\-().]{6,}\d/g, (m) => (m.replace(/\D/g, "").length >= 8 ? "" : m)).replace(/\s{2,}/g, " ");
 }
 
+/** "1,500 SAR", "Now Hiring", "Get a Quote"… — or "" (Community ads without a price). */
 function priceText(l: SeoListing): string {
-  if (!(l.price > 0)) return "Price on request";
-  const monthly = l.category === "Housing" ? "/month" : "";
-  return `${l.price.toLocaleString("en-US")} SAR${monthly}`;
+  return priceTag(l);
+}
+
+/** "2,000 SAR (negotiable)" — "(negotiable)" only when there is a real price. */
+function priceWithNote(l: SeoListing): string {
+  return priceText(l) + (l.price > 0 && l.negotiable ? " (negotiable)" : "");
 }
 
 function place(l: SeoListing): string {
@@ -112,7 +117,8 @@ function seoTitle(l: SeoListing): string {
   const brand = " | MYKSA Connect";
   // full area first; if that leaves too little room for the ad's own words, use just the city
   for (const where of [place(l), l.city && l.city !== "All" ? l.city : ""]) {
-    const tail = ` – ${priceText(l)}${where ? ` | ${where}` : ""}`;
+    const tag = priceText(l);
+    const tail = `${tag ? ` – ${tag}` : ""}${where ? ` | ${where}` : ""}`;
     const room = 62 - tail.length;
     if (name.length > room && room < 30 && where !== (l.city && l.city !== "All" ? l.city : "")) continue;
     const t = cut(name, Math.max(24, room)) + tail;
@@ -125,13 +131,13 @@ function seoTitle(l: SeoListing): string {
 function seoDescription(l: SeoListing): string {
   const where = place(l);
   const lead = [l.subCategory || l.category, where && `in ${where}`].filter(Boolean).join(" ");
-  const head = `${lead}. ${priceText(l)}${l.negotiable ? " (negotiable)" : ""}. `;
-  const tail = " Contact the seller on MYKSA Connect.";
+  const tag = priceWithNote(l);
+  const head = `${lead}. ${tag ? `${tag}. ` : ""}`;
   const body = tidy(l.description);
-  const room = 155 - head.length - tail.length;
+  const room = 158 - head.length;
   let text = room > 20 && body ? cut(body, room) : "";
   if (text && !/[.!?…]$/.test(text)) text += ".";
-  return (head + text + tail).replace(/\s+\./g, ".").replace(/\s{2,}/g, " ").trim();
+  return (head + text).replace(/\s+\./g, ".").replace(/\s{2,}/g, " ").trim();
 }
 
 // ── SEO: title, description, link previews (Facebook / WhatsApp / Google) ──
@@ -228,7 +234,7 @@ export default async function ListingDetailPage({
     l && typeof l === "object" && l.status === "active"
       ? {
           title: l.title,
-          price: priceText(l) + (l.negotiable ? " (negotiable)" : ""),
+          price: priceWithNote(l),
           place: place(l),
           category: [l.category, l.subCategory].filter(Boolean).join(" · "),
           description: stripPhones(l.description).slice(0, 600),

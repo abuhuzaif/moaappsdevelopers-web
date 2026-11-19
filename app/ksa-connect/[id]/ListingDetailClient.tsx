@@ -331,7 +331,7 @@ export default function ListingDetailClient({ preview }: { preview?: ListingPrev
               {/* Share this ad */}
               {(() => {
                 const url = `https://www.myksaconnect.com/ksa-connect/${listing.id}`;
-                const text = `${listing.title} — ${formattedPrice(listing)} · ${listing.city}`;
+                const text = [listing.title, formattedPrice(listing), listing.city].filter(Boolean).join(" · ");
                 const btn = {
                   display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 999,
                   border: "1px solid #d4a017", background: "#fff", color: "#0c1730", fontWeight: 700, fontSize: 13,

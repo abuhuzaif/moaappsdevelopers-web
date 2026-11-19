@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { priceTag } from "@/lib/types";
 
 const PROJECT_ID = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
 const API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
@@ -43,7 +44,7 @@ async function latestAds(): Promise<Mini[]> {
           title: str("title"),
           city: str("city"),
           location: str("location"),
-          price: num > 0 ? `${num.toLocaleString("en-US")} SAR` : "Price on request",
+          price: priceTag({ category: str("category"), subCategory: str("subCategory"), price: num }),
           image: imgs[0] ?? null,
           category: str("category"),
         };

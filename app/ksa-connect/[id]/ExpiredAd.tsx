@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { priceTag } from "@/lib/types";
 
 type Mini = { id: string; title: string; city: string; location: string; price: string; image: string | null; category: string };
 
@@ -24,7 +25,7 @@ export default function ExpiredAd() {
               title: String(x.title ?? ""),
               city: String(x.city ?? ""),
               location: String(x.location ?? ""),
-              price: n > 0 ? `${n.toLocaleString("en-US")} SAR` : "Price on request",
+              price: priceTag({ category: String(x.category ?? ""), subCategory: String(x.subCategory ?? ""), price: n }),
               image: imgs[0] ?? null,
               category: String(x.category ?? ""),
             };
