@@ -11,7 +11,7 @@
   --red: #c8102e;           /* offer badge */
   --add: #4caf50;           /* "+" button — same green as before */
   --box: rgba(240, 180, 41, 0.45);
-  --header: 0px;            /* sticky search sits at the top of the screen */
+  --header: 66px;           /* MYKSA's sticky restaurant bar (logo · phone · WhatsApp) — search stops right below it */
   background: var(--bg);
   color: var(--text);
   margin-top: 16px;
@@ -23,7 +23,7 @@
 .top {
   position: sticky;
   top: var(--header);
-  z-index: 40;
+  z-index: 30; /* under the restaurant bar, above the dishes */
   background: var(--card);
   border-bottom: 1px solid rgba(240, 180, 41, 0.18);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);

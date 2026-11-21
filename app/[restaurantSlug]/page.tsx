@@ -210,7 +210,8 @@ export default async function RestaurantMenuPage({
         <div style={{ position: "absolute", bottom: 16, left: 20, right: 20, display: "flex", alignItems: "flex-end", gap: 14 }}>
           {restaurant.logoUrl && (
             <div style={{ position: "relative", width: 72, height: 72, borderRadius: 16, overflow: "hidden", border: "3px solid #E8B84B", flexShrink: 0, background: "#fff" }}>
-              <Image src={restaurant.logoUrl} alt={`${restaurant.name} logo`} fill style={{ objectFit: "cover" }} />
+              {/* contain: the whole logo always shows (wide logos are not cut off) */}
+              <Image src={restaurant.logoUrl} alt={`${restaurant.name} logo`} fill sizes="72px" style={{ objectFit: "contain", padding: 4 }} />
             </div>
           )}
           <div>
@@ -280,6 +281,50 @@ export default async function RestaurantMenuPage({
       {restaurant.description && (() => {
         // Poster-style menus (black & gold) get a chocolate-brown band (gold accents); others a warm cream card
         // tinted with the menu's own accent colour.
+        // Red Chillies (live menu, dark green): green band with gold text, red chilli stripe — matches its menu below.
+        const rc = restaurant.liveMenu === "redchillies";
+        if (rc) {
+          return (
+            <div
+              style={{
+                margin: "16px 16px 0",
+                padding: "18px 22px",
+                borderRadius: 16,
+                textAlign: "center",
+                background:
+                  "radial-gradient(circle at 15% 0%, rgba(240,180,41,0.18), transparent 55%), linear-gradient(135deg, #0f4a26 0%, #0a3219 45%, #071a0f 100%)",
+                border: "1px solid rgba(240,180,41,0.45)",
+                borderInlineStart: "5px solid #c8102e",
+                boxShadow: "0 10px 26px rgba(10, 50, 25, 0.35)",
+              }}
+            >
+              <p
+                className={descFont.className}
+                style={{
+                  margin: 0,
+                  fontStyle: "italic",
+                  fontWeight: 600,
+                  fontSize: "clamp(17px, 2.8vw, 22px)",
+                  lineHeight: 1.5,
+                  letterSpacing: "0.01em",
+                  color: "#f0b429",
+                }}
+              >
+                <span aria-hidden style={{ fontStyle: "normal", marginInlineEnd: 6 }}>🌶️</span>
+                <span
+                  style={{
+                    background: "linear-gradient(90deg, #ffe08a, #f0b429 50%, #ffd36b)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    color: "transparent",
+                  }}
+                >
+                  {restaurant.description}
+                </span>
+              </p>
+            </div>
+          );
+        }
         const dark = restaurant.menuTheme?.style === "poster";
         const accent = restaurant.menuTheme?.highlight || restaurant.menuTheme?.accent || "#b8860b";
         return (

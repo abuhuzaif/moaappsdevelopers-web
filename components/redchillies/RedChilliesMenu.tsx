@@ -60,7 +60,7 @@ export default function RedChilliesMenu({ sections, announcement }: { sections: 
         const id = (v[0]?.target as HTMLElement | undefined)?.dataset.cat;
         if (id) setActive(id);
       },
-      { rootMargin: "-170px 0px -55% 0px" }
+      { rootMargin: "-240px 0px -55% 0px" }
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
