@@ -11,6 +11,8 @@ import RestaurantMenu from "@/components/restaurant-menu/RestaurantMenu";
 import StickyRestaurantBar from "@/components/restaurant-menu/StickyRestaurantBar";
 import AddToHomeScreen from "@/components/restaurant-menu/AddToHomeScreen";
 import ExploreAdsCard from "@/components/restaurant-menu/ExploreAdsCard";
+import RedChilliesMenu from "@/components/redchillies/RedChilliesMenu";
+import { getRedChilliesAnnouncement, getRedChilliesMenu } from "@/lib/redchillies-menu";
 import {
   getMenuSections,
   parseCategories,
@@ -53,6 +55,12 @@ interface Restaurant {
   // When set (and there are no inline menuItems), this page shows a "View Full Menu"
   // button + QR code that sends visitors there.
   menuUrl?: string;
+  // Show the restaurant's own live menu (menuUrl) inside this page instead of a button + QR —
+  // e.g. Urban Red Chillies, whose menu, prices and orders are run from its owner app (Supabase).
+  menuEmbed?: boolean;
+  // Menu read live from the restaurant's own database, with orders going to its own owner app
+  // ("redchillies" = Urban Red Chillies' Supabase).
+  liveMenu?: "redchillies";
   // Inline menu (see lib/restaurant-menu.ts)
   menuCategories?: unknown;
   menuTheme?: MenuTheme;
@@ -145,11 +153,15 @@ export default async function RestaurantMenuPage({
     telephone: restaurant.phone,
     image: restaurant.coverImageUrl,
     url: pageUrl,
-    ...(hasInlineMenu ? { hasMenu: pageUrl } : restaurant.menuUrl ? { hasMenu: restaurant.menuUrl } : {}),
+    ...(hasInlineMenu || restaurant.liveMenu ? { hasMenu: pageUrl } : restaurant.menuUrl ? { hasMenu: restaurant.menuUrl } : {}),
   };
 
+  const rcLive = !hasInlineMenu && restaurant.liveMenu === "redchillies";
+  const [rcSections, rcAnnouncement] = rcLive ? await Promise.all([getRedChilliesMenu(), getRedChilliesAnnouncement()]) : [[], null];
+  const embedMenu = !hasInlineMenu && !rcLive && !!restaurant.menuUrl && !!restaurant.menuEmbed;
+
   const qrCodeUrl =
-    !hasInlineMenu && restaurant.menuUrl
+    !hasInlineMenu && !rcLive && !embedMenu && restaurant.menuUrl
       ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=${encodeURIComponent(
           restaurant.menuUrl
         )}`
@@ -307,6 +319,24 @@ export default async function RestaurantMenuPage({
       {/* ── Digital Menu ── */}
       {hasInlineMenu ? (
         <RestaurantMenu restaurant={menuInfo} sections={sections} />
+      ) : rcLive ? (
+        <RedChilliesMenu sections={rcSections} announcement={rcAnnouncement} />
+      ) : embedMenu ? (
+        <div style={{ marginTop: 16, borderTop: "1px solid var(--border)" }}>
+          <iframe
+            src={restaurant.menuUrl}
+            title={`${restaurant.name} menu`}
+            allow="geolocation"
+            loading="eager"
+            style={{ display: "block", width: "100%", height: "calc(100dvh - 64px)", minHeight: 620, border: 0, background: "#0a1a10" }}
+          />
+          <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-muted)", margin: "8px 16px 0" }}>
+            Orders go straight to {restaurant.name}&apos;s kitchen ·{" "}
+            <a href={restaurant.menuUrl} target="_blank" rel="noreferrer" style={{ color: "inherit" }}>
+              Open full screen ↗
+            </a>
+          </p>
+        </div>
       ) : (
         <div style={{ padding: "28px 20px" }}>
           {restaurant.menuUrl ? (
