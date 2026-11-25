@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { addDoc, collection, doc, getDoc, serverTimestamp, Timestamp, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getApp } from "firebase/app";
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { db, storage, signInWithGoogle, signOutUser } from "@/lib/firebase";
 import { useAuth } from "@/lib/useAuth";
 import { isAdmin } from "@/lib/admin";
@@ -157,6 +159,29 @@ async function compressImage(file: File, maxDim = 1600, quality = 0.82): Promise
   }
 }
 
+/** What the adFromImage Cloud Function sends back (see ksa-connect-functions/src/adFromImage.ts). */
+type AdFromImageResult = {
+  title: string;
+  description: string;
+  category: string;
+  subCategory: string;
+  city: string;
+  location: string;
+  phone: string;
+  price: number;
+  priceNote: string;
+  negotiable: boolean;
+};
+
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).replace(/^data:[^,]+,/, ""));
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(blob);
+  });
+}
+
 function PostListingForm() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -197,6 +222,8 @@ function PostListingForm() {
   const [editLoading, setEditLoading] = useState(!!loadId);
   const [notAuthorized, setNotAuthorized] = useState(false);
   const [draftReady, setDraftReady] = useState(!!loadId);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiMsg, setAiMsg] = useState<string | null>(null);
 
   // Tracks whether Title/Description currently came from our own draft
   // template (so switching sub-category keeps updating it) vs. the user
@@ -449,6 +476,83 @@ function PostListingForm() {
     const combined = [...files, ...chosen].slice(0, Math.max(room, 0));
     setFiles(combined);
     e.target.value = ""; // allow choosing the same photo again after removing it
+  }
+
+  /** Admin only: read the first new photo (poster) with AI and fill the form. */
+  async function autoFillFromImage() {
+    const file = files[0];
+    if (!file || aiBusy) return;
+    if ((title.trim() || description.trim()) && !isDraftAutoFilled) {
+      if (!window.confirm("Replace the title and description you typed with the text from the photo?")) return;
+    }
+    setAiBusy(true);
+    setAiMsg(null);
+    setError(null);
+    try {
+      const blob = await compressImage(file, 1600, 0.85);
+      const imageBase64 = await blobToBase64(blob);
+      const call = httpsCallable<object, AdFromImageResult>(getFunctions(getApp(), "us-central1"), "adFromImage", {
+        timeout: 70_000,
+      });
+      const { data: ai } = await call({
+        imageBase64,
+        mimeType: blob.type || "image/jpeg",
+        categories: SUB_CATEGORIES,
+        cities: CITIES,
+      });
+
+      // Category / sub-category (only values our lists know)
+      if (ai.category && SUB_CATEGORIES[ai.category]) {
+        const subs = SUB_CATEGORIES[ai.category];
+        setCategory(ai.category);
+        setCategoryChosen(true);
+        if (ai.subCategory && subs.includes(ai.subCategory)) {
+          setSubCategory(ai.subCategory);
+          setCustomJob("");
+        } else if (ai.category === "Jobs" && subs.includes("Other") && ai.subCategory) {
+          setSubCategory("Other");
+          setCustomJob(jobLabel(ai.subCategory).slice(0, 40));
+        } else {
+          setSubCategory(subs[0]);
+        }
+      }
+
+      if (ai.title) setTitle(fixAllCaps(ai.title.replace(/\d[\d\s-]{7,}\d/g, "").trim()));
+      if (ai.description) setDescription(ai.description);
+      setIsDraftAutoFilled(false);
+
+      if (ai.negotiable) {
+        setNegotiable(true);
+        setPrice("");
+      } else if (ai.price > 0) {
+        setNegotiable(false);
+        setPrice(ai.price.toLocaleString("en-US"));
+        if (ai.priceNote) setPriceNote(ai.priceNote);
+      }
+
+      if (ai.city) {
+        const c = normalizeCity(ai.city);
+        if (CITIES.includes(c)) {
+          setCityOther(false);
+          setCity(c);
+        } else if (TEXT_ONLY_RE.test(c)) {
+          setCityOther(true);
+          setCity(c);
+        }
+      }
+      if (ai.location) setLocation(ai.location);
+      if (ai.phone) {
+        const m = saudiMobile(ai.phone);
+        setPhone(m ? `0${m}` : ai.phone);
+      }
+
+      setAiMsg("✨ Filled from the photo. Please check every field (salary, numbers, city) before publishing.");
+    } catch (err: any) {
+      setAiMsg(null);
+      setError(err?.message ?? "Couldn't read the photo. Please fill the form by hand.");
+    } finally {
+      setAiBusy(false);
+    }
   }
 
   function removeFile(i: number) {
@@ -956,6 +1060,29 @@ function PostListingForm() {
                       </label>
                     )}
                   </div>
+
+                  {/* Admin only: read the poster with AI and fill the form */}
+                  {adminPosting && files.length > 0 && (
+                    <div style={{ marginTop: 12 }}>
+                      <button
+                        type="button"
+                        onClick={autoFillFromImage}
+                        disabled={aiBusy}
+                        style={{
+                          ...backBtn,
+                          padding: "11px 18px",
+                          fontSize: 14,
+                          border: "1.5px solid var(--mk-gold, #f6b91f)",
+                          background: aiBusy ? "#f6f4ee" : "#fff8df",
+                          cursor: aiBusy ? "wait" : "pointer",
+                        }}
+                      >
+                        {aiBusy ? "Reading the photo…" : "✨ Auto-fill from photo"}
+                      </button>
+                      <p style={fieldHint}>Reads the first photo (poster) and fills title, description, category, city and phone.</p>
+                      {aiMsg && <p style={{ ...hintBox, margin: "10px 0 0" }}>{aiMsg}</p>}
+                    </div>
+                  )}
 
                   <label style={fieldLabel} htmlFor="post-title">
                     Title
