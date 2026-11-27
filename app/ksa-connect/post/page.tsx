@@ -20,6 +20,11 @@ const MAX_PHOTOS = 6;
 const LISTING_LIFESPAN_DAYS = 30;
 const IS_KSA_CONNECT_SITE = process.env.NEXT_PUBLIC_SITE_MODE === "ksaconnect";
 const ADMIN_PUBLIC_NAME = "MYKSA CONNECT";
+const SITE_URL = "https://myksaconnect.com";
+const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.riyadhconnect.riyadh_connect";
+
+/** Shown after a new ad is published. ownerWaUrl: admin only (message to the ad owner). */
+type PostedAd = { id: string; title: string; ownerWaUrl: string | null; ownerLinkError: boolean };
 const DESCRIPTION_COLORS = [
   { label: "Default", value: "" },
   { label: "Red", value: "#dc2626" },
@@ -224,6 +229,7 @@ function PostListingForm() {
   const [draftReady, setDraftReady] = useState(!!loadId);
   const [aiBusy, setAiBusy] = useState(false);
   const [aiMsg, setAiMsg] = useState<string | null>(null);
+  const [posted, setPosted] = useState<PostedAd | null>(null);
 
   // Tracks whether Title/Description currently came from our own draft
   // template (so switching sub-category keeps updating it) vs. the user
@@ -702,6 +708,7 @@ function PostListingForm() {
         descriptionItalic,
       };
 
+      let newId = "";
       if (editId) {
         // Editing an existing listing — owner or admin only (checked on load).
         await updateDoc(doc(db, "listings", editId), commonFields);
@@ -732,11 +739,11 @@ function PostListingForm() {
         };
         try {
           // `source` (e.g. "facebook") shows which channel brings new posters.
-          await addDoc(collection(db, "listings"), source ? { ...newListing, source } : newListing);
+          newId = (await addDoc(collection(db, "listings"), source ? { ...newListing, source } : newListing)).id;
         } catch (e: any) {
           // If security rules don't allow the extra field, post without it.
           if (source && String(e?.code ?? e?.message ?? "").includes("permission")) {
-            await addDoc(collection(db, "listings"), newListing);
+            newId = (await addDoc(collection(db, "listings"), newListing)).id;
           } else {
             throw e;
           }
@@ -761,7 +768,28 @@ function PostListingForm() {
         photos: existingImageUrls.length + files.length,
         by_admin: adminPosting,
       });
-      router.push(editId ? `/ksa-connect/${editId}` : "/ksa-connect");
+      if (editId || !newId) {
+        router.push(editId ? `/ksa-connect/${editId}` : "/ksa-connect");
+        return;
+      }
+
+      // New ad → "Your ad is live" screen. Admin posting someone else's ad also
+      // gets the ready WhatsApp message for the owner (with a one-tap remove link).
+      let ownerWaUrl: string | null = null;
+      let ownerLinkError = false;
+      if (adminPosting) {
+        try {
+          const call = httpsCallable<{ listingId: string }, { waUrl: string | null }>(
+            getFunctions(getApp(), "us-central1"),
+            "ownerShareLink"
+          );
+          ownerWaUrl = (await call({ listingId: newId })).data.waUrl;
+        } catch {
+          ownerLinkError = true;
+        }
+      }
+      setPosted({ id: newId, title: finalTitle, ownerWaUrl, ownerLinkError });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
       funnel("post_ad_submit_error", { message: String(err?.code ?? err?.message ?? "unknown").slice(0, 100) });
       setError(err.message ?? "Something went wrong while posting. Please try again.");
@@ -795,7 +823,7 @@ function PostListingForm() {
   const coverPhoto = existingImageUrls[0] ?? filePreviews[0] ?? null;
   const isJob = category === "Classifieds" && subCategory === "Jobs";
   const categoryInfo = CATEGORIES.find((c) => c.key === category);
-  const showForm = !loading && !editLoading && !notAuthorized && (!loadId || !!user);
+  const showForm = !posted && !loading && !editLoading && !notAuthorized && (!loadId || !!user);
 
   return (
     <div className="mk-page">
@@ -881,6 +909,8 @@ function PostListingForm() {
           {!loading && !editLoading && user && notAuthorized && (
             <div className="empty-state">{error && repostId ? error : "You don't have permission to edit this listing."}</div>
           )}
+
+          {posted && <PostedScreen ad={posted} admin={adminPosting} />}
 
           {showForm && (
             <form onSubmit={onFormSubmit} noValidate>
@@ -1375,6 +1405,76 @@ function PostListingForm() {
     </div>
   );
 }
+
+/** "Your ad is live" screen after publishing a new ad. */
+function PostedScreen({ ad, admin }: { ad: PostedAd; admin: boolean }) {
+  const adUrl = `${SITE_URL}/ksa-connect/${ad.id}`;
+  const share = `https://wa.me/?text=${encodeURIComponent(`${ad.title}\n${adUrl}\n\nPosted free on MYKSA Connect`)}`;
+  const places = [
+    { label: "MYKSA Connect website", note: "Live now" },
+    { label: "MYKSA Connect app", note: "Live now" },
+    { label: "Facebook (MYKSAConnect page)", note: "In a few minutes" },
+    { label: "Instagram (@myksaconnect)", note: "In a few minutes" },
+  ];
+  return (
+    <div style={{ textAlign: "center", padding: "6px 0" }}>
+      <div style={{ fontSize: 54, lineHeight: 1 }} aria-hidden>
+        ✅
+      </div>
+      <h2 style={{ fontSize: 26, fontWeight: 850, color: "var(--mk-navy, #06172a)", margin: "12px 0 4px" }}>Your ad is live!</h2>
+      <p style={{ margin: "0 0 18px", color: "var(--text-muted)", fontSize: 14.5, overflowWrap: "anywhere" }}>{ad.title}</p>
+
+      <div style={{ textAlign: "left", border: "1px solid #e8e5dc", borderRadius: 14, padding: "6px 16px", background: "#fcfbf8", marginBottom: 20 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-muted)", padding: "10px 0 4px" }}>We&apos;re sharing it on:</div>
+        {places.map((p) => (
+          <div key={p.label} style={{ display: "flex", justifyContent: "space-between", gap: 10, padding: "9px 0", borderTop: "1px solid #efece4", fontSize: 14.5 }}>
+            <span style={{ fontWeight: 700, color: "var(--mk-navy, #06172a)" }}>✅ {p.label}</span>
+            <span style={{ color: "var(--mk-green, #005744)", fontWeight: 600, whiteSpace: "nowrap" }}>{p.note}</span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: "grid", gap: 10 }}>
+        {admin && ad.ownerWaUrl && (
+          <a href={ad.ownerWaUrl} target="_blank" rel="noopener noreferrer" className="mk-btn" style={{ ...successBtn, background: "#25D366", color: "#fff" }}>
+            📲 WhatsApp owner (message ready)
+          </a>
+        )}
+        {admin && !ad.ownerWaUrl && (
+          <p style={{ ...hintBox, margin: 0, textAlign: "left" }}>
+            {ad.ownerLinkError
+              ? "Couldn't prepare the owner's WhatsApp message. Use the Telegram bot or message the owner yourself."
+              : "No usable WhatsApp number on this ad — message the owner yourself."}
+          </p>
+        )}
+        <a href={`/ksa-connect/${ad.id}`} className="mk-btn mk-btn-gold" style={successBtn}>
+          🔗 View your ad
+        </a>
+        <a href={share} target="_blank" rel="noopener noreferrer" className="mk-btn" style={{ ...successBtn, background: "#fff", border: "1.5px solid #25D366", color: "#128C7E" }}>
+          Share on WhatsApp
+        </a>
+        {!admin && (
+          <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className="mk-btn" style={{ ...successBtn, background: "var(--mk-navy, #06172a)", color: "#fff" }}>
+            📱 Get the MYKSA Connect app
+          </a>
+        )}
+        <a href="/ksa-connect/post" style={{ ...linkBtn, marginTop: 6, textAlign: "center" }}>
+          Post another ad
+        </a>
+      </div>
+    </div>
+  );
+}
+
+const successBtn: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  padding: "14px 0",
+  fontSize: 15,
+  fontWeight: 800,
+  borderRadius: 999,
+  textDecoration: "none",
+};
 
 export default function PostListingPage() {
   return (
